@@ -78,15 +78,23 @@ Close the remaining structural gaps to achieve end-to-end diagnostic completenes
 
 ### Phase 2 — lock the implementation contracts
 
-Define the exact capabilities that any implementation must expose, including:
+Create detailed, canonical contract files for all 9 required semantic modules:
 
-- state normalization
-- control derivation
-- transition application
-- topology generation
-- axiom diagnostics
-- generation planning
-- artifact materialization boundary
+- `StateModel` — normalization, locked derivation/admissibility, diagnostics, classification
+- `RecoveryEngine` — recovery, fallback, containment, safe halt, monotonic escalation
+- `RealmEncoder` — deterministic encoding from normalized state
+- `TransitionRegistry` — deterministic transition resolution, core/control preservation
+- `TopologyGenerator` — deterministic topology generation, stable ordering/lineage
+- `AxiomEvaluator` — explainable evaluation, no silent pass/fail
+- `GenerationPlanner` — abstract planning, no side effects, explicit handoff to emitter
+- `ArtifactEmitter` — plan materialization only, no invention of semantics
+- `Diagnostics` — schema conformance, taxonomy compliance, chain exposure
+
+Lock the materialization boundary: `GenerationPlanner` plans, `ArtifactEmitter` materializes, neither crosses the other's boundary.
+
+Update `semantic-contracts.md` as the umbrella contract document referencing the detailed contract files.
+
+**Status**: Complete. Phase 2 is the implementation-contract lock package.
 
 ### Phase 3 — define invariant-based verification requirements
 
@@ -113,6 +121,6 @@ For each target implementation repo, the coding agent should receive:
 
 ## Immediate next design step
 
-Design Packages A, B, C, and D are complete. The semantic, algebraic, and diagnostic foundation is fully locked. The immediate next step is **Phase 2 — lock the implementation contracts**.
+Design Packages A–D and Phase 2 are complete. The semantic, algebraic, diagnostic, and implementation-contract foundation is fully locked. The immediate next step is **Phase 3 — define invariant-based verification requirements**.
 
-Phase 2 will define the exact capabilities that every downstream implementation must expose, with confidence that the entire semantic foundation — state model, classification, recoverability, recovery/fallback/containment algorithms, locked algebraic definitions, canonical fallback-policy registry, unified diagnostic schema, and rule-ID taxonomy — is complete and internally consistent.
+Phase 3 will describe what downstream test suites must prove, ensuring that every locked semantic, algebraic, and contractual requirement can be verified through deterministic, repeatable tests.

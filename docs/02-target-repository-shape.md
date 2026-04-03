@@ -31,7 +31,17 @@ ash-pattern-system/
 │   └── interfaces/
 │       ├── semantic-contracts.md
 │       ├── diagnostic-schema.md
-│       └── rule-id-taxonomy.md
+│       ├── rule-id-taxonomy.md
+│       └── contracts/
+│           ├── state-model-contract.md
+│           ├── recovery-engine-contract.md
+│           ├── realm-encoder-contract.md
+│           ├── transition-registry-contract.md
+│           ├── topology-generator-contract.md
+│           ├── axiom-evaluator-contract.md
+│           ├── generation-planner-contract.md
+│           ├── artifact-emitter-contract.md
+│           └── diagnostics-module-contract.md
 └── governance/
     ├── repository-governance.md
     └── ai-coding-handoff.md

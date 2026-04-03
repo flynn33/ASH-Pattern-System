@@ -26,7 +26,7 @@ The corrected-core derivation rule is authoritative: expected control semantics 
 4. read all files in `specs/algorithms/`, paying particular attention to:
    - `recovery-fallback-semantics.pseudo.md` — deterministic recovery and fallback selection
    - `containment-safe-failure-semantics.pseudo.md` — containment and safe-failure behavior
-5. read `specs/interfaces/semantic-contracts.md`
+5. read `specs/interfaces/semantic-contracts.md` and all files in `specs/interfaces/contracts/`
 6. read `governance/repository-governance.md`
 7. confirm that the locked algebraic definitions (parity formula, 16-codeword set) match the canonical specs
 8. check for any remaining unresolved items (e.g., fallback-policy registry)
@@ -86,12 +86,21 @@ The following structural items are **locked** (Design Package D) and must be imp
 - **Diagnostic schema** — the shared diagnostic envelope for all diagnostic contexts (see `specs/interfaces/diagnostic-schema.md`). All diagnostics must conform to this schema. Local invention of diagnostic structures is prohibited.
 - **Rule-ID taxonomy** — the canonical rule identifier structure and governance (see `specs/interfaces/rule-id-taxonomy.md`). All rule IDs in diagnostics must conform to this taxonomy.
 
+The following implementation contracts are **locked** (Phase 2) and are canonical for module-level behavior:
+
+- **Detailed contract files** — 9 contract files in `specs/interfaces/contracts/` define the exact implementation behavior for each required semantic module. These are authoritative for module-level implementation decisions.
+- **Materialization boundary** — `GenerationPlanner` plans (no artifacts, no side effects); `ArtifactEmitter` materializes (no inventing semantics). Neither may cross the other's boundary.
+- **Umbrella contract** — `specs/interfaces/semantic-contracts.md` is the umbrella contract document referencing the detailed contracts.
+
+The coding agent must not invent module behavior outside the canonical contract files.
+
 ## Design package status
 
 - **Design Package A** — complete (state-layer formal foundation)
 - **Design Package B** — formally closed (resilient software semantics layer)
 - **Design Package C** — complete (algebraic lock package)
 - **Design Package D** — complete (registry and diagnostics layer closure)
+- **Phase 2** — complete (implementation-contract lock)
 
 ## Required delivery shape for implementation repos
 

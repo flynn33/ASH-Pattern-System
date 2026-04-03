@@ -27,6 +27,7 @@ This repository defines:
 - recovery, fallback, containment, and safe-failure algorithms
 - canonical fallback-policy registry for deterministic fallback selection
 - unified diagnostic schema and rule-ID taxonomy for auditable diagnostics
+- locked implementation contracts for all 9 required semantic modules
 - deterministic transition semantics
 - deterministic topology expansion semantics
 - axiom evaluation semantics
@@ -86,9 +87,18 @@ The 9th coordinate is therefore **not** treated as an ordinary peer bit for unre
 - `specs/algorithms/axiom-evaluation.pseudo.md` — axiom evaluation semantics
 - `specs/algorithms/generation-planning.pseudo.md` — abstract generation planning flow
 - `specs/registries/fallback-policy-registry.md` — canonical fallback-policy registry for deterministic fallback selection
-- `specs/interfaces/semantic-contracts.md` — implementation-facing semantic contracts
+- `specs/interfaces/semantic-contracts.md` — umbrella contract document referencing detailed module contracts
 - `specs/interfaces/diagnostic-schema.md` — shared diagnostic envelope for all diagnostic contexts
 - `specs/interfaces/rule-id-taxonomy.md` — canonical rule-ID structure and governance
+- `specs/interfaces/contracts/state-model-contract.md` — StateModel implementation contract
+- `specs/interfaces/contracts/recovery-engine-contract.md` — RecoveryEngine implementation contract
+- `specs/interfaces/contracts/realm-encoder-contract.md` — RealmEncoder implementation contract
+- `specs/interfaces/contracts/transition-registry-contract.md` — TransitionRegistry implementation contract
+- `specs/interfaces/contracts/topology-generator-contract.md` — TopologyGenerator implementation contract
+- `specs/interfaces/contracts/axiom-evaluator-contract.md` — AxiomEvaluator implementation contract
+- `specs/interfaces/contracts/generation-planner-contract.md` — GenerationPlanner implementation contract
+- `specs/interfaces/contracts/artifact-emitter-contract.md` — ArtifactEmitter implementation contract
+- `specs/interfaces/contracts/diagnostics-module-contract.md` — Diagnostics module implementation contract
 - `governance/repository-governance.md` — governance rules for this repository
 - `governance/ai-coding-handoff.md` — handoff instructions for coding agents
 

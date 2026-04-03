@@ -1,96 +1,60 @@
 # Semantic Contracts for Future Implementations
 
+## Umbrella contract document
+
+This file is the **umbrella contract document** for the ASH Pattern System. It lists the required semantic modules and references the detailed contract files that define module-level implementation behavior.
+
+The detailed contract files in `specs/interfaces/contracts/` are **canonical** for module-level implementation behavior (Phase 2 — implementation-contract lock). This umbrella document provides the high-level structure; the contract files provide the authoritative detail.
+
 ## Required semantic modules
 
 Every downstream implementation must provide semantic equivalents of the following modules:
 
-1. `StateModel`
-2. `RealmEncoder`
-3. `TransitionRegistry`
-4. `TopologyGenerator`
-5. `AxiomEvaluator`
-6. `GenerationPlanner`
-7. `ArtifactEmitter`
-8. `Diagnostics`
-9. `RecoveryEngine`
+| # | Module | Detailed contract |
+|---|--------|------------------|
+| 1 | `StateModel` | `contracts/state-model-contract.md` |
+| 2 | `RealmEncoder` | `contracts/realm-encoder-contract.md` |
+| 3 | `TransitionRegistry` | `contracts/transition-registry-contract.md` |
+| 4 | `TopologyGenerator` | `contracts/topology-generator-contract.md` |
+| 5 | `AxiomEvaluator` | `contracts/axiom-evaluator-contract.md` |
+| 6 | `GenerationPlanner` | `contracts/generation-planner-contract.md` |
+| 7 | `ArtifactEmitter` | `contracts/artifact-emitter-contract.md` |
+| 8 | `Diagnostics` | `contracts/diagnostics-module-contract.md` |
+| 9 | `RecoveryEngine` | `contracts/recovery-engine-contract.md` |
 
-## Required behaviors
+Each detailed contract file defines: purpose, canonical responsibility, required inputs, required outputs, required behaviors, required diagnostics, invariants, prohibited shortcuts, and relation to other contracts/specs.
 
-### `StateModel`
-Must:
+## Materialization boundary (locked)
 
-- normalize states deterministically where normalization is defined
-- distinguish the 8-bit core from the derived control dimension
-- derive the control bit deterministically using the function defined in `control-bit-derivation.pseudo.md`
-- classify core admissibility using the rules defined in `core-admissibility.pseudo.md`
-- validate state consistency and produce a `StateValidityDiagnostic` as defined in `state-validity-diagnostics.pseudo.md`
-- report diagnosable failure when normalization cannot proceed (e.g., inadmissible core beyond correctable distance, or malformed input)
-- implement the exact locked parity formula for control-bit derivation: `b0 ⊕ b1 ⊕ b2 ⊕ b3 ⊕ b4 ⊕ b5 ⊕ b6 ⊕ b7`
-- implement the exact locked normative 16-codeword admissibility law from `core-admissibility.pseudo.md`
-- never substitute a different derivation formula or codeword set
-- classify system state using the classes defined in `system-state-classification.pseudo.md`
-- classify recoverability using the categories defined in `recoverability-semantics.pseudo.md`
-- apply the corrected-core derivation rule: for correctable cores, expected control is derived from the corrected admissible core, not the raw inadmissible core
+The boundary between `GenerationPlanner` and `ArtifactEmitter` is a **locked design decision**:
 
-### `RecoveryEngine`
-Must:
+- `GenerationPlanner` produces an abstract, target-aware but non-materialized plan. It must not emit artifacts or perform side effects.
+- `ArtifactEmitter` materializes that plan for a target runtime/platform. It must not invent semantics not present in the plan.
+- The plan is the sole interface between planner and emitter. The emitter must not call back to the planner.
+- Planning and materialization must not be collapsed into a single opaque step.
 
-- implement deterministic recovery as defined in `recovery-fallback-semantics.pseudo.md`
-- implement deterministic fallback selection against the canonical fallback-policy registry (`specs/registries/fallback-policy-registry.md`)
-- implement containment as defined in `containment-safe-failure-semantics.pseudo.md`
-- implement safe halt as defined in `containment-safe-failure-semantics.pseudo.md`
-- produce a `RecoveryDiagnostic` for every recovery, fallback, containment, and safe-halt action
-- never silently heal — all recovery must produce diagnosable records
-- escalate monotonically when recovery fails (fallback failure -> containment, containment breach -> safe halt)
-- respect the deterministic class-to-action mapping from `system-state-classification.pseudo.md`
-- produce minimum diagnostic content for every action as specified in `recovery-fallback-semantics.pseudo.md` and `containment-safe-failure-semantics.pseudo.md`
-- expose diagnostics conforming to the shared diagnostic schema (`specs/interfaces/diagnostic-schema.md`)
-- emit rule IDs conforming to the canonical taxonomy (`specs/interfaces/rule-id-taxonomy.md`)
-- never invent local fallback-policy behavior outside the canonical registry
-- never invent local diagnostic structures outside the canonical schema
+See `contracts/generation-planner-contract.md` and `contracts/artifact-emitter-contract.md` for the authoritative boundary definition.
 
-### `RealmEncoder`
-Must:
+## Mandatory algebraic conformance
 
-- encode realm identity from normalized state
-- produce deterministic results
-- represent control semantics explicitly
+The control-bit derivation formula and the core admissibility law are **locked design decisions** (Design Package C). They are not open choices.
 
-### `TransitionRegistry`
-Must:
+A downstream implementation **must**:
 
-- resolve transitions deterministically
-- apply transitions to normalized states
-- preserve the rule that ordinary transitions operate on the core and then re-derive control
+- implement the exact locked parity formula: `b0 ⊕ b1 ⊕ b2 ⊕ b3 ⊕ b4 ⊕ b5 ⊕ b6 ⊕ b7`
+- implement the exact locked normative 16-codeword set from `core-admissibility.pseudo.md`
+- preserve the corrected-core derivation rule: for correctable cores, derive expected control from the corrected admissible core
+- not substitute a different derivation formula, codeword set, or generator matrix
 
-### `TopologyGenerator`
-Must:
+## Mandatory registry, schema, and taxonomy conformance
 
-- generate deterministic ternary topology
-- preserve stable ordering and lineage
+The following are **locked design decisions** (Design Package D):
 
-### `AxiomEvaluator`
-Must:
+- Fallback selection must use the canonical fallback-policy registry (`specs/registries/fallback-policy-registry.md`)
+- All diagnostics must conform to the shared diagnostic schema (`specs/interfaces/diagnostic-schema.md`)
+- All rule IDs must conform to the canonical taxonomy (`specs/interfaces/rule-id-taxonomy.md`)
 
-- return the full diagnostic record
-- explain failure states in diagnostic notes
-
-### `GenerationPlanner`
-Must:
-
-- produce an abstract generation plan before any side effects occur
-- include topology, role assignment, axiom diagnostics, and artifact descriptions
-
-### `ArtifactEmitter`
-Must:
-
-- materialize a generation plan for a target platform
-- preserve the meaning of the plan rather than invent new semantics
-
-### `Diagnostics`
-Must:
-
-- expose explainable validation information for states, transitions, topology, and axioms
+A downstream implementation must not invent local fallback policy, diagnostic structures, or rule-ID formats.
 
 ## Prohibited shortcuts
 
@@ -104,27 +68,9 @@ A downstream implementation must not:
 - silently accept an inadmissible core as valid
 - produce a control bit by any means other than the canonical derivation function
 - skip admissibility classification before normalization
-
-## Mandatory algebraic conformance
-
-The control-bit derivation formula and the core admissibility law are **locked design decisions** (Design Package C). They are not open choices.
-
-A downstream implementation **must**:
-
-- implement the exact locked parity formula: `b0 ⊕ b1 ⊕ b2 ⊕ b3 ⊕ b4 ⊕ b5 ⊕ b6 ⊕ b7`
-- implement the exact locked normative 16-codeword set from `core-admissibility.pseudo.md`
-- preserve the corrected-core derivation rule: for correctable cores, derive expected control from the corrected admissible core
-- not substitute a different derivation formula, codeword set, or generator matrix
-- not treat the formula or codeword set as configurable, optional, or open to local variation
-- use an equivalent implementation (e.g., popcount mod 2, reduction XOR) only if it produces identical results for all inputs in F2^8
-
-A downstream implementation **must not**:
-
-- invent or substitute an alternative derivation formula
-- invent or substitute an alternative codeword set
-- treat these locked decisions as suggestions or defaults that may be overridden
+- invent module behavior not defined in the canonical contract files
 
 ## Portability rule
 
 Implementations may differ in syntax, packaging, runtime model, memory layout, and tooling.
-They may not differ in the semantic behavior defined by this repository.
+They may not differ in the semantic behavior defined by this repository and its contract files.
