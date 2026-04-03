@@ -15,6 +15,8 @@ ash-pattern-system/
 │   │   ├── ash-state-space.pseudo.md
 │   │   ├── control-bit-derivation.pseudo.md
 │   │   ├── core-admissibility.pseudo.md
+│   │   ├── codeword-set.pseudo.md
+│   │   ├── state-admissibility.pseudo.md
 │   │   ├── state-validity-diagnostics.pseudo.md
 │   │   ├── system-state-classification.pseudo.md
 │   │   ├── recoverability-semantics.pseudo.md

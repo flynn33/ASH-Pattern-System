@@ -43,16 +43,17 @@ The boundary between `GenerationPlanner` and `ArtifactEmitter` is a **locked des
 
 See `contracts/generation-planner-contract.md` and `contracts/artifact-emitter-contract.md` for the authoritative boundary definition.
 
-## Mandatory algebraic conformance
+## Research-baseline algebraic conformance
 
-The control-bit derivation formula and the core admissibility law are **locked design decisions** (Design Package C). They are not open choices.
+> **Note**: The previous "mandatory algebraic conformance" section mandating the parity formula, 16-codeword set, and corrected-core derivation rule has been **removed** following R1/R2 realignment. Those requirements were based on the superseded 8+1 formalization.
 
 A downstream implementation **must**:
 
-- implement the exact locked parity formula: `b0 ⊕ b1 ⊕ b2 ⊕ b3 ⊕ b4 ⊕ b5 ⊕ b6 ⊕ b7`
-- implement the exact locked normative 16-codeword set from `core-admissibility.pseudo.md`
-- preserve the corrected-core derivation rule: for correctable cores, derive expected control from the corrected admissible core
-- not substitute a different derivation formula, codeword set, or generator matrix
+- treat the full F2^9 state space as canonical
+- use XOR-by-codeword transformations as the canonical state transformation mechanism
+- ground the codeword set in the research baseline (see `specs/core/codeword-set.pseudo.md`)
+- use full 9-bit state admissibility (see `specs/core/state-admissibility.pseudo.md`)
+- not reintroduce the superseded 8+1 decomposition (8-bit core + derived 9th bit) as canonical
 
 ## Mandatory registry, schema, and taxonomy conformance
 
@@ -68,7 +69,6 @@ A downstream implementation must not invent local fallback policy, diagnostic st
 
 A downstream implementation must not:
 
-- treat the 9th coordinate as an ordinary unrestricted peer bit during ordinary transitions
 - treat syntax as the source of truth over semantics
 - skip normalization before encoding or transition application
 - collapse planning and materialization into one opaque semantic step

@@ -1,20 +1,17 @@
-# Recovery and Fallback Semantics — agnostic specification
+# Recovery and Fallback Semantics — canonical specification (Research Baseline)
+
+> **Rewritten in R2 — State/Recovery Realignment.**
+> Recovery operates on full 9-bit states using codeword-based correction, not 8+1 core/control re-derivation.
 
 ## Purpose
 
 This specification defines the **algorithmic semantics of deterministic recovery and fallback selection** for the ASH Pattern System.
 
-The ASH Pattern System is designed for self-healing, self-correcting, safe-failure, and fallback software. This file specifies how recovery actions are carried out once a system-state classification and recoverability category have been determined.
-
-Every recovery action must be:
-
-- **Deterministic** — the same inputs produce the same recovery outcome
-- **Diagnosable** — every step emits diagnostic information explaining what was done and why
-- **Policy-driven** — fallback selection is governed by a canonical policy registry, not by heuristic guessing
+Every recovery action must be deterministic, diagnosable, and policy-driven.
 
 ## Correction attempt flow
 
-When the recovery category is `CORRECT_AND_RE_DERIVE` (for `CORRECTABLE` states) or `RE_DERIVE_CONTROL` (for `UNSTABLE` states), the system attempts deterministic correction.
+When the recovery category is `APPLY_CORRECTION` (for `CORRECTABLE` states) or `NORMALIZE_STATE` (for `UNSTABLE` states), the system attempts deterministic correction using the codeword structure.
 
 ```text
 FUNCTION attempt_recovery(diagnostic: StateValidityDiagnostic, state_class: SystemStateClass) -> RecoveryResult
@@ -25,27 +22,34 @@ FUNCTION attempt_recovery(diagnostic: StateValidityDiagnostic, state_class: Syst
 
     SWITCH result.recovery_category
 
-        CASE RE_DERIVE_CONTROL:
-            -- Core is admissible; only control bit needs re-derivation
-            -- Formula is locked: overall parity (b0 XOR b1 XOR ... XOR b7)
-            new_control = derive_control_bit(diagnostic.extracted_core)
-            result.corrected_state = AshState(core_bits = diagnostic.extracted_core, control_bit = new_control)
-            result.steps.append(step("re-derive-control", COMPLETED, "control re-derived from admissible core"))
+        CASE NORMALIZE_STATE:
+            -- State is transformation-compatible; restore to valid configuration
+            normalized = normalize_via_codeword_structure(diagnostic.input_state)
+            IF normalized is NONE THEN
+                result.outcome = BLOCKED
+                result.reason = "Normalization path not found"
+                result.steps.append(step("normalize", BLOCKED, "no normalization path available"))
+                RETURN result
+            END IF
+
+            result.corrected_state = normalized
+            result.steps.append(step("normalize", COMPLETED, "state normalized via codeword structure"))
             result.outcome = RECOVERED
 
-        CASE CORRECT_AND_RE_DERIVE:
-            -- Core is inadmissible but correctable
-            -- Admissibility law is locked: normative 16-codeword set
-            corrected_core = correct_to_nearest_codeword(diagnostic.extracted_core)
-            result.steps.append(step("correct-core", COMPLETED,
-                "core corrected from " + diagnostic.extracted_core + " to " + corrected_core))
+        CASE APPLY_CORRECTION:
+            -- State is correctable; apply known correction sequence
+            correction = find_correction_sequence(diagnostic.input_state)
+            IF correction is NONE THEN
+                result.outcome = BLOCKED
+                result.reason = "Correction sequence not computable"
+                result.steps.append(step("correct", BLOCKED, "no correction path found"))
+                RETURN result
+            END IF
 
-            -- Corrected-core derivation rule: derive from corrected core
-            -- Formula is locked: overall parity
-            new_control = derive_control_bit(corrected_core)
-            result.corrected_state = AshState(core_bits = corrected_core, control_bit = new_control)
-            result.steps.append(step("re-derive-control", COMPLETED,
-                "control derived from corrected admissible core"))
+            corrected = apply_codeword_chain(diagnostic.input_state, correction)
+            result.corrected_state = corrected
+            result.steps.append(step("correct", COMPLETED,
+                "state corrected via codeword sequence"))
             result.outcome = RECOVERED
 
         CASE FALLBACK_REQUIRED:
@@ -53,8 +57,6 @@ FUNCTION attempt_recovery(diagnostic: StateValidityDiagnostic, state_class: Syst
             RETURN result
 
         OTHERWISE:
-            -- NO_ACTION, CONTAINMENT_REQUIRED, ESCALATION_REQUIRED, TERMINAL_NO_RECOVERY
-            -- These are handled by other specifications
             result.outcome = NOT_APPLICABLE
             result.reason = "Recovery category handled by another specification"
             RETURN result
@@ -65,13 +67,13 @@ FUNCTION attempt_recovery(diagnostic: StateValidityDiagnostic, state_class: Syst
     IF result.outcome == RECOVERED THEN
         validation = diagnose_state(result.corrected_state)
         result.steps.append(step("validate-recovery", COMPLETED,
-            "post-recovery validation: " + validation.recoverability_status))
+            "post-recovery validation: " + validation.admissibility_status))
 
-        IF validation.recoverability_status != STABLE THEN
+        IF NOT validation.is_valid THEN
             result.outcome = RECOVERY_FAILED
-            result.reason = "Recovered state did not classify as STABLE"
+            result.reason = "Recovered state did not classify as VALID"
             result.steps.append(step("validate-recovery", FAILED,
-                "post-recovery state classified as " + validation.recoverability_status))
+                "post-recovery state is not valid"))
         END IF
     END IF
 
@@ -81,7 +83,7 @@ END FUNCTION
 
 ## Fallback selection flow
 
-When the recovery category is `FALLBACK_REQUIRED` (for `DEGRADED` states), the system must select a known-good state from the fallback-policy registry.
+When the recovery category is `FALLBACK_REQUIRED` (for `DEGRADED` states), the system selects from the canonical fallback-policy registry.
 
 Fallback selection operates against the **canonical fallback-policy registry** (see `specs/registries/fallback-policy-registry.md`). Ordering is deterministic and fully specified by policy identifiers.
 
@@ -104,10 +106,7 @@ FUNCTION select_fallback(diagnostic: StateValidityDiagnostic, result: RecoveryRe
         RETURN result
     END IF
 
-    -- Deterministic ordering: candidates are ordered by policy identifier
-    -- The first candidate in policy order is selected
     selected = candidates.first_by_policy_order()
-
     result.corrected_state = selected.state
     result.fallback_policy_id = selected.policy_id
     result.steps.append(step("select-fallback", COMPLETED,
@@ -116,67 +115,21 @@ FUNCTION select_fallback(diagnostic: StateValidityDiagnostic, result: RecoveryRe
 
     -- Validate fallback state
     validation = diagnose_state(result.corrected_state)
-    result.steps.append(step("validate-fallback", COMPLETED,
-        "post-fallback validation: " + validation.recoverability_status))
-
-    IF validation.recoverability_status != STABLE THEN
+    IF NOT validation.is_valid THEN
         result.outcome = ESCALATE_TO_CONTAINMENT
-        result.reason = "Fallback state did not classify as STABLE"
-        result.steps.append(step("validate-fallback", FAILED,
-            "fallback state classified as " + validation.recoverability_status + "; escalating"))
+        result.reason = "Fallback state is not valid"
+        result.steps.append(step("validate-fallback", FAILED, "escalating to containment"))
     END IF
 
     RETURN result
 END FUNCTION
 ```
 
-## Fallback escalation behavior
-
-When fallback fails, the system must escalate:
-
-1. **Primary fallback fails** — the selected fallback state does not classify as `STABLE` after validation
-2. **No candidates** — the fallback-policy registry has no candidates for the current state
-3. **Registry unavailable** — no fallback-policy registry is configured
-
-In all three cases, the system escalates to `CONTAINMENT_REQUIRED`. The escalation must be recorded in the diagnostic with the reason for escalation.
-
-Escalation is always monotonic in severity: fallback failure never leads to a less severe action than containment.
-
-## Deterministic ordering rules
-
-Fallback selection must obey these ordering rules:
-
-1. **Policy-identifier ordering** — candidates are ordered by their canonical policy identifier, not by recency, frequency, or heuristic score.
-2. **Stability preference** — among candidates with the same policy priority, prefer the candidate whose post-selection diagnostic is most likely to classify as `STABLE`.
-3. **No randomness** — fallback selection must never involve randomness, shuffling, or probabilistic choice.
-4. **No heuristic guessing** — if canonical policy is absent, the system must not guess. It must escalate to containment.
-
-## Prohibition on heuristic guessing
-
-When the canonical fallback-policy registry is absent, empty, or does not contain a candidate for the current state, the system **must not**:
-
-- Invent a fallback state from convenience or local defaults
-- Select a "closest" state by heuristic distance
-- Use a previously seen state as a fallback without policy backing
-- Silently continue in the current degraded state
-
-The system must escalate to containment and produce a diagnostic explaining why fallback was not possible.
-
 ## No silent healing
 
 All recovery actions must be diagnosable. The system must not silently mutate its own state without producing an explainable diagnostic record.
 
-Every recovery step must record:
-
-- The action taken
-- The input state
-- The output state (if recovery succeeded)
-- The reason for the action
-- Which specification rules were applied
-
-## Minimum diagnostic content for recovery and fallback actions
-
-Every recovery or fallback action must produce a diagnostic record containing at minimum:
+## Minimum diagnostic content for recovery and fallback
 
 ```text
 TYPE RecoveryDiagnostic
@@ -191,12 +144,6 @@ TYPE RecoveryDiagnostic
     rule_ids                 : List of String
 END TYPE
 
-TYPE RecoveryStep
-    action                   : String
-    status                   : COMPLETED | BLOCKED | FAILED
-    detail                   : String
-END TYPE
-
 ENUM RecoveryOutcome
     RECOVERED
     RECOVERED_VIA_FALLBACK
@@ -207,31 +154,20 @@ ENUM RecoveryOutcome
 END ENUM
 ```
 
-## Relation to other specifications
+## Prohibition on heuristic guessing
 
-- **system-state-classification.pseudo.md** — provides the `SystemStateClass` that determines recovery category
-- **recoverability-semantics.pseudo.md** — provides the `RecoveryCategory` mapping
-- **containment-safe-failure-semantics.pseudo.md** — handles escalation when recovery/fallback fails
-- **state-validity-diagnostics.pseudo.md** — provides pre-recovery diagnostics and post-recovery validation
-- **core-admissibility.pseudo.md** — provides `correct_to_nearest_codeword` for core correction
-- **control-bit-derivation.pseudo.md** — provides `derive_control_bit` for control re-derivation
-
----
+When canonical policy is absent, the system must not guess. It must escalate to containment.
 
 ## Canonical fallback-policy registry
 
-> **STATUS: CANONICAL (Design Package D)**
-
 The fallback-policy registry is defined in `specs/registries/fallback-policy-registry.md`. It governs deterministic fallback selection with normative entry shapes, ordering rules, validation requirements, and escalation behavior.
 
-Downstream implementations must implement fallback selection against this canonical registry. Local invention of fallback policy is prohibited.
+## Relation to other specifications
 
-## Schema and taxonomy conformance
-
-Recovery and fallback diagnostics conform to the shared diagnostic envelope defined in `specs/interfaces/diagnostic-schema.md`:
-
-- Recovery diagnostics use `diagnostic_kind` = `RECOVERY`, `stage` = `RECOVERY`
-- Fallback diagnostics use `diagnostic_kind` = `FALLBACK`, `stage` = `RECOVERY`
-- `rule_ids` must conform to the `ASH-RECOVERY` and `ASH-FALLBACK` families in `specs/interfaces/rule-id-taxonomy.md`
-
-All rule IDs referenced in recovery and fallback diagnostics must conform to the canonical rule-ID pattern defined in the taxonomy.
+- **system-state-classification.pseudo.md** — provides the system-state class that determines recovery category
+- **recoverability-semantics.pseudo.md** — provides the recovery-category mapping
+- **containment-safe-failure-semantics.pseudo.md** — handles escalation when recovery/fallback fails
+- **state-validity-diagnostics.pseudo.md** — provides diagnostics for pre/post-recovery validation
+- **codeword-set.pseudo.md** — provides the codeword structure used for normalization and correction
+- **state-admissibility.pseudo.md** — provides admissibility classification
+- **fallback-policy-registry.md** — canonical registry for fallback selection

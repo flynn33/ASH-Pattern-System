@@ -64,6 +64,7 @@ This specification establishes branching as a canonical first-class capability a
 
 ## Relation to other specifications
 
+- **codeword-set.pseudo.md** — defines the codeword set whose structure governs branching topology
 - **ash-state-space.pseudo.md** — defines the canonical F2^9 state space in which branching occurs
 - **codeword-transformation-semantics.pseudo.md** — defines the codeword operations that govern branching expansion
 - **averaging-operator-semantics.pseudo.md** — defines the averaging operator whose invariant structure interacts with branching

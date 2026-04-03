@@ -30,8 +30,8 @@ This repository defines:
 - axiom evaluation semantics
 - generation-planning semantics
 - realm identity encoding from full 9-bit states
-- resilient software semantics (classification, recovery, fallback, containment, safe failure) — pending revalidation against research baseline
-- implementation contracts and verification requirements — pending revalidation against research baseline
+- resilient software semantics (classification, recovery, fallback, containment, safe failure) — rewritten against 9D research baseline in R2
+- implementation contracts and verification requirements — pending revalidation / rebuild in R3
 
 This repository does **not** define:
 
@@ -71,9 +71,11 @@ Canonical motion between states is **XOR-by-codeword**: `x' = x ⊕ c` where `c 
 - `specs/core/ash-state-space.pseudo.md` — canonical ASH state definition
 - `specs/core/control-bit-derivation.pseudo.md` — control-bit derivation semantics and closure status
 - `specs/core/core-admissibility.pseudo.md` — core admissibility rules and state classification
-- `specs/core/state-validity-diagnostics.pseudo.md` — canonical state-validity diagnostic model
-- `specs/core/system-state-classification.pseudo.md` — canonical system-state classes and class-to-action mapping
-- `specs/core/recoverability-semantics.pseudo.md` — recoverability categories and deterministic recovery mapping
+- `specs/core/codeword-set.pseudo.md` — canonical codeword set definition (research baseline)
+- `specs/core/state-admissibility.pseudo.md` — full 9-bit state admissibility and validity
+- `specs/core/state-validity-diagnostics.pseudo.md` — canonical state-validity diagnostic model (9D)
+- `specs/core/system-state-classification.pseudo.md` — canonical system-state classes and class-to-action mapping (9D)
+- `specs/core/recoverability-semantics.pseudo.md` — recoverability categories and deterministic recovery mapping (9D)
 - `specs/core/realm-identity.pseudo.md` — realm identity and encoding semantics
 - `specs/algorithms/codeword-transformation-semantics.pseudo.md` — canonical XOR-by-codeword state transformation
 - `specs/algorithms/averaging-operator-semantics.pseudo.md` — canonical averaging operator (T² = T)

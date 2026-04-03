@@ -1,24 +1,26 @@
-# System-State Classification — agnostic specification
+# System-State Classification — canonical specification (Research Baseline)
+
+> **Rewritten in R2 — State/Recovery Realignment.**
+> Classification is now based on full 9-bit state diagnostics and codeword-structure compatibility, not on 8-bit core admissibility + control-bit mismatch.
 
 ## Purpose
 
 This specification defines the **canonical system-state classes** for the ASH Pattern System.
 
-The ASH Pattern System is a framework for self-healing, self-correcting, safe-failure, and fallback software. At its core, the system must be able to classify any state into a behavioral category that deterministically maps to the correct system response — whether that is normal operation, correction, fallback, containment, or safe halt.
-
-System-state classification sits above state-validity diagnostics. Where diagnostics answer "what is the condition of this state?", classification answers "what should the system do about it?"
+Classification answers: given a state-validity diagnostic for a full 9-bit state, what should the system do about it?
 
 ## Classification criteria
 
-A system-state class is determined by evaluating two conditions from the state-validity diagnostic:
+A system-state class is determined by evaluating the state-validity diagnostic (`StateValidityDiagnostic`) which provides:
 
-1. **Core admissibility** — is the 8-bit stabilizing core a valid codeword, correctable, detectable, or unrecoverable?
-2. **Control-derivation status** — does the observed control bit match the expected derived value?
+1. **Admissibility status** — VALID, TRANSFORMATION_COMPATIBLE, TRANSFORMATION_INCOMPATIBLE, or UNCLASSIFIED
+2. **Transformation compatibility** — COMPATIBLE, INCOMPATIBLE, or UNKNOWN
+3. **Normalization status** — ALREADY_VALID, NORMALIZABLE, NOT_NORMALIZABLE, or BLOCKED
 
-Additional conditions arise from runtime context:
+Additional conditions from runtime context:
 
-3. **Containment status** — has the system entered containment mode?
-4. **Halt status** — has the system entered safe halt?
+4. **Containment status** — has the system entered containment mode?
+5. **Halt status** — has the system entered safe halt?
 
 ## Canonical state classes
 
@@ -35,100 +37,58 @@ END ENUM
 ```
 
 ### STABLE
-
 The system is in normal operating condition.
-
-- Core admissibility: `ADMISSIBLE`
-- Control derivation: `MATCH`
+- Admissibility: `VALID`
+- Normalization: `ALREADY_VALID`
 - No recovery action required
-- All transitions proceed normally
 
 ### UNSTABLE
-
-The system has a valid core but an inconsistent control dimension.
-
-- Core admissibility: `ADMISSIBLE`
-- Control derivation: `MISMATCH` or `UNABLE_TO_DERIVE`
-- Recovery: re-derive control bit from the admissible core
-- The system should not proceed with normal transitions until control is re-derived
-- This is a recoverable condition that does not require fallback
+The state is transformation-compatible but not currently in a recognized valid configuration.
+- Admissibility: `TRANSFORMATION_COMPATIBLE`
+- Normalization: `NORMALIZABLE`
+- Recovery: restore to valid state via codeword-based normalization
 
 ### CORRECTABLE
-
-The system has an inadmissible core that is within correctable distance of a valid codeword.
-
-- Core admissibility: `INADMISSIBLE_CORRECTABLE`
-- Control derivation: any (will be re-derived after correction)
-- Recovery: correct core to nearest codeword, then re-derive control from the **corrected admissible core**
-- The corrected-core derivation rule applies: expected control semantics are defined on the corrected core, not the raw inadmissible core
-- This is a recoverable condition that does not require fallback
+The state can be corrected to a valid state through codeword operations.
+- Admissibility: `TRANSFORMATION_COMPATIBLE`
+- The specific correction path is known
+- Recovery: apply codeword correction sequence to reach a valid state
 
 ### DEGRADED
-
-The system has an inadmissible core where the error is detected but correction is ambiguous.
-
-- Core admissibility: `INADMISSIBLE_DETECTABLE`
-- Control derivation: not meaningful (core is not correctable)
-- Recovery: **fallback required** — the system must select a known-good state from the fallback-policy registry
-- Deterministic correction is not possible; the system must not guess
-- If fallback fails or is unavailable, the system must escalate to containment
+The state is transformation-incompatible or correction is ambiguous. Fallback is required.
+- Admissibility: `TRANSFORMATION_INCOMPATIBLE` or correction is ambiguous
+- Normalization: `NOT_NORMALIZABLE` or no unique correction path
+- Recovery: select a known-good fallback state from the fallback-policy registry
 
 ### CONTAINED
-
-The system has entered containment mode to prevent error propagation.
-
-- Entry conditions:
-  - DEGRADED state where fallback is unavailable or has failed
-  - Propagation risk detected during recovery
-  - Explicit containment request from operator or policy
-- Behavior: operations are restricted to a safe subset; the system does not attempt further correction
-- The system remains operational but in a restricted mode
-- Awaits operator/policy decision for resolution
-- Containment may escalate to SAFE_HALT if the containment boundary is breached
+The system has entered containment to prevent error propagation.
+- Entry: DEGRADED where fallback is unavailable, propagation risk detected, or operator request
+- Behavior: restricted operations, awaiting resolution
+- May escalate to SAFE_HALT if containment boundary is breached
 
 ### FAILED
-
-The system has an inadmissible core beyond reliable correction, and no automated recovery path exists.
-
-- Core admissibility: `INADMISSIBLE_UNRECOVERABLE`
-- Control derivation: not meaningful
-- Recovery: **escalation required** — no automated recovery; the system must escalate to an external authority (operator, supervisor, or upstream system)
-- The system is still running but in an unrecoverable error state
-- FAILED is distinct from SAFE_HALT: FAILED means the system has detected an unrecoverable condition but has not yet halted
-- The system must produce diagnostic state for escalation
-- FAILED may transition to SAFE_HALT if escalation determines that halt is appropriate
+The state is not recoverable through any automated path. Escalation required.
+- Admissibility: `TRANSFORMATION_INCOMPATIBLE` with no fallback available
+- Or: containment has failed to resolve the condition
+- System is still running but in an unrecoverable error state
 
 ### SAFE_HALT
-
 The system has deliberately halted in a known-safe terminal state.
-
-- Entry conditions:
-  - FAILED state where escalation determines halt is appropriate
-  - Containment breach (CONTAINED state where the containment boundary is violated)
-  - Explicit halt request from operator or policy
-- Behavior: **no further transitions are permitted**
-- The system preserves its full diagnostic state for post-mortem analysis
-- SAFE_HALT is an intentional terminal action, not just an error condition
-- SAFE_HALT is the only system-state class from which no recovery path exists by design
+- No further transitions permitted
+- Diagnostic state preserved for post-mortem
+- Distinct from FAILED: SAFE_HALT is an intentional terminal action
 
 ## Deterministic class-to-action mapping
 
-Every system-state class maps deterministically to exactly one action category:
-
 | System-State Class | Action Category | Description |
 |---|---|---|
-| `STABLE` | `NO_ACTION` | Normal operation; no recovery needed |
-| `UNSTABLE` | `RE_DERIVE_CONTROL` | Re-derive control bit from admissible core |
-| `CORRECTABLE` | `CORRECT_AND_RE_DERIVE` | Correct core to nearest codeword, then re-derive control |
+| `STABLE` | `NO_ACTION` | Normal operation |
+| `UNSTABLE` | `NORMALIZE_STATE` | Restore to valid state via codeword-based normalization |
+| `CORRECTABLE` | `APPLY_CORRECTION` | Apply known codeword correction sequence |
 | `DEGRADED` | `FALLBACK_REQUIRED` | Select known-good state from fallback-policy registry |
-| `CONTAINED` | `CONTAINMENT_REQUIRED` | Restrict operations; await operator/policy decision |
-| `FAILED` | `ESCALATION_REQUIRED` | Escalate to external authority; no automated recovery |
-| `SAFE_HALT` | `TERMINAL_NO_RECOVERY` | Already halted in known-safe terminal state; no further transitions or recovery actions |
-
-This mapping is:
-- **Total** — every possible system-state class has exactly one action category
-- **Deterministic** — the same class always maps to the same action
-- **Monotonic in severity** — action severity increases with classification severity
+| `CONTAINED` | `CONTAINMENT_REQUIRED` | Restrict operations; await resolution |
+| `FAILED` | `ESCALATION_REQUIRED` | Escalate to external authority |
+| `SAFE_HALT` | `TERMINAL_NO_RECOVERY` | Already halted; no further transitions |
 
 ## Pseudocode
 
@@ -144,42 +104,47 @@ FUNCTION classify_system_state(diagnostic: StateValidityDiagnostic, context: Sys
         RETURN CONTAINED
     END IF
 
-    -- Classify from diagnostic conditions
-    SWITCH diagnostic.admissibility_status
-        CASE ADMISSIBLE:
-            IF diagnostic.control_derivation_status == MATCH THEN
-                RETURN STABLE
+    -- Classify from full-state diagnostic
+    IF diagnostic.admissibility_status == VALID AND diagnostic.normalization_status == ALREADY_VALID THEN
+        RETURN STABLE
+    END IF
+
+    IF diagnostic.admissibility_status == TRANSFORMATION_COMPATIBLE THEN
+        IF diagnostic.normalization_status == NORMALIZABLE THEN
+            -- Determine if specific correction is known
+            IF correction_path_is_known(diagnostic) THEN
+                RETURN CORRECTABLE
             ELSE
                 RETURN UNSTABLE
             END IF
+        END IF
+    END IF
 
-        CASE INADMISSIBLE_CORRECTABLE:
-            RETURN CORRECTABLE
-
-        CASE INADMISSIBLE_DETECTABLE:
+    IF diagnostic.admissibility_status == TRANSFORMATION_INCOMPATIBLE THEN
+        IF fallback_is_available(diagnostic) THEN
             RETURN DEGRADED
-
-        CASE INADMISSIBLE_UNRECOVERABLE:
+        ELSE
             RETURN FAILED
-    END SWITCH
+        END IF
+    END IF
+
+    -- Default for UNCLASSIFIED admissibility
+    RETURN DEGRADED
 END FUNCTION
 ```
 
 ## Invariants
 
-1. **Completeness** — every possible combination of admissibility status, control-derivation status, and runtime context maps to exactly one system-state class.
-2. **Determinism** — the same inputs always produce the same classification.
-3. **Monotonic severity** — STABLE < UNSTABLE < CORRECTABLE < DEGRADED < CONTAINED < FAILED < SAFE_HALT in severity ordering.
-4. **No silent classification** — classification must always be accompanied by a diagnostic record.
-5. **Terminal finality** — SAFE_HALT is a terminal state; once entered, no transition to any other class is permitted.
-6. **Containment monotonicity** — once CONTAINED, the system may only transition to SAFE_HALT (escalation), never back to a lower-severity class without explicit operator intervention.
+1. **Completeness** — every state maps to exactly one system-state class
+2. **Determinism** — the same diagnostic always produces the same classification
+3. **Monotonic severity** — STABLE < UNSTABLE < CORRECTABLE < DEGRADED < CONTAINED < FAILED < SAFE_HALT
+4. **Terminal finality** — SAFE_HALT is irrevocable
+5. **No 8+1 dependency** — classification is based on full 9-bit state diagnostics
 
 ## Relation to other specifications
 
-- **state-validity-diagnostics.pseudo.md** — provides the `StateValidityDiagnostic` record that feeds classification
-- **core-admissibility.pseudo.md** — provides the `AdmissibilityStatus` used in classification criteria
-- **control-bit-derivation.pseudo.md** — provides the derivation status used in classification criteria
+- **state-validity-diagnostics.pseudo.md** — provides the diagnostic that feeds classification
+- **state-admissibility.pseudo.md** — provides admissibility status
 - **recoverability-semantics.pseudo.md** — maps each class to its recovery category
-- **recovery-fallback-semantics.pseudo.md** — defines the algorithmic recovery and fallback flows
-- **containment-safe-failure-semantics.pseudo.md** — defines containment and safe-halt behavior
-- **ash-state-space.pseudo.md** — defines the state structure being classified
+- **recovery-fallback-semantics.pseudo.md** — implements recovery and fallback actions
+- **containment-safe-failure-semantics.pseudo.md** — implements containment and safe-halt

@@ -88,6 +88,8 @@ END FUNCTION
 
 ## Relation to other specifications
 
+- **codeword-set.pseudo.md** — defines the canonical codeword set used in transformations
+- **state-admissibility.pseudo.md** — defines state validity for pre/post-transition checks
 - **codeword-transformation-semantics.pseudo.md** — defines the canonical XOR-by-codeword operation
 - **ash-state-space.pseudo.md** — defines the canonical F2^9 state space
 - **averaging-operator-semantics.pseudo.md** — the averaging operator is defined over codeword transformations

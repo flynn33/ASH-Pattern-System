@@ -1,26 +1,18 @@
-# State-Validity Diagnostics — SUPERSEDED
+# State-Validity Diagnostics — canonical specification (Research Baseline)
 
-> **SUPERSEDED — Research Math Realignment Package R1**
->
-> This file reflects the **superseded 8+1 drift formalization**. Its diagnostic structure (extracted_core, corrected_core, control_derivation_status, etc.) is tied to the 8-bit core + derived control bit model. That model is **not canonical** after R1.
->
-> The canonical ASH mathematical foundation is now the **full 9-dimensional research baseline**. A new diagnostic model aligned to the restored 9D research baseline will be defined in later realignment packages (R2).
->
-> **This file must not be used as authority for downstream implementation work.**
-> It is retained for historical reference only and is pending rewrite.
-
----
-
-# State-Validity Diagnostics — superseded specification (historical reference)
+> **Rewritten in R2 — State/Recovery Realignment.**
+> This file now defines diagnostics for the full 9D research model.
+> The previous 8+1 diagnostic structure (extracted_core, control_derivation_status, corrected_core, etc.) is superseded.
 
 ## Purpose
 
-This specification defines a **canonical diagnostic model** for ASH state validity.
+This specification defines the **canonical diagnostic model** for ASH state validity in the full 9-dimensional research baseline.
 
 Every downstream implementation must be able to produce a structured diagnostic record that explains, for any candidate state:
 
 - whether it is valid
-- why or why not
+- its admissibility status relative to the codeword structure
+- its transformation compatibility
 - what recovery path (if any) is available
 - which specification rules were evaluated
 
@@ -30,214 +22,148 @@ This record is the foundation for:
 - **self-correcting behavior** — the system can identify correctable errors and apply fixes
 - **safe-failure behavior** — the system can recognize unrecoverable states and fail gracefully
 - **deterministic recovery planning** — recovery decisions are based on structured diagnostics, not heuristics
-- **observability** — external monitors can inspect state health without understanding internal implementation details
+- **observability** — external monitors can inspect state health
 
 ## Diagnostic record
 
 ```text
 TYPE StateValidityDiagnostic
-    input_state              : AshStateExpanded or raw 9-element vector
-    extracted_core           : Vector[8] over F2
-    corrected_core           : Vector[8] over F2 or NOT_APPLICABLE
-    observed_control_dimension : Bit
-    expected_control_dimension : Bit or UNABLE_TO_DERIVE
-    admissibility_status     : AdmissibilityStatus
-    control_derivation_status : ControlDerivationStatus
-    normalization_status     : NormalizationStatus
-    recoverability_status    : RecoverabilityStatus
-    is_valid_normalized_state : Boolean
-    rule_ids                 : List of String
-    notes                    : List of String
+    input_state                  : Vector[9] over F2
+    admissibility_status         : AdmissibilityStatus
+    transformation_compatibility : TransformationCompatibility
+    normalization_status         : NormalizationStatus
+    recoverability_relevance     : RecoverabilityRelevance
+    is_valid                     : Boolean
+    orbit_info                   : OrbitInfo or NONE
+    rule_ids                     : List of String
+    notes                        : List of String
 END TYPE
 ```
 
 ### Field definitions
 
 #### `input_state`
-The raw candidate state as received by the diagnostic function. This is the unmodified input before any extraction or derivation.
-
-#### `extracted_core`
-The 8-bit stabilizing core extracted from the input state (coordinates `b0..b7`). This is the raw, unmodified core before any correction.
-
-#### `corrected_core`
-If the extracted core is `INADMISSIBLE_CORRECTABLE`, this field contains the corrected admissible core (the nearest valid codeword). If the core is already `ADMISSIBLE` or is not correctable, this field is `NOT_APPLICABLE`.
-
-The **corrected-core derivation rule** requires that `expected_control_dimension` be derived from `corrected_core` (not `extracted_core`) when correction applies. This ensures that the diagnostic predicts the same control value that normalization would produce.
-
-#### `observed_control_dimension`
-The value of the 9th coordinate (`b8`) as it appears in the input state.
-
-#### `expected_control_dimension`
-The derived control value that normalization would produce, determined by the **corrected-core derivation rule**:
-
-- If the core is `ADMISSIBLE`: the value that `derive_control_bit(extracted_core)` would produce
-- If the core is `INADMISSIBLE_CORRECTABLE`: the value that `derive_control_bit(corrected_core)` would produce, where `corrected_core` is the nearest admissible codeword
-- If the core is `INADMISSIBLE_DETECTABLE` or `INADMISSIBLE_UNRECOVERABLE`: `UNABLE_TO_DERIVE` — control derivation is not meaningful for uncorrectable inadmissible cores because no valid recovery precondition exists
-
-This ensures that the diagnostic predicts the same control value that `normalize_state` would produce.
+The raw candidate state as received — a full 9-bit vector in F2^9.
 
 #### `admissibility_status`
-The result of `classify_core_admissibility(extracted_core)` as defined in `core-admissibility.pseudo.md`.
+The result of classifying the state against the codeword structure, as defined in `state-admissibility.pseudo.md`.
 
 ```text
 ENUM AdmissibilityStatus
-    ADMISSIBLE
-    INADMISSIBLE_CORRECTABLE
-    INADMISSIBLE_DETECTABLE
-    INADMISSIBLE_UNRECOVERABLE
+    VALID
+    TRANSFORMATION_COMPATIBLE
+    TRANSFORMATION_INCOMPATIBLE
+    UNCLASSIFIED
 END ENUM
 ```
 
-#### `control_derivation_status`
-Whether the observed control dimension matches the expected derived value.
+#### `transformation_compatibility`
+Whether the state can participate in codeword transformations.
 
 ```text
-ENUM ControlDerivationStatus
-    MATCH                -- observed == expected
-    MISMATCH             -- observed != expected, but expected is known
-    UNABLE_TO_DERIVE     -- derivation not meaningful (uncorrectable inadmissible core or malformed input)
-    DERIVATION_ERROR     -- derivation failed due to invalid input
+ENUM TransformationCompatibility
+    COMPATIBLE       -- state is within a codeword orbit
+    INCOMPATIBLE     -- state is outside all known codeword orbits
+    UNKNOWN          -- cannot determine (codeword set not fully specified)
 END ENUM
 ```
 
 #### `normalization_status`
-Whether the state can be or has been normalized.
+Whether the state can be or has been normalized within the 9D model.
 
 ```text
 ENUM NormalizationStatus
-    ALREADY_NORMALIZED   -- core is admissible, control matches derivation
-    NORMALIZABLE         -- core is admissible or correctable, control can be re-derived
-    NOT_NORMALIZABLE     -- core is inadmissible beyond correction
-    BLOCKED              -- normalization cannot proceed (e.g., malformed input or implementation nonconformance)
+    ALREADY_VALID        -- state is valid, no normalization needed
+    NORMALIZABLE         -- state can be restored to a valid state via codeword-based correction
+    NOT_NORMALIZABLE     -- state cannot be restored via codeword operations
+    BLOCKED              -- normalization cannot proceed (e.g., codeword set not fully specified)
 END ENUM
 ```
 
-#### `recoverability_status`
-The overall recovery classification of the state.
+#### `recoverability_relevance`
+Whether the state's condition is relevant to the recovery/fallback/containment system.
 
 ```text
-ENUM RecoverabilityStatus
-    STABLE               -- valid, no action needed
-    UNSTABLE             -- admissible core, wrong control bit; recoverable via re-derivation
-    CORRECTABLE          -- inadmissible core within correctable distance; recoverable via correction + re-derivation
-    DEGRADED             -- inadmissible core, error detected but correction ambiguous; fallback required
-    FAILED               -- inadmissible core, beyond reliable correction; safe failure required
+ENUM RecoverabilityRelevance
+    NO_RECOVERY_NEEDED   -- state is valid
+    RECOVERY_APPLICABLE  -- state is not valid but recovery may be possible
+    FALLBACK_NEEDED      -- state requires fallback selection
+    CONTAINMENT_NEEDED   -- state requires containment
+    NOT_RECOVERABLE      -- no recovery path exists
 END ENUM
 ```
 
-#### `is_valid_normalized_state`
-A boolean summary: `TRUE` if and only if:
+#### `is_valid`
+Boolean summary: `TRUE` if `admissibility_status == VALID` and `normalization_status == ALREADY_VALID`.
 
-1. `admissibility_status == ADMISSIBLE`
-2. `control_derivation_status == MATCH`
-3. `normalization_status == ALREADY_NORMALIZED`
+#### `orbit_info`
+Optional information about the state's codeword orbit, if computable:
+- which orbit the state belongs to
+- how many states are in that orbit
+- whether the orbit contains known valid states
+
+Set to `NONE` if orbit information is not available or not applicable.
 
 #### `rule_ids`
-A list of specification rule identifiers that were evaluated during diagnosis. This provides traceability back to this repository.
-
-Example rule IDs:
-
-- `ASH-STATE-SPACE-VALIDITY-1` — core must be structurally admissible
-- `ASH-STATE-SPACE-VALIDITY-2` — control bit must be consistent with derivation rule
-- `CONTROL-BIT-DERIVATION-INVARIANT-1` — derivation is deterministic
-- `CORE-ADMISSIBILITY-INVARIANT-4` — inadmissible core must not be silently accepted
+A list of specification rule identifiers that were evaluated during diagnosis. Must conform to the rule-ID taxonomy when the taxonomy is revalidated in R3.
 
 #### `notes`
-A list of human-readable diagnostic strings providing additional context. These are not machine-parseable and are intended for developers and operators.
+Human-readable diagnostic strings providing additional context.
 
 ## Pseudocode
 
 ```text
-FUNCTION diagnose_state(candidate) -> StateValidityDiagnostic
+FUNCTION diagnose_state(candidate[9], codeword_set C) -> StateValidityDiagnostic
     diagnostic = new StateValidityDiagnostic()
     diagnostic.input_state = candidate
     diagnostic.rule_ids = []
     diagnostic.notes = []
 
-    -- Step 1: Extract core and observed control
-    diagnostic.extracted_core = extract_core_bits(candidate)
-    diagnostic.observed_control_dimension = extract_control_bit(candidate)
+    -- Step 1: Classify admissibility against codeword structure
+    diagnostic.admissibility_status = classify_state_admissibility(candidate, C)
 
-    -- Step 2: Classify core admissibility and apply corrected-core derivation rule
-    diagnostic.admissibility_status = classify_core_admissibility(diagnostic.extracted_core)
-    diagnostic.rule_ids.append("ASH-STATE-SPACE-VALIDITY-1")
-
-    -- Step 2a: Determine the core to use for control-bit derivation
-    -- Corrected-core derivation rule: for correctable cores, derive from the corrected core
-    IF diagnostic.admissibility_status == INADMISSIBLE_CORRECTABLE THEN
-        diagnostic.corrected_core = correct_to_nearest_codeword(diagnostic.extracted_core)
-        derivation_core = diagnostic.corrected_core
-        diagnostic.notes.append("Core corrected for derivation: " + diagnostic.extracted_core + " -> " + diagnostic.corrected_core)
+    -- Step 2: Determine transformation compatibility
+    IF diagnostic.admissibility_status IN [VALID, TRANSFORMATION_COMPATIBLE] THEN
+        diagnostic.transformation_compatibility = COMPATIBLE
+    ELSE IF diagnostic.admissibility_status == TRANSFORMATION_INCOMPATIBLE THEN
+        diagnostic.transformation_compatibility = INCOMPATIBLE
+        diagnostic.notes.append("State is outside codeword orbit structure")
     ELSE
-        diagnostic.corrected_core = NOT_APPLICABLE
-        derivation_core = diagnostic.extracted_core
+        diagnostic.transformation_compatibility = UNKNOWN
+        diagnostic.notes.append("Transformation compatibility cannot be determined")
     END IF
 
-    -- Step 3: Derive expected control bit (formula is locked: overall parity)
-    IF diagnostic.admissibility_status IN [INADMISSIBLE_DETECTABLE, INADMISSIBLE_UNRECOVERABLE] THEN
-        -- Core is not correctable; derivation is not meaningful for normalization
-        diagnostic.control_derivation_status = UNABLE_TO_DERIVE
-        diagnostic.expected_control_dimension = UNABLE_TO_DERIVE
-        diagnostic.notes.append("Control derivation not meaningful: uncorrectable inadmissible core")
-    ELSE
-        TRY
-            diagnostic.expected_control_dimension = derive_control_bit(derivation_core)
-
-            IF diagnostic.observed_control_dimension == diagnostic.expected_control_dimension THEN
-                diagnostic.control_derivation_status = MATCH
-            ELSE
-                diagnostic.control_derivation_status = MISMATCH
-                diagnostic.notes.append("Observed control bit does not match derived value")
-            END IF
-        CATCH derivation_error
-            diagnostic.control_derivation_status = DERIVATION_ERROR
-            diagnostic.expected_control_dimension = UNABLE_TO_DERIVE
-            diagnostic.notes.append("Derivation failed: " + derivation_error.message)
-        END TRY
-    END IF
-    diagnostic.rule_ids.append("ASH-STATE-SPACE-VALIDITY-2")
-
-    -- Step 4: Determine recoverability
-    SWITCH diagnostic.admissibility_status
-        CASE ADMISSIBLE:
-            IF diagnostic.control_derivation_status == MATCH THEN
-                diagnostic.recoverability_status = STABLE
-            ELSE
-                diagnostic.recoverability_status = UNSTABLE
-            END IF
-
-        CASE INADMISSIBLE_CORRECTABLE:
-            diagnostic.recoverability_status = CORRECTABLE
-            diagnostic.notes.append("Core is correctable to nearest codeword")
-
-        CASE INADMISSIBLE_DETECTABLE:
-            diagnostic.recoverability_status = DEGRADED
-            diagnostic.notes.append("Error detected but correction is ambiguous; fallback required")
-
-        CASE INADMISSIBLE_UNRECOVERABLE:
-            diagnostic.recoverability_status = FAILED
-            diagnostic.notes.append("Core is beyond reliable correction; safe failure required")
-    END SWITCH
-
-    -- Step 5: Determine normalization status
-    IF diagnostic.recoverability_status == STABLE THEN
-        diagnostic.normalization_status = ALREADY_NORMALIZED
-    ELSE IF diagnostic.recoverability_status IN [UNSTABLE, CORRECTABLE] THEN
-        IF diagnostic.control_derivation_status == DERIVATION_ERROR THEN
-            diagnostic.normalization_status = BLOCKED
-            diagnostic.notes.append("Cannot normalize: derivation failed due to malformed input")
-        ELSE
-            diagnostic.normalization_status = NORMALIZABLE
-        END IF
-    ELSE
+    -- Step 3: Determine normalization status
+    IF diagnostic.admissibility_status == VALID THEN
+        diagnostic.normalization_status = ALREADY_VALID
+    ELSE IF diagnostic.admissibility_status == TRANSFORMATION_COMPATIBLE THEN
+        diagnostic.normalization_status = NORMALIZABLE
+    ELSE IF diagnostic.admissibility_status == TRANSFORMATION_INCOMPATIBLE THEN
         diagnostic.normalization_status = NOT_NORMALIZABLE
+    ELSE
+        diagnostic.normalization_status = BLOCKED
+        diagnostic.notes.append("Normalization blocked: admissibility cannot be determined")
     END IF
+
+    -- Step 4: Determine recoverability relevance
+    IF diagnostic.normalization_status == ALREADY_VALID THEN
+        diagnostic.recoverability_relevance = NO_RECOVERY_NEEDED
+    ELSE IF diagnostic.normalization_status == NORMALIZABLE THEN
+        diagnostic.recoverability_relevance = RECOVERY_APPLICABLE
+    ELSE IF diagnostic.normalization_status == NOT_NORMALIZABLE THEN
+        diagnostic.recoverability_relevance = NOT_RECOVERABLE
+        diagnostic.notes.append("State is not recoverable via codeword operations")
+    ELSE
+        diagnostic.recoverability_relevance = CONTAINMENT_NEEDED
+    END IF
+
+    -- Step 5: Compute orbit info if available
+    diagnostic.orbit_info = compute_orbit_info(candidate, C)
 
     -- Step 6: Summary validity
-    diagnostic.is_valid_normalized_state = (
-        diagnostic.admissibility_status == ADMISSIBLE
-        AND diagnostic.control_derivation_status == MATCH
-        AND diagnostic.normalization_status == ALREADY_NORMALIZED
+    diagnostic.is_valid = (
+        diagnostic.admissibility_status == VALID
+        AND diagnostic.normalization_status == ALREADY_VALID
     )
 
     RETURN diagnostic
@@ -246,30 +172,18 @@ END FUNCTION
 
 ## Diagnostic completeness requirement
 
-Every downstream implementation must be capable of producing a `StateValidityDiagnostic` for any candidate state, even when:
+Every downstream implementation must be capable of producing a `StateValidityDiagnostic` for any candidate 9-bit state, even when:
 
-- the candidate state is malformed (report the malformation in notes and set appropriate status fields)
-- the core is uncorrectable inadmissible (use `UNABLE_TO_DERIVE` for expected control)
-- derivation fails due to implementation error (use `DERIVATION_ERROR`)
+- The codeword set is not fully specified (use `UNCLASSIFIED` / `BLOCKED`)
+- The candidate state is malformed (report in notes)
+- Orbit information is not computable (use `NONE`)
 
-The diagnostic must never be empty, partial, or silently omitted. If diagnosis cannot be completed, the diagnostic record must explain why.
-
-## Schema and taxonomy conformance
-
-State-validity diagnostics conform to the shared diagnostic envelope defined in `specs/interfaces/diagnostic-schema.md`:
-
-- `diagnostic_kind` = `STATE_VALIDITY`
-- `stage` = `DETECTION`
-- `severity` is determined by the admissibility and control-derivation status
-- `rule_ids` must conform to the `ASH-STATE` family in `specs/interfaces/rule-id-taxonomy.md`
-
-All rule IDs referenced in this specification (e.g., `ASH-STATE-VALIDITY-001`, `ASH-STATE-VALIDITY-002`) must conform to the canonical rule-ID pattern defined in the taxonomy.
+The diagnostic must never be empty, partial, or silently omitted.
 
 ## Relation to other specifications
 
-- **ash-state-space.pseudo.md** — defines the state structure that is being diagnosed
-- **control-bit-derivation.pseudo.md** — provides the locked derivation formula (overall parity) used in step 3
-- **core-admissibility.pseudo.md** — provides the locked admissibility classification (normative 16-codeword set) used in step 2
-- **diagnostic-schema.md** — defines the shared diagnostic envelope this specification conforms to
-- **rule-id-taxonomy.md** — defines the canonical rule-ID pattern for the `rule_ids` field
-- **semantic-contracts.md** — requires that all implementations expose diagnosable state validation
+- **ash-state-space.pseudo.md** — defines the F2^9 state space being diagnosed
+- **state-admissibility.pseudo.md** — provides the admissibility classification
+- **codeword-set.pseudo.md** — provides the codeword structure used for classification
+- **system-state-classification.pseudo.md** — consumes diagnostics to classify system state
+- **recoverability-semantics.pseudo.md** — consumes diagnostics to determine recovery category

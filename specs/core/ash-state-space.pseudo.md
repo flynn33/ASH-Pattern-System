@@ -92,14 +92,13 @@ END FUNCTION
 
 ## Validity and admissibility
 
-The validity and admissibility framework for the full 9D model is being defined as part of the research math realignment. The previous 8+1 admissibility framing (based on an 8-bit [8,4,4] extended Hamming code core) is superseded.
+Validity and admissibility for the full 9D model are defined by:
 
-The restored research baseline defines validity in terms of:
-- membership in algebraic substructures of F2^9
-- codeword-orbit relationships
-- averaging-operator invariance
+- **Codeword-orbit membership** — whether a state is reachable from known valid states via codeword transformations
+- **Admissibility classification** — VALID, TRANSFORMATION_COMPATIBLE, TRANSFORMATION_INCOMPATIBLE, or UNCLASSIFIED
 
-The exact admissibility rules for the full 9D model will be formalized in realignment package R2.
+See `specs/core/state-admissibility.pseudo.md` for the full admissibility specification.
+See `specs/core/codeword-set.pseudo.md` for the canonical codeword structure.
 
 ## Required invariants
 
@@ -111,6 +110,8 @@ The exact admissibility rules for the full 9D model will be formalized in realig
 
 ## Related specifications
 
+- `specs/core/codeword-set.pseudo.md` — canonical codeword set definition
+- `specs/core/state-admissibility.pseudo.md` — full 9-bit admissibility and validity
 - `specs/algorithms/codeword-transformation-semantics.pseudo.md` — canonical XOR-by-codeword transformation
 - `specs/algorithms/averaging-operator-semantics.pseudo.md` — canonical averaging operator `T` with `T² = T`
 - `specs/algorithms/branching-semantics.pseudo.md` — canonical branching / leaf expansion

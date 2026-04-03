@@ -89,6 +89,7 @@ This specification defines the averaging operator as it appears in the research 
 
 ## Relation to other specifications
 
+- **codeword-set.pseudo.md** — defines the canonical codeword set `C` over which the averaging operator sums
 - **codeword-transformation-semantics.pseudo.md** — defines the `x ⊕ c` transformation that the averaging operator is built on
 - **ash-state-space.pseudo.md** — defines the canonical F2^9 state space
 - **branching-semantics.pseudo.md** — branching and averaging interact in the full ASH model

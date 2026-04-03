@@ -34,43 +34,41 @@ The **research baseline** is canonical — not the superseded 8+1 drift formaliz
    - `containment-safe-failure-semantics.pseudo.md` — containment and safe-failure behavior
 5. read `specs/interfaces/semantic-contracts.md` and all files in `specs/interfaces/contracts/`
 6. read `governance/repository-governance.md`
-7. confirm that the locked algebraic definitions (parity formula, 16-codeword set) match the canonical specs
-8. check for any remaining unresolved items (e.g., fallback-policy registry)
+7. confirm that the canonical specs use the full 9D research baseline (not the superseded 8+1 model)
+8. check for any remaining unresolved or pending-research-closure items
 9. only then begin target-specific design and implementation planning
 
 ## What the coding agent must preserve
 
 The coding agent must preserve:
 
-- the ASH state space as **F2^9**
-- the special role of the first 8 coordinates as the stabilizing algebraic core
-- the special role of the 9th coordinate as a derived control/parity dimension
-- deterministic normalization
-- deterministic realm identity
-- deterministic transition behavior
+- the ASH state space as **full F2^9** — all 9 coordinates participate in the algebraic structure
+- XOR-by-codeword as the canonical state transformation mechanism
+- research-baseline codeword structure (see `specs/core/codeword-set.pseudo.md`)
+- full 9-bit state admissibility (see `specs/core/state-admissibility.pseudo.md`)
+- deterministic normalization on full 9-bit states
+- deterministic realm identity from full 9-bit states
+- deterministic transition behavior via codeword transformations
 - deterministic topology expansion
 - full axiom diagnostics
 - explicit separation between generation planning and materialization
-- system-state classification (all 7 canonical classes)
+- system-state classification (all 7 canonical classes) based on full-state diagnostics
 - deterministic recoverability mapping (class-to-recovery-category)
-- deterministic recovery and fallback behavior
+- deterministic recovery and fallback behavior using codeword-based correction
 - containment and safe-failure behavior
-- the corrected-core derivation rule (expected control from corrected admissible core for correctable states)
 - diagnosable recovery — no silent healing
 
 ## What the coding agent must not do
 
 The coding agent must not:
 
-- reinterpret the 9th coordinate as a normal peer bit for ordinary transitions
-- silently collapse the core/control distinction
-- make one platform's file structure into the engine's identity
+- reintroduce the superseded 8+1 decomposition (8-bit core + derived 9th bit) as canonical
+- invent codewords not grounded in the research baseline
+- treat the superseded parity formula or 16-codeword set as canonical
+- make one platform's file structure into the system's identity
 - replace semantic planning with direct side effects
 - treat convenience behavior as canonical if the specs do not say so
-- substitute a different control-bit derivation formula for the locked parity formula
-- substitute a different admissibility codeword set for the locked normative 16-codeword set
-- treat the locked algebraic definitions as configurable, optional, or open to local variation
-- guess any foundational semantic that is explicitly marked as unresolved in this repository (e.g., the fallback-policy registry)
+- guess any foundational semantic that is explicitly marked as unresolved or pending research closure
 - silently heal or mutate state without producing a diagnostic record
 - skip containment when the recovery/fallback specifications require it
 - allow a `FAILED` state to continue normal operations without escalation

@@ -77,6 +77,8 @@ The codeword transformation is defined entirely by the XOR operation on F2^9. Im
 
 ## Relation to other specifications
 
+- **codeword-set.pseudo.md** — defines the canonical codeword set `C ⊂ F2^9`
+- **state-admissibility.pseudo.md** — defines admissibility relative to codeword orbit structure
 - **ash-state-space.pseudo.md** — defines the canonical F2^9 state space
 - **averaging-operator-semantics.pseudo.md** — defines the averaging operator built on codeword transformations
 - **transition-system.pseudo.md** — general transition framework; codeword transformation is the canonical transition mechanism

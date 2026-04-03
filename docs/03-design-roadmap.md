@@ -56,7 +56,24 @@ Rewrite the state-layer and resilient-software semantics to operate on the full 
 - Rewrite system-state classification, recoverability, recovery/fallback/containment against the 9D baseline
 - Formalize the specific codeword set `C ⊂ F2^9` from the research baseline
 
-**Status**: Not started. This is the immediate next phase.
+New specifications created:
+
+- `specs/core/codeword-set.pseudo.md`
+- `specs/core/state-admissibility.pseudo.md`
+
+Rewritten to full 9D terms:
+
+- `specs/core/state-validity-diagnostics.pseudo.md`
+- `specs/core/system-state-classification.pseudo.md`
+- `specs/core/recoverability-semantics.pseudo.md`
+- `specs/algorithms/recovery-fallback-semantics.pseudo.md`
+
+Cleaned of authoritative 8+1 mandates:
+
+- `specs/interfaces/semantic-contracts.md`
+- `governance/ai-coding-handoff.md`
+
+**Status**: Complete. State/recovery semantics are now grounded in the full 9D research baseline.
 
 ### R3 — Rebuild contracts and verification after math realignment
 
@@ -84,6 +101,6 @@ For each target implementation repo, the coding agent should receive:
 
 ## Immediate next design step
 
-R1 is complete. The immediate next step is **R2 — rewrite state/recovery semantics against the restored 9D baseline**.
+R1 and R2 are complete. The immediate next step is **R3 — rebuild contracts and verification after math realignment**.
 
-R2 will define validity, admissibility, diagnostics, classification, and recovery semantics for the full 9-bit state model, grounded in the research codeword structure rather than the superseded 8+1 formalization.
+R3 will rebuild the contract and verification layers on the revalidated 9D foundation, ensuring that implementation contracts, diagnostic schemas, rule-ID taxonomy, invariant specifications, and conformance criteria are all grounded in the research baseline rather than the superseded 8+1 formalization.
