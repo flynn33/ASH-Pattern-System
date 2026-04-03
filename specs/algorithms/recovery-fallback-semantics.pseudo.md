@@ -83,7 +83,7 @@ END FUNCTION
 
 When the recovery category is `FALLBACK_REQUIRED` (for `DEGRADED` states), the system must select a known-good state from the fallback-policy registry.
 
-Fallback selection operates against the **canonical fallback-policy registry** (see future `specs/registries/fallback-policy-registry.md`). Ordering is deterministic and fully specified by policy identifiers.
+Fallback selection operates against the **canonical fallback-policy registry** (see `specs/registries/fallback-policy-registry.md`). Ordering is deterministic and fully specified by policy identifiers.
 
 ```text
 FUNCTION select_fallback(diagnostic: StateValidityDiagnostic, result: RecoveryResult) -> RecoveryResult
@@ -218,13 +218,20 @@ END ENUM
 
 ---
 
-## Unresolved closure item — fallback-policy registry
+## Canonical fallback-policy registry
 
-> **STATUS: FUTURE SPECIFICATION REQUIRED**
+> **STATUS: CANONICAL (Design Package D)**
 
-The fallback-policy registry (`specs/registries/fallback-policy-registry.md`) has not yet been defined. Until it is:
+The fallback-policy registry is defined in `specs/registries/fallback-policy-registry.md`. It governs deterministic fallback selection with normative entry shapes, ordering rules, validation requirements, and escalation behavior.
 
-1. Implementations must structure their code so the fallback registry is a replaceable component.
-2. Implementations must report `fallback-registry-unavailable` in diagnostics when no registry is configured.
-3. Implementations must escalate to containment when the registry is absent.
-4. Implementations must not invent a fallback registry or hardcode fallback states.
+Downstream implementations must implement fallback selection against this canonical registry. Local invention of fallback policy is prohibited.
+
+## Schema and taxonomy conformance
+
+Recovery and fallback diagnostics conform to the shared diagnostic envelope defined in `specs/interfaces/diagnostic-schema.md`:
+
+- Recovery diagnostics use `diagnostic_kind` = `RECOVERY`, `stage` = `RECOVERY`
+- Fallback diagnostics use `diagnostic_kind` = `FALLBACK`, `stage` = `RECOVERY`
+- `rule_ids` must conform to the `ASH-RECOVERY` and `ASH-FALLBACK` families in `specs/interfaces/rule-id-taxonomy.md`
+
+All rule IDs referenced in recovery and fallback diagnostics must conform to the canonical rule-ID pattern defined in the taxonomy.

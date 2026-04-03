@@ -16,14 +16,22 @@ ash-pattern-system/
 │   │   ├── control-bit-derivation.pseudo.md
 │   │   ├── core-admissibility.pseudo.md
 │   │   ├── state-validity-diagnostics.pseudo.md
+│   │   ├── system-state-classification.pseudo.md
+│   │   ├── recoverability-semantics.pseudo.md
 │   │   └── realm-identity.pseudo.md
 │   ├── algorithms/
 │   │   ├── transition-system.pseudo.md
 │   │   ├── topology-expansion.pseudo.md
 │   │   ├── axiom-evaluation.pseudo.md
-│   │   └── generation-planning.pseudo.md
+│   │   ├── generation-planning.pseudo.md
+│   │   ├── recovery-fallback-semantics.pseudo.md
+│   │   └── containment-safe-failure-semantics.pseudo.md
+│   ├── registries/
+│   │   └── fallback-policy-registry.md
 │   └── interfaces/
-│       └── semantic-contracts.md
+│       ├── semantic-contracts.md
+│       ├── diagnostic-schema.md
+│       └── rule-id-taxonomy.md
 └── governance/
     ├── repository-governance.md
     └── ai-coding-handoff.md
@@ -42,8 +50,11 @@ This is the highest-priority semantic layer.
 ### `specs/algorithms/`
 Contains algorithmic semantics expressed in platform-neutral pseudocode and prose.
 
+### `specs/registries/`
+Contains canonical registries that govern deterministic policy-driven behavior (e.g., fallback selection).
+
 ### `specs/interfaces/`
-Contains contracts that downstream implementations must satisfy.
+Contains contracts, diagnostic schemas, and rule taxonomies that downstream implementations must satisfy.
 
 ### `governance/`
 Contains repository rules and handoff rules for coding agents.

@@ -80,15 +80,18 @@ The following foundational algebraic items are **locked** (Design Package C) and
 
 These are not open choices. The coding agent must not substitute alternatives.
 
-## Remaining unresolved items
+The following structural items are **locked** (Design Package D) and must be implemented exactly:
 
-- **Fallback-policy registry** — the canonical registry for fallback candidates (see future `specs/registries/fallback-policy-registry.md`). Until this is defined, implementations must report `fallback-registry-unavailable` in diagnostics and escalate to containment when fallback is needed.
+- **Fallback-policy registry** — the canonical registry for deterministic fallback selection (see `specs/registries/fallback-policy-registry.md`). Implementations must implement fallback selection against this registry. Local invention of fallback policy is prohibited.
+- **Diagnostic schema** — the shared diagnostic envelope for all diagnostic contexts (see `specs/interfaces/diagnostic-schema.md`). All diagnostics must conform to this schema. Local invention of diagnostic structures is prohibited.
+- **Rule-ID taxonomy** — the canonical rule identifier structure and governance (see `specs/interfaces/rule-id-taxonomy.md`). All rule IDs in diagnostics must conform to this taxonomy.
 
 ## Design package status
 
 - **Design Package A** — complete (state-layer formal foundation)
 - **Design Package B** — formally closed (resilient software semantics layer)
 - **Design Package C** — complete (algebraic lock package)
+- **Design Package D** — complete (registry and diagnostics layer closure)
 
 ## Required delivery shape for implementation repos
 

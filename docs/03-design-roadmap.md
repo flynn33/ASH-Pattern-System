@@ -52,9 +52,7 @@ Specifications created for this phase:
 
 **Status**: Complete. Design Package B is formally closed.
 
-A future specification is still needed:
-
-- the fallback-policy registry (`specs/registries/fallback-policy-registry.md`)
+**Status**: Complete. The fallback-policy registry was defined in Design Package D.
 
 ### Phase 1.85 — lock the algebraic foundation (Design Package C)
 
@@ -66,6 +64,17 @@ Lock the two remaining foundational algebraic items:
 Consequence: all admissible normalized cores derive `control_bit = 0`. The control dimension is a deterministic parity sentinel.
 
 **Status**: Complete. Design Package C is the algebraic-lock package. Both items are now locked.
+
+### Phase 1.9 — registry and diagnostics layer (Design Package D)
+
+Close the remaining structural gaps to achieve end-to-end diagnostic completeness:
+
+- **fallback-policy registry** — define the canonical registry governing deterministic fallback selection (`specs/registries/fallback-policy-registry.md`)
+- **unified diagnostic schema** — define the shared diagnostic envelope for all diagnostic contexts (`specs/interfaces/diagnostic-schema.md`)
+- **rule-ID taxonomy** — define the canonical rule identifier structure and governance (`specs/interfaces/rule-id-taxonomy.md`)
+- **end-to-end diagnostic alignment** — ensure all diagnostic-bearing specs conform to the shared schema and use taxonomy-compliant rule IDs
+
+**Status**: Complete. Design Package D is the registry and diagnostics closure package. All items are now canonical.
 
 ### Phase 2 — lock the implementation contracts
 
@@ -104,10 +113,6 @@ For each target implementation repo, the coding agent should receive:
 
 ## Immediate next design step
 
-Design Packages A, B, and C are complete. The algebraic foundation is fully locked. The current design milestone is to **prepare for Phase 2**:
+Design Packages A, B, C, and D are complete. The semantic, algebraic, and diagnostic foundation is fully locked. The immediate next step is **Phase 2 — lock the implementation contracts**.
 
-1. **Define the fallback-policy registry** — create `specs/registries/fallback-policy-registry.md` specifying how fallback candidates are registered, ordered, and selected
-2. **Verify end-to-end diagnostic completeness** — confirm that the full chain from state validity through classification, recovery, fallback, containment, and safe halt produces complete, auditable diagnostics
-3. **Begin Phase 2** — lock implementation contracts with confidence that the semantic and algebraic foundation is complete
-
-The repository now has a complete semantic foundation for resilient software: state model, classification, recoverability, recovery/fallback/containment algorithms, and locked algebraic definitions.
+Phase 2 will define the exact capabilities that every downstream implementation must expose, with confidence that the entire semantic foundation — state model, classification, recoverability, recovery/fallback/containment algorithms, locked algebraic definitions, canonical fallback-policy registry, unified diagnostic schema, and rule-ID taxonomy — is complete and internally consistent.

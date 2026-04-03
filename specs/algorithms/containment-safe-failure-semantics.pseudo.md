@@ -190,9 +190,27 @@ Containment and safe failure are the most critical states for observability:
 5. **Containment is not halt** — a contained system is still operational in restricted mode. Only safe halt stops the system.
 6. **Diagnostic sufficiency** — the preserved diagnostic state must be sufficient for post-mortem analysis without access to runtime memory.
 
+## Schema and taxonomy conformance
+
+Containment and safe-halt diagnostics conform to the shared diagnostic envelope defined in `specs/interfaces/diagnostic-schema.md`:
+
+- Containment diagnostics use `diagnostic_kind` = `CONTAINMENT`, `stage` = `ESCALATION`
+- Safe-halt diagnostics use `diagnostic_kind` = `SAFE_HALT`, `stage` = `TERMINAL`
+- `rule_ids` must conform to the `ASH-CONTAINMENT` and `ASH-HALT` families in `specs/interfaces/rule-id-taxonomy.md`
+
+### Diagnostic chaining
+
+- Containment diagnostics must set `parent_diagnostic_reference` to the preceding recovery or fallback diagnostic that triggered escalation.
+- Safe-halt diagnostics must set `parent_diagnostic_reference` to the preceding containment or escalation diagnostic.
+- Both must set `chain_root_reference` to the originating state-validity diagnostic at the root of the chain.
+- The `full_diagnostic_chain` field in `SafeHaltDiagnostic` preserves the entire chain for post-mortem.
+
 ## Relation to other specifications
 
 - **system-state-classification.pseudo.md** — defines `CONTAINED`, `FAILED`, and `SAFE_HALT` as system-state classes
 - **recoverability-semantics.pseudo.md** — defines `CONTAINMENT_REQUIRED`, `ESCALATION_REQUIRED`, and `TERMINAL_NO_RECOVERY` as recovery categories
 - **recovery-fallback-semantics.pseudo.md** — escalates to containment when fallback fails
+- **fallback-policy-registry.md** — containment receives escalation when no valid fallback candidate exists
 - **state-validity-diagnostics.pseudo.md** — provides the diagnostic records consumed by containment and safe-halt logic
+- **diagnostic-schema.md** — defines the shared diagnostic envelope this specification conforms to
+- **rule-id-taxonomy.md** — defines the canonical rule-ID pattern for the `rule_ids` field

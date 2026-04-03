@@ -241,9 +241,22 @@ Every downstream implementation must be capable of producing a `StateValidityDia
 
 The diagnostic must never be empty, partial, or silently omitted. If diagnosis cannot be completed, the diagnostic record must explain why.
 
+## Schema and taxonomy conformance
+
+State-validity diagnostics conform to the shared diagnostic envelope defined in `specs/interfaces/diagnostic-schema.md`:
+
+- `diagnostic_kind` = `STATE_VALIDITY`
+- `stage` = `DETECTION`
+- `severity` is determined by the admissibility and control-derivation status
+- `rule_ids` must conform to the `ASH-STATE` family in `specs/interfaces/rule-id-taxonomy.md`
+
+All rule IDs referenced in this specification (e.g., `ASH-STATE-VALIDITY-001`, `ASH-STATE-VALIDITY-002`) must conform to the canonical rule-ID pattern defined in the taxonomy.
+
 ## Relation to other specifications
 
 - **ash-state-space.pseudo.md** — defines the state structure that is being diagnosed
 - **control-bit-derivation.pseudo.md** — provides the locked derivation formula (overall parity) used in step 3
 - **core-admissibility.pseudo.md** — provides the locked admissibility classification (normative 16-codeword set) used in step 2
+- **diagnostic-schema.md** — defines the shared diagnostic envelope this specification conforms to
+- **rule-id-taxonomy.md** — defines the canonical rule-ID pattern for the `rule_ids` field
 - **semantic-contracts.md** — requires that all implementations expose diagnosable state validation

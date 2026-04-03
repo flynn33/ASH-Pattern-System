@@ -25,6 +25,8 @@ This repository defines:
 - system-state classification (stable, unstable, correctable, degraded, contained, failed, safe-halt)
 - recoverability semantics and deterministic recovery-category mapping
 - recovery, fallback, containment, and safe-failure algorithms
+- canonical fallback-policy registry for deterministic fallback selection
+- unified diagnostic schema and rule-ID taxonomy for auditable diagnostics
 - deterministic transition semantics
 - deterministic topology expansion semantics
 - axiom evaluation semantics
@@ -83,7 +85,10 @@ The 9th coordinate is therefore **not** treated as an ordinary peer bit for unre
 - `specs/algorithms/topology-expansion.pseudo.md` — topology generation semantics
 - `specs/algorithms/axiom-evaluation.pseudo.md` — axiom evaluation semantics
 - `specs/algorithms/generation-planning.pseudo.md` — abstract generation planning flow
+- `specs/registries/fallback-policy-registry.md` — canonical fallback-policy registry for deterministic fallback selection
 - `specs/interfaces/semantic-contracts.md` — implementation-facing semantic contracts
+- `specs/interfaces/diagnostic-schema.md` — shared diagnostic envelope for all diagnostic contexts
+- `specs/interfaces/rule-id-taxonomy.md` — canonical rule-ID structure and governance
 - `governance/repository-governance.md` — governance rules for this repository
 - `governance/ai-coding-handoff.md` — handoff instructions for coding agents
 

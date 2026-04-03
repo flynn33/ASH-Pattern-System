@@ -36,7 +36,7 @@ Must:
 Must:
 
 - implement deterministic recovery as defined in `recovery-fallback-semantics.pseudo.md`
-- implement deterministic fallback selection against the canonical fallback-policy registry
+- implement deterministic fallback selection against the canonical fallback-policy registry (`specs/registries/fallback-policy-registry.md`)
 - implement containment as defined in `containment-safe-failure-semantics.pseudo.md`
 - implement safe halt as defined in `containment-safe-failure-semantics.pseudo.md`
 - produce a `RecoveryDiagnostic` for every recovery, fallback, containment, and safe-halt action
@@ -44,6 +44,10 @@ Must:
 - escalate monotonically when recovery fails (fallback failure -> containment, containment breach -> safe halt)
 - respect the deterministic class-to-action mapping from `system-state-classification.pseudo.md`
 - produce minimum diagnostic content for every action as specified in `recovery-fallback-semantics.pseudo.md` and `containment-safe-failure-semantics.pseudo.md`
+- expose diagnostics conforming to the shared diagnostic schema (`specs/interfaces/diagnostic-schema.md`)
+- emit rule IDs conforming to the canonical taxonomy (`specs/interfaces/rule-id-taxonomy.md`)
+- never invent local fallback-policy behavior outside the canonical registry
+- never invent local diagnostic structures outside the canonical schema
 
 ### `RealmEncoder`
 Must:
