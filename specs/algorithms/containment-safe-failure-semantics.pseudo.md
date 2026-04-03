@@ -72,7 +72,7 @@ Containment must never silently resolve. Resolution must be recorded in the diag
 
 The system must enter `SAFE_HALT` when:
 
-1. **FAILED state** — the system is in an unrecoverable error state (`INADMISSIBLE_UNRECOVERABLE` core) and the external authority (operator/supervisor) directs halt
+1. **FAILED state** — the system is in an unrecoverable error state (transformation-incompatible state with no recovery path) and the external authority (operator/supervisor) directs halt
 2. **Containment breach** — the system is in `CONTAINED` state and the containment boundary has been violated (error has propagated despite restrictions)
 3. **Operator/policy halt request** — an explicit halt is requested regardless of current state
 4. **Unresolvable blocked recovery** — the system is in a blocked recovery state with no path forward and no containment option
@@ -96,7 +96,7 @@ The system must enter `SAFE_HALT` when:
 | Further transitions | Possible (escalation to SAFE_HALT, or external resolution) | None permitted |
 | Recovery path | Escalation to external authority | None — terminal |
 | Diagnostic state | Preserved and actively updated | Frozen for post-mortem |
-| Entry mechanism | Automatic from `INADMISSIBLE_UNRECOVERABLE` classification | Deliberate action (operator, policy, containment breach) |
+| Entry mechanism | Automatic from `TRANSFORMATION_INCOMPATIBLE` classification with no recovery path | Deliberate action (operator, policy, containment breach) |
 
 A system in `FAILED` state may eventually enter `SAFE_HALT`, but a system in `SAFE_HALT` cannot return to `FAILED` or any other state.
 

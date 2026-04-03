@@ -1,89 +1,50 @@
-# StateModel Contract — implementation contract
+# StateModel Contract — temporary bridge contract (R2 baseline)
+
+> **TEMPORARY BRIDGE CONTRACT — Pending R3 Rebuild**
+>
+> This contract has been rewritten as a **temporary bridge** aligned to the R2 full-9D research baseline. It replaces the previous 8+1-era contract that mandated the parity formula, 16-codeword set, and corrected-core derivation.
+>
+> This is **not the final authoritative contract**. The full contract rebuild occurs in R3. This bridge provides interim guidance for understanding the StateModel module's responsibility within the restored 9D model.
 
 ## Purpose
 
 The `StateModel` module is the foundational implementation module for the ASH Pattern System. It owns the canonical state representation, normalization, validity diagnostics, system-state classification, and recoverability classification.
 
-## Canonical responsibility
+## Canonical responsibility (R2 baseline)
 
-The `StateModel` module is the single authority for:
+The `StateModel` module is responsible for:
 
-- representing ASH states as 9-coordinate binary vectors over F2
-- normalizing candidate states into valid normalized form
-- classifying core admissibility against the locked [8,4,4] codeword set
-- deriving the control bit using the locked parity formula
-- producing state-validity diagnostics
-- classifying system states into the 7 canonical classes
-- classifying recoverability for each system-state class
-- applying the corrected-core derivation rule
+- Representing ASH states as **full 9-bit vectors in F2^9**
+- Classifying state admissibility using the codeword-orbit structure defined in `specs/core/state-admissibility.pseudo.md`
+- Producing state-validity diagnostics as defined in `specs/core/state-validity-diagnostics.pseudo.md`
+- Classifying system states into the 7 canonical classes as defined in `specs/core/system-state-classification.pseudo.md`
+- Classifying recoverability as defined in `specs/core/recoverability-semantics.pseudo.md`
+- Grounding transformation semantics in the canonical codeword set defined in `specs/core/codeword-set.pseudo.md`
 
-## Required inputs
+## Required behaviors (R2 baseline)
 
-- A candidate ASH state (raw 9-element vector or structured `AshState`)
+- States are full 9-bit vectors — not decomposed into an 8-bit core plus a derived 9th bit
+- Normalization operates on the full 9-bit state using codeword-based correction
+- Admissibility is determined by codeword-orbit membership, not by an 8-bit sub-code
+- Diagnostics use the full-state diagnostic record (no extracted_core, no control_derivation_status)
+- XOR-by-codeword is the canonical transformation mechanism
 
-## Required outputs
+## What this bridge contract does NOT mandate
 
-- Normalized `AshState` (when normalization succeeds)
-- `StateValidityDiagnostic` record (for any candidate state)
-- `SystemStateClass` classification
-- `RecoveryCategory` classification
+This bridge contract does **not** mandate any of the following superseded 8+1 requirements:
 
-## Required behaviors
+- The parity formula (`b0 XOR b1 XOR ... XOR b7`) as canonical control-bit derivation
+- The [8,4,4] extended Hamming code 16-codeword set as canonical admissibility law
+- Extracted-core / corrected-core / derived-control handling as canonical implementation behavior
+- The corrected-core derivation rule
 
-### Normalization
-- Extract the 8-bit core and observed control bit from the candidate state
-- Classify core admissibility using the locked normative 16-codeword set
-- If `ADMISSIBLE`: derive control from `extracted_core` using the locked parity formula (`b0 XOR b1 XOR ... XOR b7`)
-- If `INADMISSIBLE_CORRECTABLE`: correct to nearest codeword, then derive control from `corrected_core` (corrected-core derivation rule)
-- If `INADMISSIBLE_DETECTABLE` or `INADMISSIBLE_UNRECOVERABLE`: normalization fails with diagnostic
-- Return normalized state or diagnostic failure
+Those requirements belonged to the superseded 8+1 formalization and are no longer authoritative.
 
-### Control-bit derivation
-- Use the locked parity formula: `derive_control_bit(core) = b0 XOR b1 XOR b2 XOR b3 XOR b4 XOR b5 XOR b6 XOR b7`
-- For admissible normalized cores, the derived control bit is always `0`
-- Must not substitute a different formula
+## Relation to other specifications
 
-### Admissibility classification
-- Use the locked normative 16-codeword set from `core-admissibility.pseudo.md`
-- Classification is by Hamming distance: 0=ADMISSIBLE, 1=CORRECTABLE, 2=DETECTABLE, >=3=UNRECOVERABLE
-- Must not substitute a different codeword set
-
-### System-state classification
-- Map admissibility + control-derivation + runtime context to one of: STABLE, UNSTABLE, CORRECTABLE, DEGRADED, CONTAINED, FAILED, SAFE_HALT
-- Classification must be deterministic and total
-
-### Recoverability classification
-- Map each system-state class to its recovery category: NO_ACTION, RE_DERIVE_CONTROL, CORRECT_AND_RE_DERIVE, FALLBACK_REQUIRED, CONTAINMENT_REQUIRED, ESCALATION_REQUIRED, TERMINAL_NO_RECOVERY
-
-## Required diagnostics
-
-- Every normalization attempt must produce a `StateValidityDiagnostic` conforming to `diagnostic-schema.md`
-- Rule IDs must conform to `rule-id-taxonomy.md` (`ASH-STATE` family)
-- Diagnostics must never be silently omitted
-
-## Invariants
-
-1. Normalization is deterministic
-2. Equal 8-bit cores produce equal derived control bits
-3. State validity can be explained diagnostically
-4. The corrected-core derivation rule is applied for all correctable states
-5. Classification is total — every state maps to exactly one class
-
-## Prohibited shortcuts
-
-- Must not treat the 9th coordinate as an ordinary peer bit
-- Must not derive control from a raw inadmissible core when correction applies
-- Must not skip admissibility classification before normalization
-- Must not silently accept an inadmissible core as valid
-- Must not invent alternative algebraic definitions
-
-## Relation to other contracts and specifications
-
-- `ash-state-space.pseudo.md` — canonical state definition
-- `control-bit-derivation.pseudo.md` — locked parity formula
-- `core-admissibility.pseudo.md` — locked 16-codeword set
-- `state-validity-diagnostics.pseudo.md` — diagnostic record definition
-- `system-state-classification.pseudo.md` — classification logic
-- `recoverability-semantics.pseudo.md` — recovery category mapping
-- `recovery-engine-contract.md` — consumes classification and diagnostics from StateModel
-- `diagnostics-module-contract.md` — schema and taxonomy conformance requirements
+- `specs/core/ash-state-space.pseudo.md` — canonical F2^9 state definition
+- `specs/core/codeword-set.pseudo.md` — canonical codeword structure
+- `specs/core/state-admissibility.pseudo.md` — full 9-bit admissibility
+- `specs/core/state-validity-diagnostics.pseudo.md` — full 9D diagnostic model
+- `specs/core/system-state-classification.pseudo.md` — system-state classes
+- `specs/core/recoverability-semantics.pseudo.md` — recovery categories

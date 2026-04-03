@@ -12,7 +12,7 @@
 
 This file is the **umbrella contract document** for the ASH Pattern System. It lists the required semantic modules and references the detailed contract files that define module-level implementation behavior.
 
-The detailed contract files in `specs/interfaces/contracts/` are **canonical** for module-level implementation behavior (Phase 2 — implementation-contract lock). This umbrella document provides the high-level structure; the contract files provide the authoritative detail.
+The detailed contract files in `specs/interfaces/contracts/` provide structural guidance for module-level implementation behavior. However, those contracts were authored under the superseded 8+1 formalization and are **pending R3 rebuild/revalidation**. They are structurally useful but **not yet authoritative for canonical conformance** until the R3 contract rebuild is complete.
 
 ## Required semantic modules
 
@@ -73,10 +73,9 @@ A downstream implementation must not:
 - skip normalization before encoding or transition application
 - collapse planning and materialization into one opaque semantic step
 - replace semantic validation with superficial metadata checks
-- silently accept an inadmissible core as valid
-- produce a control bit by any means other than the canonical derivation function
-- skip admissibility classification before normalization
-- invent module behavior not defined in the canonical contract files
+- bypass full-state admissibility classification before normalization or transformation
+- silently treat a transformation-incompatible state as valid
+- invent module behavior not grounded in the research-baseline specifications
 
 ## Portability rule
 

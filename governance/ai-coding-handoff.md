@@ -23,12 +23,13 @@ The **research baseline** is canonical — not the superseded 8+1 drift formaliz
 1. read `README.md`
 2. read all files in `docs/`
 3. read all files in `specs/core/`, paying particular attention to:
-   - `ash-state-space.pseudo.md` — the canonical state definition
-   - `control-bit-derivation.pseudo.md` — the control-bit derivation spec and its closure status
-   - `core-admissibility.pseudo.md` — the admissibility rules and their closure status
-   - `state-validity-diagnostics.pseudo.md` — the canonical diagnostic model
-   - `system-state-classification.pseudo.md` — canonical system-state classes and class-to-action mapping
-   - `recoverability-semantics.pseudo.md` — recoverability categories and recovery mapping
+   - `ash-state-space.pseudo.md` — canonical F2^9 state definition (research baseline)
+   - `codeword-set.pseudo.md` — canonical codeword structure (research baseline)
+   - `state-admissibility.pseudo.md` — full 9-bit admissibility and validity
+   - `state-validity-diagnostics.pseudo.md` — full 9D diagnostic model
+   - `system-state-classification.pseudo.md` — system-state classes (9D terms)
+   - `recoverability-semantics.pseudo.md` — recovery categories (9D terms)
+   - Note: `control-bit-derivation.pseudo.md` and `core-admissibility.pseudo.md` are **superseded** historical files — do not treat as current authority
 4. read all files in `specs/algorithms/`, paying particular attention to:
    - `recovery-fallback-semantics.pseudo.md` — deterministic recovery and fallback selection
    - `containment-safe-failure-semantics.pseudo.md` — containment and safe-failure behavior
