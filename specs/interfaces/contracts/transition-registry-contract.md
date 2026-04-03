@@ -1,67 +1,64 @@
-# TransitionRegistry Contract — implementation contract
+# TransitionRegistry Contract — implementation contract (9D Research Baseline)
 
 ## Purpose
 
-The `TransitionRegistry` module resolves and applies state transitions deterministically. It operates exclusively on normalized states and preserves the locked core/control semantics through every transition.
+The `TransitionRegistry` module resolves and applies state transitions deterministically. It operates on full 9-bit states and uses XOR-by-codeword as the canonical transformation mechanism.
 
 ## Canonical responsibility
 
 The `TransitionRegistry` module is the single authority for:
 
-- resolving which transitions are available for a given normalized state
-- applying a selected transition to produce a new normalized state
-- preserving the rule that ordinary transitions operate on the core and then re-derive the control bit
+- resolving which transitions are available for a given state
+- applying a selected transition to produce a new state
+- ensuring transitions respect the codeword structure
 
 ## Required inputs
 
-- A normalized `AshState`
-- A transition identifier or transition request
+- A valid `AshState` (full 9-bit vector in F2^9)
+- A transition identifier or codeword
 
 ## Required outputs
 
-- A new normalized `AshState` (the result of applying the transition)
+- A new `AshState` (full 9-bit vector, the result of applying the transition)
 - Transition diagnostics when resolution or application fails
 
 ## Required behaviors
 
 ### Deterministic resolution
 - Transition resolution must be deterministic — the same state and transition identifier always resolve to the same outcome
-- The set of available transitions for a given state must be deterministic
 
-### Normalized-state requirement
-- Transitions must only be applied to normalized states
-- If a non-normalized state is provided, the registry must fail with a diagnostic
-- The registry must not attempt normalization itself — that is the responsibility of `StateModel`
+### XOR-by-codeword transformation
+- The canonical transformation mechanism is `x' = x ⊕ c` where `c ∈ C ⊂ F2^9`
+- Transitions operate on the full 9-bit state simultaneously
+- There is no separate "apply to subset, then re-derive remainder" step
 
-### Core/control preservation
-- Ordinary transitions operate on the 8-bit stabilizing core
-- After modifying the core, the control bit must be re-derived using the locked parity formula
-- The transition must not directly mutate the control bit as an independent coordinate
-- The result of a transition must be a valid normalized state
+### Valid-state requirement
+- Transitions should operate on valid states
+- If an invalid state is provided, the registry must fail with a diagnostic
 
 ## Required diagnostics
 
-- If transition resolution fails (e.g., unknown identifier, inapplicable transition), produce a diagnostic conforming to `diagnostic-schema.md`
+- If transition resolution fails, produce a diagnostic conforming to `diagnostic-schema.md`
 - Rule IDs must conform to `rule-id-taxonomy.md`
 
 ## Invariants
 
 1. Transition resolution is deterministic
-2. Transition application produces a normalized state
-3. The control bit is always re-derived after core modification
-4. No direct mutation of the control bit during ordinary transitions
+2. XOR-by-codeword produces a well-formed 9-bit state
+3. `(x ⊕ c) ⊕ c = x` — applying the same codeword twice returns to the original state
+4. Failed applicability checks return explainable diagnostics
 
 ## Prohibited shortcuts
 
-- Must not apply transitions to unnormalized states
-- Must not directly mutate the control bit outside of re-derivation
-- Must not skip re-derivation after core modification
+- Must not decompose the state into sub-components for transformation
 - Must not silently drop a failed transition
+- Must not assume a specific exhaustive codeword set if research-baseline closure is pending
 
 ## Relation to other contracts and specifications
 
-- `state-model-contract.md` — provides normalized states consumed by TransitionRegistry
+- `state-model-contract.md` — provides valid states consumed by TransitionRegistry
 - `transition-system.pseudo.md` — transition semantics
-- `ash-state-space.pseudo.md` — canonical state definition
-- `control-bit-derivation.pseudo.md` — locked parity formula for re-derivation
-- `diagnostics-module-contract.md` — schema and taxonomy conformance requirements
+- `codeword-transformation-semantics.pseudo.md` — canonical XOR-by-codeword operation
+- `codeword-set.pseudo.md` — canonical codeword structure
+- `ash-state-space.pseudo.md` — canonical F2^9 state definition
+- `diagnostics-module-contract.md` — schema and taxonomy conformance

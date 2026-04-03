@@ -1,4 +1,4 @@
-# Rule-ID Taxonomy — canonical specification
+# Rule-ID Taxonomy — canonical specification (9D Research Baseline)
 
 ## Purpose
 
@@ -26,7 +26,7 @@ Example: `ASH-STATE-VALIDITY-001`
 | Family | Scope | Source specification |
 |---|---|---|
 | `ASH-STATE` | State-space structure, validity, normalization | `ash-state-space.pseudo.md`, `state-validity-diagnostics.pseudo.md` |
-| `ASH-CONTROL` | Control-bit derivation, parity formula | `control-bit-derivation.pseudo.md` |
+| `ASH-CODEWORD` | Codeword structure, transformation, orbit membership | `codeword-set.pseudo.md`, `codeword-transformation-semantics.pseudo.md` |
 | `ASH-ADMISSIBILITY` | Core admissibility, codeword classification, correction | `core-admissibility.pseudo.md` |
 | `ASH-CLASSIFICATION` | System-state classification, class-to-action mapping | `system-state-classification.pseudo.md` |
 | `ASH-RECOVERY` | Recoverability semantics, recovery actions | `recoverability-semantics.pseudo.md`, `recovery-fallback-semantics.pseudo.md` |
@@ -76,7 +76,7 @@ Example: `ASH-STATE-VALIDITY-001`
 |---|---|---|
 | `ASH-STATE-VALIDITY-001` | Core must be structurally admissible | `ash-state-space.pseudo.md` |
 | `ASH-STATE-VALIDITY-002` | Control bit must be consistent with derivation rule | `ash-state-space.pseudo.md` |
-| `ASH-CONTROL-DERIVATION-001` | Derivation must be deterministic (locked parity formula) | `control-bit-derivation.pseudo.md` |
+| `ASH-CODEWORD-STRUCTURE-001` | Codeword set must be research-baseline grounded | `codeword-set.pseudo.md` |
 | `ASH-ADMISSIBILITY-CLASSIFICATION-001` | Every F2^8 vector maps to exactly one admissibility class | `core-admissibility.pseudo.md` |
 | `ASH-CLASSIFICATION-MAPPING-001` | Every state maps to exactly one system-state class | `system-state-classification.pseudo.md` |
 | `ASH-RECOVERY-ACTION-001` | Recovery category is deterministic from state class | `recoverability-semantics.pseudo.md` |

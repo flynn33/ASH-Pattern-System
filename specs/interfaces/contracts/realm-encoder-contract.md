@@ -1,20 +1,20 @@
-# RealmEncoder Contract — implementation contract
+# RealmEncoder Contract — implementation contract (9D Research Baseline)
 
 ## Purpose
 
-The `RealmEncoder` module encodes realm identity from a normalized ASH state. It translates the algebraic state representation into a realm-level identity that preserves the semantic structure of the state model.
+The `RealmEncoder` module encodes realm identity from a full 9-bit ASH state. It translates the algebraic state representation into a realm-level identity that preserves the semantic structure of the state model.
 
 ## Canonical responsibility
 
 The `RealmEncoder` module is the single authority for:
 
-- encoding realm identity from a normalized ASH state
+- encoding realm identity from a valid full 9-bit ASH state
 - producing deterministic, reproducible realm encodings
-- preserving the semantic distinction between core and control dimensions in the encoded output
+- rejecting invalid or unclassified states with a diagnostic
 
 ## Required inputs
 
-- A normalized `AshState` (must be valid — admissible core, correctly derived control bit)
+- A valid `AshState` (full 9-bit vector in F2^9)
 
 ## Required outputs
 
@@ -23,17 +23,17 @@ The `RealmEncoder` module is the single authority for:
 ## Required behaviors
 
 ### Deterministic encoding
-- The same normalized state must always produce the same realm encoding
+- The same state must always produce the same realm encoding
 - Encoding must be reproducible across platforms, implementations, and execution contexts
 
-### Normalized-state requirement
-- The encoder must only accept normalized states as input
-- If an unnormalized or invalid state is provided, the encoder must fail with a diagnostic rather than silently produce a potentially incorrect encoding
+### Valid-state requirement
+- The encoder must only accept valid states as input
+- If an invalid or unclassified state is provided, the encoder must fail with a diagnostic
 - The encoder must not attempt normalization itself — that is the responsibility of `StateModel`
 
-### Control semantics preservation
-- The encoded output must preserve the semantic distinction between the 8-bit stabilizing core and the derived control dimension
-- The encoding must not collapse the core/control distinction
+### Full-state encoding
+- All 9 coordinates of the state participate in the identity encoding
+- The encoding must not decompose the state into sub-components for encoding purposes
 
 ## Required diagnostics
 
@@ -43,18 +43,18 @@ The `RealmEncoder` module is the single authority for:
 ## Invariants
 
 1. Encoding is deterministic — equal inputs produce equal outputs
-2. Encoding operates only on normalized states
-3. The core/control semantic distinction is preserved in the encoding
+2. Encoding operates only on valid states
+3. All 9 coordinates participate in the encoding
 
 ## Prohibited shortcuts
 
-- Must not encode from an unnormalized or invalid state
-- Must not collapse the core/control distinction in the encoding
+- Must not encode from an invalid or unclassified state
 - Must not silently produce a default encoding when input is invalid
+- Must not decompose the 9-bit state for encoding purposes
 
 ## Relation to other contracts and specifications
 
-- `state-model-contract.md` — provides normalized states consumed by RealmEncoder
-- `realm-identity.pseudo.md` — realm identity and encoding semantics
-- `ash-state-space.pseudo.md` — canonical state definition
-- `diagnostics-module-contract.md` — schema and taxonomy conformance requirements
+- `state-model-contract.md` — provides valid states consumed by RealmEncoder
+- `realm-identity.pseudo.md` — realm identity semantics
+- `ash-state-space.pseudo.md` — canonical F2^9 state definition
+- `diagnostics-module-contract.md` — schema and taxonomy conformance

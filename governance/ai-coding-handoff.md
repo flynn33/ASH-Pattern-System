@@ -1,10 +1,6 @@
 # AI Coding Handoff
 
-> **REALIGNED — Research Math Realignment Package R1**
->
-> The ASH Pattern System has been realigned to the **full 9-dimensional research baseline**. The previous 8+1 formalization (8-bit core + derived control bit) is **superseded and not canonical**.
->
-> Platform build handoff work is **paused** until post-realignment rebuild (R2–R3) is complete. The contract, verification, and conformance layers built on the 8+1 model require revalidation before downstream implementation may proceed.
+> **Post-R3 status**: The ASH Pattern System is grounded in the **full 9-dimensional research baseline**. The contract and verification layers have been rebuilt on the 9D foundation (R3). The exhaustive codeword-set enumeration remains pending research closure.
 
 ## Purpose
 
@@ -92,30 +88,23 @@ The following are **superseded and not canonical** after R1:
 - Control-bit derivation formula (`b8 = b0 ⊕ ... ⊕ b7`) — superseded
 - 8-bit [8,4,4] core admissibility law — superseded
 - Corrected-core derivation rule — superseded
-- All contracts, verification, and conformance layers built on the 8+1 model — **pending revalidation**
-
 The coding agent must not treat the superseded 8+1 formalization as authoritative for implementation.
 
-## Layers pending revalidation
+## Rebuilt layers (post-R3)
 
-The following layers require research-baseline revalidation before they can be used as authority:
+The following layers have been **rebuilt on the 9D research baseline** and are authoritative:
 
-- Contract layer (`specs/interfaces/semantic-contracts.md` and `specs/interfaces/contracts/`)
-- Verification layer (`specs/verification/`)
-- Recovery/fallback/containment semantics built on the 8+1 model
-- Diagnostic schema and rule-ID taxonomy (structural concepts may survive, but 8+1-specific invariants must be revalidated)
+- Contract layer (`specs/interfaces/semantic-contracts.md` and `specs/interfaces/contracts/`) — rebuilt in R3
+- Verification layer (`specs/verification/`) — rebuilt in R3
+- Diagnostic schema and rule-ID taxonomy — revalidated in R3
 
-Platform build handoff work is **paused** until R2–R3 revalidation is complete.
+**Open research-closure item**: The exhaustive codeword-set enumeration (`C ⊂ F2^9`) is pending research closure. Implementations must handle this honestly (see `implementation-acceptance.md` for CONFORMANT WITH CAVEATS acceptance).
 
 ## Design package status
 
-- **Design Package A** — complete, then **partially superseded by R1**
-- **Design Package B** — formally closed, then **partially superseded by R1**
-- **Design Package C** — complete, then **superseded by R1** (algebraic locks based on 8+1 model)
-- **Design Package D** — complete, **pending revalidation after R1**
-- **Phase 2** — complete, **pending revalidation after R1**
-- **Phase 3** — complete, **pending revalidation after R1**
-- **R1 — Foundational Math Reset** — complete (current)
+- **R1 — Foundational Math Reset** — complete
+- **R2 — State/Recovery Realignment** — complete
+- **R3 — Contract and Verification Rebuild** — complete
 
 ## Required delivery shape for implementation repos
 

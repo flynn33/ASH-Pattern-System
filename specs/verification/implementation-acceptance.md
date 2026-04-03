@@ -1,110 +1,83 @@
-# Implementation Acceptance — PENDING REVALIDATION
-
-> **PENDING REVALIDATION — Research Math Realignment Package R1**
->
-> This acceptance specification was built on the **superseded 8+1 drift formalization**. The acceptance criteria, non-waivable requirements, and judgment language defined here require **research-baseline revalidation** before they can be treated as authoritative.
->
-> No downstream implementation may claim conformance or receive a CONFORMANT judgment based on these criteria until they are revalidated against the restored 9D research baseline. Revalidation is planned for realignment packages R2–R3.
-
----
-
-# Implementation Acceptance — verification requirements (pending revalidation)
+# Implementation Acceptance — canonical verification requirements (9D Research Baseline)
 
 ## Purpose
 
-This specification defines the **minimum acceptance threshold** for a downstream implementation repository to be considered conformant with the ASH Pattern System.
+This specification defines the **minimum acceptance threshold** for a downstream implementation to be considered conformant with the ASH Pattern System, grounded in the full 9D research baseline.
 
-This specification is **canonical** (Phase 3). No downstream implementation may claim conformance without satisfying these requirements.
+**Open research-closure item**: The exhaustive enumeration of `C ⊂ F2^9` is pending research closure. Acceptance for codeword-set-dependent invariants (marked in `invariant-spec.md`) applies to whatever codeword set is provided but cannot be fully assessed until the set is specified. This is explicitly acknowledged in the acceptance framework — it does not block conformance judgment for all other invariants.
 
 ---
 
 ## Minimum acceptance conditions
 
-A downstream implementation is **accepted as conformant** if and only if all of the following conditions are met:
+A downstream implementation is **accepted as conformant** if and only if:
 
-1. **All invariants pass** — every invariant defined in `invariant-spec.md` must be verified and must pass. No invariant may be skipped.
+1. **All non-codeword-dependent invariants pass** — every invariant in `invariant-spec.md` that does not depend on the exhaustive codeword-set closure must be verified and must pass.
 
-2. **All conformance categories are covered** — every category defined in `conformance-categories.md` must be represented in the test suite. No category may be omitted entirely.
+2. **Codeword-dependent invariants are satisfied for the provided codeword set** — if a codeword set is provided (even partial), the implementation must satisfy codeword-dependent invariants against that set.
 
-3. **Locked semantics are preserved exactly** — the locked algebraic definitions (parity formula, [8,4,4] codeword set), corrected-core derivation rule, materialization boundary, fallback-policy registry, diagnostic schema, and rule-ID taxonomy must be implemented exactly as specified. No substitutions, approximations, or local overrides.
+3. **All 5 conformance categories are covered** — every category in `conformance-categories.md` must be represented in the test suite.
 
-4. **Per-module contracts are satisfied** — every module contract defined in `specs/interfaces/contracts/` must be satisfied. Module behavior must match the detailed contract, not just the umbrella summary.
+4. **Per-module contracts are satisfied** — every module contract in `specs/interfaces/contracts/` must be satisfied as grounded in the 9D baseline.
 
-5. **Diagnostics are complete** — the diagnostic chain from state-validity detection through terminal safe halt must be complete, auditable, and conformant with the shared schema and taxonomy.
+5. **Diagnostics are complete** — the diagnostic chain is conformant with the shared schema and taxonomy.
+
+6. **Open research items are handled honestly** — if the codeword set is not fully specified, the implementation must handle `UNCLASSIFIED` admissibility status correctly and must not substitute an invented codeword set.
 
 ---
 
 ## Failure conditions
 
-A downstream implementation is **non-conformant** if any of the following conditions are true:
+A downstream implementation is **non-conformant** if any of the following:
 
-1. **Any invariant fails** — a single failing invariant for a locked semantic renders the implementation non-conformant for the associated conformance category.
-
-2. **Any conformance category is missing** — if the test suite does not cover one or more conformance categories, the implementation cannot be assessed and is treated as non-conformant.
-
-3. **A locked semantic is substituted** — if the implementation uses a different derivation formula, codeword set, fallback policy, diagnostic schema, or rule-ID taxonomy than the canonical specification, it is non-conformant regardless of test results.
-
-4. **The materialization boundary is violated** — if the planner emits artifacts or the emitter invents semantics, the implementation is non-conformant for the Generation/Materialization-Boundary category.
-
-5. **Diagnostics are incomplete** — if any step in the recovery/escalation chain fails to produce a diagnostic, or if diagnostics do not conform to the schema/taxonomy, the implementation is non-conformant for the Diagnostics category.
-
-6. **Silent healing occurs** — if recovery actions mutate state without producing diagnostic records, the implementation is non-conformant for the Recovery/Fallback/Containment category.
+1. Any non-codeword-dependent invariant fails
+2. Any conformance category is missing from the test suite
+3. The implementation decomposes the 9-bit state into an 8-bit core + derived 9th bit for canonical processing
+4. The materialization boundary is violated
+5. Diagnostics are incomplete or non-conformant with the schema/taxonomy
+6. Silent healing occurs (recovery without diagnostics)
+7. The implementation invents codewords not grounded in the research baseline
 
 ---
 
-## Non-waivable locked requirements
+## Non-waivable requirements
 
-The following locked requirements **may not be waived, deferred, or locally overridden** by any downstream implementation:
+The following may **not be waived, deferred, or locally overridden**:
 
-| Requirement | Source | Locked since |
-|---|---|---|
-| Control-bit derivation formula (overall parity) | `control-bit-derivation.pseudo.md` | Design Package C |
-| Core admissibility law (normative 16-codeword set) | `core-admissibility.pseudo.md` | Design Package C |
-| Corrected-core derivation rule | `ash-state-space.pseudo.md` | Design Package B |
-| Materialization boundary (planner/emitter separation) | `generation-planner-contract.md`, `artifact-emitter-contract.md` | Phase 2 |
-| Fallback-policy registry conformance | `fallback-policy-registry.md` | Design Package D |
-| Diagnostic schema conformance | `diagnostic-schema.md` | Design Package D |
-| Rule-ID taxonomy conformance | `rule-id-taxonomy.md` | Design Package D |
-| SAFE_HALT terminal finality | `containment-safe-failure-semantics.pseudo.md` | Design Package B |
-| Monotonic escalation | `recoverability-semantics.pseudo.md` | Design Package B |
-
-These requirements are the semantic foundation of the ASH Pattern System. Waiving any of them would compromise the system's guarantees for self-healing, self-correcting, safe-failure, and fallback behavior.
+| Requirement | Source |
+|---|---|
+| Full F2^9 state space | `ash-state-space.pseudo.md` |
+| XOR-by-codeword as canonical transformation | `codeword-transformation-semantics.pseudo.md` |
+| Materialization boundary (planner/emitter separation) | `generation-planner-contract.md`, `artifact-emitter-contract.md` |
+| Fallback-policy registry conformance | `fallback-policy-registry.md` |
+| Diagnostic schema conformance | `diagnostic-schema.md` |
+| Rule-ID taxonomy conformance | `rule-id-taxonomy.md` |
+| SAFE_HALT terminal finality | `containment-safe-failure-semantics.pseudo.md` |
+| Monotonic escalation | `recoverability-semantics.pseudo.md` |
+| No 8+1 decomposition as canonical | R1 realignment decision |
 
 ---
 
 ## Acceptance judgment language
 
 ### CONFORMANT
+All non-codeword-dependent invariants pass, all 5 categories are covered, all contracts are satisfied, diagnostics are complete, and open research items are handled honestly.
 
-An implementation receives the judgment **CONFORMANT** when:
-
-- All invariants in `invariant-spec.md` pass
-- All 5 conformance categories in `conformance-categories.md` are covered and passing
-- All non-waivable locked requirements are satisfied exactly
-- All per-module contracts are satisfied
-- The diagnostic chain is complete and conformant
+### CONFORMANT WITH CAVEATS
+All of the above, plus: codeword-dependent invariants are satisfied for the provided codeword set, but the set is not yet fully specified by the research baseline. The caveat must name the specific open item.
 
 ### NON-CONFORMANT
-
-An implementation receives the judgment **NON-CONFORMANT** when any acceptance condition is not met.
-
-A non-conformant judgment must include:
-
-- A list of failing invariants (by ID) with the reason for failure
-- A list of failing conformance categories
-- A list of non-waivable requirements that were violated
-- Recommendations for remediation
+Any acceptance condition is not met. The judgment must include: failing invariants (by ID), failing categories, and recommendations for remediation.
 
 ### PARTIAL — not a valid judgment
-
-There is no "partial conformance" judgment. An implementation is either **CONFORMANT** or **NON-CONFORMANT**. Partial coverage may be useful for development progress tracking, but it does not constitute a conformance claim.
+There is no "partial conformance." An implementation is CONFORMANT, CONFORMANT WITH CAVEATS, or NON-CONFORMANT.
 
 ---
 
 ## Relation to other specifications
 
-- **invariant-spec.md** — defines the canonical invariant set that must pass
-- **conformance-categories.md** — defines the 5 verification buckets that must be covered
-- **semantic-contracts.md** — umbrella contract document; Phase 3 verifies its requirements
-- **specs/interfaces/contracts/** — detailed module contracts; Phase 3 verifies their satisfaction
-- **governance/ai-coding-handoff.md** — instructs downstream coding agents that conformance requires Phase 3 satisfaction
+- `invariant-spec.md` — the canonical invariant set
+- `conformance-categories.md` — the 5 verification buckets
+- `semantic-contracts.md` — umbrella contract document
+- `specs/interfaces/contracts/` — detailed module contracts
+- `codeword-set.pseudo.md` — codeword-set closure status

@@ -1,4 +1,4 @@
-# Diagnostic Schema — canonical specification
+# Diagnostic Schema — canonical specification (9D Research Baseline)
 
 ## Purpose
 

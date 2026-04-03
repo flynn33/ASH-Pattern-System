@@ -1,4 +1,4 @@
-# ArtifactEmitter Contract — implementation contract
+# ArtifactEmitter Contract — implementation contract (9D Research Baseline)
 
 ## Purpose
 

@@ -6,7 +6,7 @@ This repository is the **platform-neutral, language-neutral source of truth** fo
 
 It is the agnostic specification repository grounded in the **full 9-dimensional ASH research math**.
 
-> **Research Math Realignment R1**: This repository has been realigned to the full 9D ASH research baseline. The previous 8+1 formalization (8-bit "stabilizing algebraic core" + derived 9th "control/parity bit") is superseded. Later contract, verification, and conformance layers are pending revalidation.
+> **Post-R3 status**: This repository is grounded in the full 9D ASH research baseline (R1). State/recovery semantics (R2) and contract/verification layers (R3) have been rebuilt on the 9D foundation. The exhaustive codeword-set enumeration (`C ⊂ F2^9`) remains pending research closure.
 
 ## Repository purpose
 
@@ -30,8 +30,9 @@ This repository defines:
 - axiom evaluation semantics
 - generation-planning semantics
 - realm identity encoding from full 9-bit states
-- resilient software semantics (classification, recovery, fallback, containment, safe failure) — rewritten against 9D research baseline in R2
-- implementation contracts and verification requirements — pending revalidation / rebuild in R3
+- resilient software semantics (classification, recovery, fallback, containment, safe failure) — rebuilt on 9D baseline
+- implementation contracts for all 9 required semantic modules — rebuilt on 9D baseline in R3
+- invariant-based verification requirements for downstream conformance — rebuilt on 9D baseline in R3
 
 This repository does **not** define:
 

@@ -1,18 +1,14 @@
 # Semantic Contracts for Future Implementations
 
-> **PENDING REVALIDATION — Research Math Realignment Package R1**
->
-> This contract layer was built on the **superseded 8+1 drift formalization**. It requires **research-baseline revalidation** before it can be treated as authoritative.
->
-> No downstream implementation may claim canonical conformance based on contracts that assume the 8+1 model (8-bit "stabilizing algebraic core" + derived 9th "control/parity bit"). The canonical mathematical foundation is now the **full 9-dimensional ASH research baseline**.
->
-> This file and the detailed contract files it references are pending rewrite in realignment packages R2–R3. Platform build handoff work is paused until post-realignment contract rebuild is complete.
+## Authority status (post-R3)
+
+This contract layer has been **rebuilt for the full 9D ASH research baseline** in R3. The detailed contract files in `specs/interfaces/contracts/` are authoritative for module-level implementation behavior within the current 9D foundation.
+
+**Open research-closure item**: The exhaustive enumeration of the canonical codeword set `C ⊂ F2^9` is still pending research closure (see `specs/core/codeword-set.pseudo.md`). Contracts that depend on the specific codeword set acknowledge this explicitly. Implementations must treat the codeword set as a research-baseline input, not an implementation choice, and must handle `UNCLASSIFIED` admissibility status when the codeword set is not fully specified.
 
 ## Umbrella contract document
 
-This file is the **umbrella contract document** for the ASH Pattern System. It lists the required semantic modules and references the detailed contract files that define module-level implementation behavior.
-
-The detailed contract files in `specs/interfaces/contracts/` provide structural guidance for module-level implementation behavior. However, those contracts were authored under the superseded 8+1 formalization and are **pending R3 rebuild/revalidation**. They are structurally useful but **not yet authoritative for canonical conformance** until the R3 contract rebuild is complete.
+This file is the **umbrella contract document** for the ASH Pattern System. It lists the required semantic modules and references the detailed contract files.
 
 ## Required semantic modules
 
@@ -30,22 +26,16 @@ Every downstream implementation must provide semantic equivalents of the followi
 | 8 | `Diagnostics` | `contracts/diagnostics-module-contract.md` |
 | 9 | `RecoveryEngine` | `contracts/recovery-engine-contract.md` |
 
-Each detailed contract file defines: purpose, canonical responsibility, required inputs, required outputs, required behaviors, required diagnostics, invariants, prohibited shortcuts, and relation to other contracts/specs.
-
 ## Materialization boundary (locked)
 
 The boundary between `GenerationPlanner` and `ArtifactEmitter` is a **locked design decision**:
 
 - `GenerationPlanner` produces an abstract, target-aware but non-materialized plan. It must not emit artifacts or perform side effects.
 - `ArtifactEmitter` materializes that plan for a target runtime/platform. It must not invent semantics not present in the plan.
-- The plan is the sole interface between planner and emitter. The emitter must not call back to the planner.
+- The plan is the sole interface between planner and emitter.
 - Planning and materialization must not be collapsed into a single opaque step.
 
-See `contracts/generation-planner-contract.md` and `contracts/artifact-emitter-contract.md` for the authoritative boundary definition.
-
 ## Research-baseline algebraic conformance
-
-> **Note**: The previous "mandatory algebraic conformance" section mandating the parity formula, 16-codeword set, and corrected-core derivation rule has been **removed** following R1/R2 realignment. Those requirements were based on the superseded 8+1 formalization.
 
 A downstream implementation **must**:
 
@@ -53,17 +43,13 @@ A downstream implementation **must**:
 - use XOR-by-codeword transformations as the canonical state transformation mechanism
 - ground the codeword set in the research baseline (see `specs/core/codeword-set.pseudo.md`)
 - use full 9-bit state admissibility (see `specs/core/state-admissibility.pseudo.md`)
-- not reintroduce the superseded 8+1 decomposition (8-bit core + derived 9th bit) as canonical
+- not reintroduce the superseded 8+1 decomposition as canonical
 
 ## Mandatory registry, schema, and taxonomy conformance
-
-The following are **locked design decisions** (Design Package D):
 
 - Fallback selection must use the canonical fallback-policy registry (`specs/registries/fallback-policy-registry.md`)
 - All diagnostics must conform to the shared diagnostic schema (`specs/interfaces/diagnostic-schema.md`)
 - All rule IDs must conform to the canonical taxonomy (`specs/interfaces/rule-id-taxonomy.md`)
-
-A downstream implementation must not invent local fallback policy, diagnostic structures, or rule-ID formats.
 
 ## Prohibited shortcuts
 
@@ -73,9 +59,10 @@ A downstream implementation must not:
 - skip normalization before encoding or transition application
 - collapse planning and materialization into one opaque semantic step
 - replace semantic validation with superficial metadata checks
-- bypass full-state admissibility classification before normalization or transformation
+- bypass full-state admissibility classification
 - silently treat a transformation-incompatible state as valid
 - invent module behavior not grounded in the research-baseline specifications
+- decompose the 9-bit state into sub-components for canonical processing
 
 ## Portability rule
 

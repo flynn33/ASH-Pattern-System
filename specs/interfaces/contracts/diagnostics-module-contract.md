@@ -1,4 +1,4 @@
-# Diagnostics Module Contract — implementation contract
+# Diagnostics Module Contract — implementation contract (9D Research Baseline)
 
 ## Purpose
 

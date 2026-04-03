@@ -84,7 +84,17 @@ Rebuild the contract and verification layers on the revalidated 9D foundation:
 - Revalidate or rewrite the invariant specification, conformance categories, and acceptance criteria
 - Confirm that the materialization boundary, fallback-policy registry, and other structural contributions from the original phases remain valid or are updated
 
-**Status**: Not started. Blocked until R2 is complete.
+Rebuilt/revalidated:
+
+- All 9 detailed module contracts in `specs/interfaces/contracts/`
+- `specs/interfaces/semantic-contracts.md` (umbrella, authority status clarified)
+- `specs/interfaces/diagnostic-schema.md` (revalidated for 9D)
+- `specs/interfaces/rule-id-taxonomy.md` (revalidated for 9D)
+- `specs/verification/invariant-spec.md` (rebuilt on 9D terms)
+- `specs/verification/conformance-categories.md` (rebuilt on 9D terms)
+- `specs/verification/implementation-acceptance.md` (rebuilt on 9D terms with honest codeword-set handling)
+
+**Status**: Complete. The contract and verification layers are now authoritative for the full 9D research baseline. The exhaustive codeword-set enumeration remains pending research closure and is handled honestly in acceptance criteria (CONFORMANT WITH CAVEATS).
 
 ### Phase 4 — create platform build handoff packages
 
@@ -97,10 +107,13 @@ For each target implementation repo, the coding agent should receive:
 - packaging constraints
 - performance constraints if applicable
 
-**Status**: Paused. Platform build handoff work cannot proceed until R1–R3 are complete and the repository is fully revalidated against the research baseline.
+**Status**: Ready to begin once the codeword-set research closure is resolved. Platform handoff may proceed with the caveat that codeword-set-dependent behavior requires the research closure.
 
 ## Immediate next design step
 
-R1 and R2 are complete. The immediate next step is **R3 — rebuild contracts and verification after math realignment**.
+R1, R2, and R3 are complete. The contract and verification layers are rebuilt on the 9D research baseline.
 
-R3 will rebuild the contract and verification layers on the revalidated 9D foundation, ensuring that implementation contracts, diagnostic schemas, rule-ID taxonomy, invariant specifications, and conformance criteria are all grounded in the research baseline rather than the superseded 8+1 formalization.
+The immediate next steps are:
+
+1. **Resolve codeword-set research closure** — formalize the exhaustive enumeration of `C ⊂ F2^9` from the published research materials in `specs/core/codeword-set.pseudo.md`
+2. **Begin Phase 4** — create platform build handoff packages once the codeword-set closure is resolved (or proceed with CONFORMANT WITH CAVEATS acceptance for codeword-dependent features)

@@ -1,4 +1,4 @@
-# TopologyGenerator Contract — implementation contract
+# TopologyGenerator Contract — implementation contract (9D Research Baseline)
 
 ## Purpose
 

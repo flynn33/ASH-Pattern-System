@@ -1,18 +1,19 @@
-# RecoveryEngine Contract — implementation contract
+# RecoveryEngine Contract — implementation contract (9D Research Baseline)
 
 ## Purpose
 
-The `RecoveryEngine` module implements deterministic recovery, fallback, containment, and safe-halt behavior for the ASH Pattern System. It consumes state classifications and diagnostics from `StateModel` and executes the appropriate recovery action.
+The `RecoveryEngine` module implements deterministic recovery, fallback, containment, and safe-halt behavior for the ASH Pattern System. It consumes state classifications and diagnostics from `StateModel` and executes the appropriate recovery action — all grounded in the full 9-dimensional research baseline.
 
 ## Canonical responsibility
 
 The `RecoveryEngine` module is the single authority for:
 
-- executing recovery actions (re-derive control, correct + re-derive)
+- executing recovery actions (codeword-based normalization, codeword-based correction)
 - selecting fallback states from the canonical fallback-policy registry
 - entering and managing containment mode
 - entering safe halt
 - producing recovery, fallback, containment, and safe-halt diagnostics
+- enforcing monotonic escalation
 
 ## Required inputs
 
@@ -20,19 +21,20 @@ The `RecoveryEngine` module is the single authority for:
 - `SystemStateClass` from StateModel
 - `RecoveryCategory` from StateModel
 - Access to the canonical fallback-policy registry
+- Access to the canonical codeword set `C ⊂ F2^9`
 
 ## Required outputs
 
 - `RecoveryDiagnostic` record for every recovery/fallback action
 - `ContainmentDiagnostic` record for containment entry
 - `SafeHaltDiagnostic` record for safe-halt entry
-- Recovered/corrected `AshState` (when recovery succeeds)
+- Recovered/corrected `AshState` (full 9-bit vector, when recovery succeeds)
 
 ## Required behaviors
 
 ### Recovery actions
-- `RE_DERIVE_CONTROL`: re-derive control bit from admissible core using locked parity formula
-- `CORRECT_AND_RE_DERIVE`: correct core to nearest codeword, then re-derive from corrected core
+- `NORMALIZE_STATE`: restore a transformation-compatible state to a valid configuration using the codeword structure
+- `APPLY_CORRECTION`: apply a known codeword correction sequence to reach a valid state
 - Post-recovery validation: re-diagnose the recovered state; must classify as STABLE
 - If validation fails: escalate
 
@@ -47,7 +49,6 @@ The `RecoveryEngine` module is the single authority for:
 - Enter containment when fallback fails, propagation risk detected, or operator requests
 - Restrict operations to safe subset
 - Preserve diagnostic state
-- Remain operational in restricted mode
 - Escalate to safe halt if containment boundary is breached
 
 ### Safe halt
@@ -65,7 +66,7 @@ The `RecoveryEngine` module is the single authority for:
 - Every recovery step must produce a diagnostic record
 - No silent healing — all state mutations must be diagnosable
 - Diagnostics must conform to `diagnostic-schema.md`
-- Rule IDs must conform to `rule-id-taxonomy.md` (`ASH-RECOVERY`, `ASH-FALLBACK`, `ASH-CONTAINMENT`, `ASH-HALT` families)
+- Rule IDs must conform to `rule-id-taxonomy.md`
 - Diagnostic chaining: each diagnostic must reference its parent and chain root
 
 ## Invariants
@@ -75,20 +76,23 @@ The `RecoveryEngine` module is the single authority for:
 3. No silent healing — every recovery action produces a diagnostic
 4. Fallback is registry-driven — no ad hoc fallback selection
 5. Safe halt is terminal — no transitions from SAFE_HALT
+6. Recovery operates on full 9-bit states — no decomposition into core + derived bit
 
 ## Prohibited shortcuts
 
 - Must not silently heal without producing diagnostics
-- Must not skip containment when the specification requires it
+- Must not skip containment when specifications require it
 - Must not select fallback states outside the canonical registry
-- Must not allow transitions from SAFE_HALT to any other state
-- Must not de-escalate without external intervention
+- Must not allow transitions from SAFE_HALT
+- Must not decompose recovery into 8-bit core operations plus control-bit re-derivation
+- Must not assume a specific exhaustive codeword set if research-baseline closure is pending
 
 ## Relation to other contracts and specifications
 
-- `state-model-contract.md` — provides classification and diagnostics consumed by RecoveryEngine
+- `state-model-contract.md` — provides classification and diagnostics
 - `recoverability-semantics.pseudo.md` — recovery category definitions
 - `recovery-fallback-semantics.pseudo.md` — algorithmic recovery/fallback flow
 - `containment-safe-failure-semantics.pseudo.md` — containment and safe-halt behavior
 - `fallback-policy-registry.md` — canonical registry for fallback selection
-- `diagnostics-module-contract.md` — schema and taxonomy conformance requirements
+- `codeword-set.pseudo.md` — codeword structure for normalization/correction
+- `diagnostics-module-contract.md` — schema and taxonomy conformance

@@ -1,104 +1,95 @@
-# Invariant Specification — PENDING REVALIDATION
-
-> **PENDING REVALIDATION — Research Math Realignment Package R1**
->
-> This verification layer was built on the **superseded 8+1 drift formalization**. The invariants defined here (e.g., INV-NORM, INV-CONTROL referencing the 8-bit core + derived control bit model) require **research-baseline revalidation** before they can be treated as authoritative.
->
-> No downstream implementation may claim conformance based on these invariants until they are revalidated against the restored 9D research baseline. Revalidation is planned for realignment packages R2–R3.
-
----
-
-# Invariant Specification — verification requirements (pending revalidation)
+# Invariant Specification — canonical verification requirements (9D Research Baseline)
 
 ## Purpose
 
-This specification defines the **canonical invariant set** that every downstream implementation of the ASH Pattern System must verify. Each invariant encodes a locked semantic, algebraic, contractual, or behavioral requirement from the agnostic specification repository.
+This specification defines the **canonical invariant set** that every downstream implementation of the ASH Pattern System must verify. All invariants are grounded in the full 9-dimensional research baseline.
 
-This specification is **canonical** (Phase 3). Downstream implementations are not conformant unless they satisfy these invariants. See `implementation-acceptance.md` for acceptance criteria.
-
-## Invariant structure
-
-Each invariant has:
-- **ID**: unique identifier in the form `INV-{FAMILY}-{NUMBER}`
-- **Statement**: the property that must hold
-- **Rationale**: why this invariant matters
-- **Test criterion**: what a test must demonstrate
-- **Source**: the specification that locks this requirement
+**Open research-closure item**: The exhaustive enumeration of `C ⊂ F2^9` is pending research closure. Invariants that depend on the specific codeword set are marked accordingly — they apply to whatever codeword set is provided but cannot be exhaustively tested until the set is fully specified.
 
 ---
 
-## INV-NORM — Deterministic normalization
+## INV-STATE — Full-state semantics
 
-### INV-NORM-001
-**Statement**: Normalization is deterministic — the same candidate state always produces the same normalized output or the same diagnostic failure.
-**Rationale**: Non-deterministic normalization would make the entire state model unreliable.
-**Test criterion**: For any candidate state, repeated normalization calls produce identical results.
+### INV-STATE-001
+**Statement**: The ASH state is a full 9-bit vector in F2^9. All 9 coordinates participate in the algebraic structure.
+**Test criterion**: State representation uses all 9 coordinates; no coordinate is excluded from processing.
+**Source**: `ash-state-space.pseudo.md`
+
+### INV-STATE-002
+**Statement**: Normalization is deterministic — the same candidate state always produces the same result.
+**Test criterion**: Repeated normalization calls with the same input produce identical outputs.
 **Source**: `ash-state-space.pseudo.md`, `state-model-contract.md`
 
-### INV-NORM-002
-**Statement**: For `INADMISSIBLE_CORRECTABLE` cores, normalization corrects to the nearest admissible codeword before deriving the control bit (corrected-core derivation rule).
-**Rationale**: Raw-core derivation would produce a control bit inconsistent with the normalized state.
-**Test criterion**: For every correctable core, the normalized output matches correction-then-derivation, not raw derivation.
-**Source**: `ash-state-space.pseudo.md`, `core-admissibility.pseudo.md`
+### INV-STATE-003
+**Statement**: Normalization fails with a diagnostic for transformation-incompatible states — it does not silently produce a result.
+**Test criterion**: Normalization of incompatible states produces a diagnostic failure, not a normalized state.
+**Source**: `state-validity-diagnostics.pseudo.md`
 
-### INV-NORM-003
-**Statement**: Normalization fails with a diagnostic for `INADMISSIBLE_DETECTABLE` and `INADMISSIBLE_UNRECOVERABLE` cores — it does not silently produce a result.
-**Rationale**: Silent normalization of uncorrectable cores would mask errors.
-**Test criterion**: Normalization of uncorrectable cores produces a diagnostic failure, not a normalized state.
-**Source**: `ash-state-space.pseudo.md`, `state-validity-diagnostics.pseudo.md`
+---
+
+## INV-CODEWORD — Codeword structure and transformation
+
+### INV-CODEWORD-001
+**Statement**: Codeword transformations are XOR-by-codeword: `x' = x ⊕ c` for `c ∈ C ⊂ F2^9`.
+**Test criterion**: Every transformation applies coordinate-wise XOR on all 9 bits.
+**Source**: `codeword-transformation-semantics.pseudo.md`
+
+### INV-CODEWORD-002
+**Statement**: Codeword transformations are deterministic and pure — same inputs always produce same outputs with no side effects.
+**Test criterion**: Repeated applications with the same state and codeword produce identical results.
+**Source**: `codeword-transformation-semantics.pseudo.md`
+
+### INV-CODEWORD-003
+**Statement**: Applying the same codeword twice returns to the original state: `(x ⊕ c) ⊕ c = x`.
+**Test criterion**: For any state and codeword, double application is identity.
+**Source**: `codeword-transformation-semantics.pseudo.md`
+
+### INV-CODEWORD-004 (codeword-set-dependent)
+**Statement**: The codeword set used by the implementation is grounded in the research baseline — no invented codewords.
+**Test criterion**: Every codeword used by the implementation matches the research-baseline source.
+**Note**: Full verification requires the codeword-set closure to be resolved.
+**Source**: `codeword-set.pseudo.md`
+
+---
+
+## INV-ADMISSIBILITY — State admissibility
+
+### INV-ADMISSIBILITY-001
+**Statement**: Admissibility classification is deterministic — the same state always maps to the same status.
+**Test criterion**: Repeated classification calls produce identical results.
+**Source**: `state-admissibility.pseudo.md`
+
+### INV-ADMISSIBILITY-002
+**Statement**: Every 9-bit vector maps to exactly one admissibility status (given a specified codeword set).
+**Test criterion**: No state produces multiple or ambiguous statuses.
+**Source**: `state-admissibility.pseudo.md`
 
 ---
 
 ## INV-REALM — Deterministic realm encoding
 
 ### INV-REALM-001
-**Statement**: Realm encoding is deterministic — equal normalized states produce equal realm encodings.
-**Rationale**: Non-deterministic encoding would break realm identity.
-**Test criterion**: For any normalized state, repeated encoding calls produce identical results.
+**Statement**: Realm encoding is deterministic — equal valid states produce equal realm encodings.
+**Test criterion**: Repeated encoding calls with the same state produce identical results.
 **Source**: `realm-identity.pseudo.md`, `realm-encoder-contract.md`
 
 ### INV-REALM-002
-**Statement**: Realm encoding operates only on normalized states — encoding from an unnormalized or invalid state must fail with a diagnostic.
-**Rationale**: Encoding invalid states would propagate corruption into realm identity.
-**Test criterion**: Encoding an unnormalized state produces a diagnostic failure.
+**Statement**: Realm encoding operates only on valid states — invalid states must be rejected with a diagnostic.
+**Test criterion**: Encoding an invalid state produces a diagnostic failure.
 **Source**: `realm-encoder-contract.md`
-
----
-
-## INV-CONTROL — Control-dimension integrity
-
-### INV-CONTROL-001
-**Statement**: The control bit is always derived using the locked parity formula: `b0 XOR b1 XOR b2 XOR b3 XOR b4 XOR b5 XOR b6 XOR b7`.
-**Rationale**: Any other formula would break the algebraic lock.
-**Test criterion**: For all 256 possible 8-bit cores, `derive_control_bit` produces the correct overall parity.
-**Source**: `control-bit-derivation.pseudo.md`
-
-### INV-CONTROL-002
-**Statement**: For all 16 admissible codewords, the derived control bit is `0`.
-**Rationale**: The locked [8,4,4] code is doubly-even; all codewords have even parity.
-**Test criterion**: `derive_control_bit(codeword) == 0` for each of the 16 normative codewords.
-**Source**: `control-bit-derivation.pseudo.md`, `core-admissibility.pseudo.md`
-
-### INV-CONTROL-003
-**Statement**: Ordinary transitions must not directly mutate the control bit — any change must come through re-derivation from the core.
-**Rationale**: Direct mutation would bypass the parity sentinel.
-**Test criterion**: After any transition, the control bit equals `derive_control_bit(resulting_core)`.
-**Source**: `ash-state-space.pseudo.md`, `transition-registry-contract.md`
 
 ---
 
 ## INV-TRANS — Deterministic transition outcomes
 
 ### INV-TRANS-001
-**Statement**: Transition resolution is deterministic — the same state and transition identifier always produce the same result.
-**Rationale**: Non-deterministic transitions would make the system unpredictable.
-**Test criterion**: Repeated transition applications with the same inputs produce identical outputs.
+**Statement**: Equal input state + equal transition always produce equal output state.
+**Test criterion**: Repeated transition applications produce identical results.
 **Source**: `transition-system.pseudo.md`, `transition-registry-contract.md`
 
 ### INV-TRANS-002
-**Statement**: Transitions operate only on normalized states — applying a transition to an unnormalized state must fail.
-**Rationale**: Transitioning from an invalid state would propagate corruption.
-**Test criterion**: Transition application to an unnormalized state produces a diagnostic failure.
+**Statement**: Transitions operate on full 9-bit states via XOR-by-codeword.
+**Test criterion**: Transition results match coordinate-wise XOR with the specified codeword.
 **Source**: `transition-registry-contract.md`
 
 ---
@@ -106,31 +97,17 @@ Each invariant has:
 ## INV-TOPO — Deterministic topology generation
 
 ### INV-TOPO-001
-**Statement**: Topology generation is deterministic — the same input produces the same topology structure.
-**Rationale**: Non-deterministic topology would break lineage and ordering guarantees.
-**Test criterion**: Repeated generation with the same input produces identical topology.
+**Statement**: Topology generation is deterministic with stable ordering and lineage.
+**Test criterion**: Same input produces identical topology structure across invocations.
 **Source**: `topology-expansion.pseudo.md`, `topology-generator-contract.md`
-
-### INV-TOPO-002
-**Statement**: Topology ordering is stable and does not depend on platform-specific behavior.
-**Rationale**: Platform-dependent ordering would break cross-implementation consistency.
-**Test criterion**: Topology ordering is identical across implementations for the same input.
-**Source**: `topology-generator-contract.md`
 
 ---
 
 ## INV-AXIOM — Stable axiom diagnostics
 
 ### INV-AXIOM-001
-**Statement**: Every axiom evaluation produces a diagnostic record — no bare pass/fail without diagnostics.
-**Rationale**: Silent pass/fail makes the system opaque and unauditable.
-**Test criterion**: Every axiom evaluation call returns a diagnostic record with rule IDs and explanation.
-**Source**: `axiom-evaluation.pseudo.md`, `axiom-evaluator-contract.md`
-
-### INV-AXIOM-002
-**Statement**: Axiom evaluation is deterministic — the same inputs produce the same results.
-**Rationale**: Non-deterministic evaluation would make axiom diagnostics unreliable.
-**Test criterion**: Repeated evaluation with the same inputs produces identical results.
+**Statement**: Every axiom evaluation produces a diagnostic record — no bare pass/fail.
+**Test criterion**: Every evaluation call returns a diagnostic with rule IDs and explanation.
 **Source**: `axiom-evaluator-contract.md`
 
 ---
@@ -138,49 +115,42 @@ Each invariant has:
 ## INV-RECOVERY — Stable recovery/fallback/containment behavior
 
 ### INV-RECOVERY-001
-**Statement**: Recovery is deterministic — the same system-state classification always produces the same recovery category.
-**Rationale**: Non-deterministic recovery would make the system unpredictable under failure.
-**Test criterion**: For each system-state class, `classify_recoverability` always returns the same category.
+**Statement**: Recovery is deterministic — the same classification always produces the same recovery category.
+**Test criterion**: `classify_recoverability` always returns the same result for the same class.
 **Source**: `recoverability-semantics.pseudo.md`, `recovery-engine-contract.md`
 
 ### INV-RECOVERY-002
-**Statement**: Fallback selection uses only the canonical fallback-policy registry — no heuristic, ad hoc, or invented fallback states.
-**Rationale**: Non-registry fallback would violate the locked policy design.
-**Test criterion**: Every fallback selection is traceable to a `policy_id` in the canonical registry.
+**Statement**: Fallback selection uses only the canonical fallback-policy registry.
+**Test criterion**: Every fallback selection is traceable to a `policy_id` in the registry.
 **Source**: `fallback-policy-registry.md`, `recovery-engine-contract.md`
 
 ### INV-RECOVERY-003
-**Statement**: Escalation is monotonic — recovery failure always escalates to a more severe category, never de-escalates without external intervention.
-**Rationale**: De-escalation without intervention would mask escalating failures.
-**Test criterion**: The severity of recovery categories in a chain is monotonically non-decreasing.
-**Source**: `recoverability-semantics.pseudo.md`, `recovery-engine-contract.md`
+**Statement**: Escalation is monotonic — severity never decreases without external intervention.
+**Test criterion**: The severity sequence in any recovery chain is non-decreasing.
+**Source**: `recoverability-semantics.pseudo.md`
 
 ### INV-RECOVERY-004
 **Statement**: No silent healing — every recovery action produces a diagnostic record.
-**Rationale**: Silent healing makes the system unauditable.
 **Test criterion**: Every recovery/fallback/containment/halt action produces at least one diagnostic.
-**Source**: `recovery-fallback-semantics.pseudo.md`, `recovery-engine-contract.md`
+**Source**: `recovery-engine-contract.md`
 
 ### INV-RECOVERY-005
-**Statement**: `SAFE_HALT` is terminal — no transitions from `SAFE_HALT` to any other state.
-**Rationale**: Terminal finality is the foundation of safe-failure semantics.
-**Test criterion**: Once a system enters `SAFE_HALT`, no subsequent state transition succeeds.
-**Source**: `containment-safe-failure-semantics.pseudo.md`, `system-state-classification.pseudo.md`
+**Statement**: SAFE_HALT is terminal — no transitions from SAFE_HALT.
+**Test criterion**: Once in SAFE_HALT, no subsequent state transition succeeds.
+**Source**: `containment-safe-failure-semantics.pseudo.md`
 
 ---
 
 ## INV-PLAN — Stable generation-plan structure
 
 ### INV-PLAN-001
-**Statement**: Generation planning produces no side effects — no files, no processes, no observable mutations.
-**Rationale**: Side effects during planning would violate the materialization boundary.
+**Statement**: Planning produces no side effects.
 **Test criterion**: Planning completes without creating, modifying, or deleting any external resource.
-**Source**: `generation-planning.pseudo.md`, `generation-planner-contract.md`
+**Source**: `generation-planner-contract.md`
 
 ### INV-PLAN-002
-**Statement**: The generation plan is self-contained — the emitter needs only the plan to materialize.
-**Rationale**: A non-self-contained plan would force the emitter to call back to the planner, violating the boundary.
-**Test criterion**: The emitter can materialize from the plan without any additional planner interaction.
+**Statement**: The plan is self-contained — the emitter needs only the plan.
+**Test criterion**: The emitter can materialize from the plan without planner interaction.
 **Source**: `generation-planner-contract.md`
 
 ---
@@ -188,41 +158,35 @@ Each invariant has:
 ## INV-BOUNDARY — Materialization-boundary conformance
 
 ### INV-BOUNDARY-001
-**Statement**: `GenerationPlanner` does not emit artifacts — it produces only a plan.
-**Rationale**: Artifact emission by the planner would collapse the materialization boundary.
+**Statement**: GenerationPlanner does not emit artifacts.
 **Test criterion**: No file, module, or service is created during planning.
 **Source**: `generation-planner-contract.md`
 
 ### INV-BOUNDARY-002
-**Statement**: `ArtifactEmitter` does not invent semantics not present in the plan.
-**Rationale**: Invented semantics would diverge from the canonical specification.
-**Test criterion**: Every emitted artifact is traceable to a plan element; no artifact exists without a plan source.
+**Statement**: ArtifactEmitter does not invent semantics not present in the plan.
+**Test criterion**: Every emitted artifact is traceable to a plan element.
 **Source**: `artifact-emitter-contract.md`
 
 ---
 
-## INV-DIAG — Diagnostic schema and rule-ID taxonomy conformance
+## INV-DIAG — Diagnostic conformance
 
 ### INV-DIAG-001
 **Statement**: Every diagnostic record conforms to the shared `DiagnosticEnvelope` schema.
-**Rationale**: Non-conformant diagnostics would break the unified diagnostic chain.
-**Test criterion**: Every diagnostic has all required fields: `diagnostic_kind`, `severity`, `stage`, `disposition`, `rule_ids`, `summary`, `notes`.
+**Test criterion**: Every diagnostic has all required fields.
 **Source**: `diagnostic-schema.md`, `diagnostics-module-contract.md`
 
 ### INV-DIAG-002
-**Statement**: Every `rule_id` in every diagnostic conforms to the canonical taxonomy pattern `{FAMILY}-{CATEGORY}-{NUMBER}`.
-**Rationale**: Non-conformant rule IDs would break traceability.
-**Test criterion**: Every `rule_id` matches the taxonomy pattern and references a defined rule family.
-**Source**: `rule-id-taxonomy.md`, `diagnostics-module-contract.md`
+**Statement**: Every rule_id conforms to the canonical taxonomy pattern.
+**Test criterion**: Every rule_id matches `{FAMILY}-{CATEGORY}-{NUMBER}`.
+**Source**: `rule-id-taxonomy.md`
 
 ### INV-DIAG-003
-**Statement**: The diagnostic chain is complete — every step from detection through terminal halt produces a diagnostic, and chain references are intact.
-**Rationale**: Gaps in the chain would make post-mortem analysis impossible.
-**Test criterion**: For any recovery/escalation sequence, every step has a diagnostic with valid `parent_diagnostic_reference` and `chain_root_reference`.
-**Source**: `diagnostic-schema.md`, `diagnostics-module-contract.md`
+**Statement**: The diagnostic chain is complete — every step produces a diagnostic with valid chain references.
+**Test criterion**: Chain parent and root references are intact for any recovery sequence.
+**Source**: `diagnostic-schema.md`
 
 ### INV-DIAG-004
-**Statement**: No silent omission — diagnostics are never deferred, batched, or conditionally suppressed.
-**Rationale**: Silent omission defeats the purpose of the diagnostic system.
-**Test criterion**: Every required diagnostic is emitted at the point of the action, not later.
-**Source**: `diagnostic-schema.md`, `diagnostics-module-contract.md`
+**Statement**: No silent omission — diagnostics are never deferred, batched, or suppressed.
+**Test criterion**: Every required diagnostic is emitted at the point of action.
+**Source**: `diagnostics-module-contract.md`

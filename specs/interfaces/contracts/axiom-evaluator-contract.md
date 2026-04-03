@@ -1,4 +1,4 @@
-# AxiomEvaluator Contract — implementation contract
+# AxiomEvaluator Contract — implementation contract (9D Research Baseline)
 
 ## Purpose
 

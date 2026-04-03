@@ -1,4 +1,4 @@
-# GenerationPlanner Contract — implementation contract
+# GenerationPlanner Contract — implementation contract (9D Research Baseline)
 
 ## Purpose
 
