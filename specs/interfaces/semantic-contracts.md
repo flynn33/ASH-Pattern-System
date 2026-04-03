@@ -12,6 +12,7 @@ Every downstream implementation must provide semantic equivalents of the followi
 6. `GenerationPlanner`
 7. `ArtifactEmitter`
 8. `Diagnostics`
+9. `RecoveryEngine`
 
 ## Required behaviors
 

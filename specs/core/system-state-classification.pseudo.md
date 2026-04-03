@@ -123,7 +123,7 @@ Every system-state class maps deterministically to exactly one action category:
 | `DEGRADED` | `FALLBACK_REQUIRED` | Select known-good state from fallback-policy registry |
 | `CONTAINED` | `CONTAINMENT_REQUIRED` | Restrict operations; await operator/policy decision |
 | `FAILED` | `ESCALATION_REQUIRED` | Escalate to external authority; no automated recovery |
-| `SAFE_HALT` | `SAFE_HALT_REQUIRED` | Halt to known-safe terminal state; no further transitions |
+| `SAFE_HALT` | `TERMINAL_NO_RECOVERY` | Already halted in known-safe terminal state; no further transitions or recovery actions |
 
 This mapping is:
 - **Total** — every possible system-state class has exactly one action category

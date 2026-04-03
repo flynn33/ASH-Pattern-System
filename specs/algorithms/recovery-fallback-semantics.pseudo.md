@@ -71,7 +71,7 @@ FUNCTION attempt_recovery(diagnostic: StateValidityDiagnostic, state_class: Syst
             RETURN result
 
         OTHERWISE:
-            -- NO_ACTION, CONTAINMENT_REQUIRED, ESCALATION_REQUIRED, SAFE_HALT_REQUIRED
+            -- NO_ACTION, CONTAINMENT_REQUIRED, ESCALATION_REQUIRED, TERMINAL_NO_RECOVERY
             -- These are handled by other specifications
             result.outcome = NOT_APPLICABLE
             result.reason = "Recovery category handled by another specification"

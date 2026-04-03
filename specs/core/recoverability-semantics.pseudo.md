@@ -18,7 +18,7 @@ ENUM RecoveryCategory
     FALLBACK_REQUIRED
     CONTAINMENT_REQUIRED
     ESCALATION_REQUIRED
-    SAFE_HALT_REQUIRED
+    TERMINAL_NO_RECOVERY
 END ENUM
 ```
 
@@ -71,13 +71,13 @@ END ENUM
 - **Postconditions**: The system remains in `FAILED` state until an external authority resolves the condition. Diagnostic state must be preserved for the authority.
 - **Escalation**: The external authority may direct the system to enter `SAFE_HALT`, attempt a full state reset, or take other action outside the scope of the ASH recovery semantics.
 
-### SAFE_HALT_REQUIRED
+### TERMINAL_NO_RECOVERY
 
 - **Applies to**: `SAFE_HALT`
-- **Meaning**: The system must halt in a known-safe terminal state. No further transitions are permitted.
-- **Preconditions**: `FAILED` state where escalation determines halt is appropriate, or containment breach, or explicit operator/policy halt request.
-- **Postconditions**: The system is halted. Full diagnostic state is preserved for post-mortem. No further state transitions occur.
-- **Finality**: This is the only recovery category from which there is no return within the ASH recovery semantics.
+- **Meaning**: The system has already halted in a known-safe terminal state. No further transitions are permitted and no recovery action is pending.
+- **Preconditions**: The system has already entered `SAFE_HALT` (via escalation from `FAILED`, containment breach, or explicit operator/policy halt).
+- **Postconditions**: The system remains halted. Full diagnostic state is preserved for post-mortem. No further state transitions or recovery actions occur.
+- **Finality**: This is the only recovery category that represents a completed terminal state. Unlike other categories, it does not prescribe an action to take — it confirms that the system is already in its final state.
 
 ## Deterministic mapping
 
@@ -90,7 +90,7 @@ FUNCTION classify_recoverability(state_class: SystemStateClass) -> RecoveryCateg
         CASE DEGRADED:              RETURN FALLBACK_REQUIRED
         CASE CONTAINED:             RETURN CONTAINMENT_REQUIRED
         CASE FAILED:                RETURN ESCALATION_REQUIRED
-        CASE SAFE_HALT:             RETURN SAFE_HALT_REQUIRED
+        CASE SAFE_HALT:             RETURN TERMINAL_NO_RECOVERY
     END SWITCH
 END FUNCTION
 ```
@@ -109,8 +109,8 @@ Recovery may be blocked when required resources are not available:
 | `RE_DERIVE_CONTROL` | Derivation formula not locked | Normalization is `BLOCKED`; system cannot recover |
 | `CORRECT_AND_RE_DERIVE` | Admissibility law or derivation formula not locked | Normalization is `BLOCKED`; system cannot recover |
 | `FALLBACK_REQUIRED` | No fallback-policy registry, or registry is empty | Escalate to `CONTAINMENT_REQUIRED` |
-| `CONTAINMENT_REQUIRED` | Containment boundary breached | Escalate to `SAFE_HALT_REQUIRED` |
-| `ESCALATION_REQUIRED` | No external authority reachable | Escalate to `SAFE_HALT_REQUIRED` |
+| `CONTAINMENT_REQUIRED` | Containment boundary breached | Escalate to `TERMINAL_NO_RECOVERY` |
+| `ESCALATION_REQUIRED` | No external authority reachable | Escalate to `TERMINAL_NO_RECOVERY` |
 
 ## Invariants
 
@@ -118,7 +118,7 @@ Recovery may be blocked when required resources are not available:
 2. **Completeness** — every system-state class has a defined recovery category.
 3. **Monotonic escalation** — blocked recovery always escalates to a more severe category, never to a less severe one.
 4. **No silent recovery** — every recovery action must produce a diagnostic record explaining what was done and why.
-5. **Finality** — `SAFE_HALT_REQUIRED` is terminal; no recovery from this category exists within the ASH recovery semantics.
+5. **Finality** — `TERMINAL_NO_RECOVERY` represents a completed terminal state; no further recovery action exists or is pending within the ASH recovery semantics.
 
 ## Relation to other specifications
 

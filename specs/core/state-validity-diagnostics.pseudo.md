@@ -55,7 +55,14 @@ The **corrected-core derivation rule** requires that `expected_control_dimension
 The value of the 9th coordinate (`b8`) as it appears in the input state.
 
 #### `expected_control_dimension`
-The value that `derive_control_bit(extracted_core)` would produce. If the derivation formula is not yet locked (see `control-bit-derivation.pseudo.md`, unresolved closure item), this field must be set to `UNABLE_TO_DERIVE` rather than a guessed value.
+The derived control value that normalization would produce, determined by the **corrected-core derivation rule**:
+
+- If the core is `ADMISSIBLE`: the value that `derive_control_bit(extracted_core)` would produce
+- If the core is `INADMISSIBLE_CORRECTABLE`: the value that `derive_control_bit(corrected_core)` would produce, where `corrected_core` is the nearest admissible codeword
+- If the core is `INADMISSIBLE_DETECTABLE` or `INADMISSIBLE_UNRECOVERABLE`: `UNABLE_TO_DERIVE` — control derivation is not meaningful for uncorrectable inadmissible cores
+- If the derivation formula is not yet locked (see `control-bit-derivation.pseudo.md`, unresolved closure item): `UNABLE_TO_DERIVE` regardless of admissibility status
+
+This ensures that the diagnostic predicts the same control value that `normalize_state` would produce.
 
 #### `admissibility_status`
 The result of `classify_core_admissibility(extracted_core)` as defined in `core-admissibility.pseudo.md`.

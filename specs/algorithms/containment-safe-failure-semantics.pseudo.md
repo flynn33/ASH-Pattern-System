@@ -193,6 +193,6 @@ Containment and safe failure are the most critical states for observability:
 ## Relation to other specifications
 
 - **system-state-classification.pseudo.md** — defines `CONTAINED`, `FAILED`, and `SAFE_HALT` as system-state classes
-- **recoverability-semantics.pseudo.md** — defines `CONTAINMENT_REQUIRED`, `ESCALATION_REQUIRED`, and `SAFE_HALT_REQUIRED` as recovery categories
+- **recoverability-semantics.pseudo.md** — defines `CONTAINMENT_REQUIRED`, `ESCALATION_REQUIRED`, and `TERMINAL_NO_RECOVERY` as recovery categories
 - **recovery-fallback-semantics.pseudo.md** — escalates to containment when fallback fails
 - **state-validity-diagnostics.pseudo.md** — provides the diagnostic records consumed by containment and safe-halt logic
