@@ -59,8 +59,7 @@ The derived control value that normalization would produce, determined by the **
 
 - If the core is `ADMISSIBLE`: the value that `derive_control_bit(extracted_core)` would produce
 - If the core is `INADMISSIBLE_CORRECTABLE`: the value that `derive_control_bit(corrected_core)` would produce, where `corrected_core` is the nearest admissible codeword
-- If the core is `INADMISSIBLE_DETECTABLE` or `INADMISSIBLE_UNRECOVERABLE`: `UNABLE_TO_DERIVE` — control derivation is not meaningful for uncorrectable inadmissible cores
-- If the derivation formula is not yet locked (see `control-bit-derivation.pseudo.md`, unresolved closure item): `UNABLE_TO_DERIVE` regardless of admissibility status
+- If the core is `INADMISSIBLE_DETECTABLE` or `INADMISSIBLE_UNRECOVERABLE`: `UNABLE_TO_DERIVE` — control derivation is not meaningful for uncorrectable inadmissible cores because no valid recovery precondition exists
 
 This ensures that the diagnostic predicts the same control value that `normalize_state` would produce.
 
@@ -83,7 +82,7 @@ Whether the observed control dimension matches the expected derived value.
 ENUM ControlDerivationStatus
     MATCH                -- observed == expected
     MISMATCH             -- observed != expected, but expected is known
-    UNABLE_TO_DERIVE     -- derivation formula not yet locked
+    UNABLE_TO_DERIVE     -- derivation not meaningful (uncorrectable inadmissible core or malformed input)
     DERIVATION_ERROR     -- derivation failed due to invalid input
 END ENUM
 ```
@@ -161,13 +160,13 @@ FUNCTION diagnose_state(candidate) -> StateValidityDiagnostic
         derivation_core = diagnostic.extracted_core
     END IF
 
-    -- Step 3: Attempt control-bit derivation (from corrected core where applicable)
+    -- Step 3: Derive expected control bit (formula is locked: overall parity)
     IF diagnostic.admissibility_status IN [INADMISSIBLE_DETECTABLE, INADMISSIBLE_UNRECOVERABLE] THEN
-        -- Core is not correctable; derivation is not meaningful
-        diagnostic.control_derivation_status = DERIVATION_ERROR
+        -- Core is not correctable; derivation is not meaningful for normalization
+        diagnostic.control_derivation_status = UNABLE_TO_DERIVE
         diagnostic.expected_control_dimension = UNABLE_TO_DERIVE
-        diagnostic.notes.append("Control derivation not meaningful for uncorrectable inadmissible core")
-    ELSE IF derivation_formula_is_locked() THEN
+        diagnostic.notes.append("Control derivation not meaningful: uncorrectable inadmissible core")
+    ELSE
         TRY
             diagnostic.expected_control_dimension = derive_control_bit(derivation_core)
 
@@ -182,10 +181,6 @@ FUNCTION diagnose_state(candidate) -> StateValidityDiagnostic
             diagnostic.expected_control_dimension = UNABLE_TO_DERIVE
             diagnostic.notes.append("Derivation failed: " + derivation_error.message)
         END TRY
-    ELSE
-        diagnostic.control_derivation_status = UNABLE_TO_DERIVE
-        diagnostic.expected_control_dimension = UNABLE_TO_DERIVE
-        diagnostic.notes.append("Derivation formula not yet locked (see control-bit-derivation.pseudo.md)")
     END IF
     diagnostic.rule_ids.append("ASH-STATE-SPACE-VALIDITY-2")
 
@@ -215,9 +210,9 @@ FUNCTION diagnose_state(candidate) -> StateValidityDiagnostic
     IF diagnostic.recoverability_status == STABLE THEN
         diagnostic.normalization_status = ALREADY_NORMALIZED
     ELSE IF diagnostic.recoverability_status IN [UNSTABLE, CORRECTABLE] THEN
-        IF diagnostic.control_derivation_status == UNABLE_TO_DERIVE THEN
+        IF diagnostic.control_derivation_status == DERIVATION_ERROR THEN
             diagnostic.normalization_status = BLOCKED
-            diagnostic.notes.append("Cannot normalize: derivation formula not locked")
+            diagnostic.notes.append("Cannot normalize: derivation failed due to malformed input")
         ELSE
             diagnostic.normalization_status = NORMALIZABLE
         END IF
@@ -240,15 +235,15 @@ END FUNCTION
 
 Every downstream implementation must be capable of producing a `StateValidityDiagnostic` for any candidate state, even when:
 
-- the derivation formula is not yet locked (use `UNABLE_TO_DERIVE`)
-- the admissibility law is not yet locked (use best-available classification or report `admissibility-law-not-provided` in notes)
 - the candidate state is malformed (report the malformation in notes and set appropriate status fields)
+- the core is uncorrectable inadmissible (use `UNABLE_TO_DERIVE` for expected control)
+- derivation fails due to implementation error (use `DERIVATION_ERROR`)
 
 The diagnostic must never be empty, partial, or silently omitted. If diagnosis cannot be completed, the diagnostic record must explain why.
 
 ## Relation to other specifications
 
 - **ash-state-space.pseudo.md** — defines the state structure that is being diagnosed
-- **control-bit-derivation.pseudo.md** — provides the derivation function used in step 3; its unresolved closure item directly affects the `control_derivation_status` field
-- **core-admissibility.pseudo.md** — provides the admissibility classification used in step 2; its unresolved closure item directly affects the `admissibility_status` field
+- **control-bit-derivation.pseudo.md** — provides the locked derivation formula (overall parity) used in step 3
+- **core-admissibility.pseudo.md** — provides the locked admissibility classification (normative 16-codeword set) used in step 2
 - **semantic-contracts.md** — requires that all implementations expose diagnosable state validation

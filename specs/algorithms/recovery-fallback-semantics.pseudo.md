@@ -27,13 +27,7 @@ FUNCTION attempt_recovery(diagnostic: StateValidityDiagnostic, state_class: Syst
 
         CASE RE_DERIVE_CONTROL:
             -- Core is admissible; only control bit needs re-derivation
-            IF NOT derivation_formula_is_locked() THEN
-                result.outcome = BLOCKED
-                result.reason = "Derivation formula not locked"
-                result.steps.append(step("re-derive-control", BLOCKED, "derivation formula unavailable"))
-                RETURN result
-            END IF
-
+            -- Formula is locked: overall parity (b0 XOR b1 XOR ... XOR b7)
             new_control = derive_control_bit(diagnostic.extracted_core)
             result.corrected_state = AshState(core_bits = diagnostic.extracted_core, control_bit = new_control)
             result.steps.append(step("re-derive-control", COMPLETED, "control re-derived from admissible core"))
@@ -41,25 +35,13 @@ FUNCTION attempt_recovery(diagnostic: StateValidityDiagnostic, state_class: Syst
 
         CASE CORRECT_AND_RE_DERIVE:
             -- Core is inadmissible but correctable
-            IF NOT admissibility_law_is_locked() THEN
-                result.outcome = BLOCKED
-                result.reason = "Admissibility law not locked"
-                result.steps.append(step("correct-core", BLOCKED, "codeword set unavailable"))
-                RETURN result
-            END IF
-
+            -- Admissibility law is locked: normative 16-codeword set
             corrected_core = correct_to_nearest_codeword(diagnostic.extracted_core)
             result.steps.append(step("correct-core", COMPLETED,
                 "core corrected from " + diagnostic.extracted_core + " to " + corrected_core))
 
-            IF NOT derivation_formula_is_locked() THEN
-                result.outcome = BLOCKED
-                result.reason = "Derivation formula not locked after core correction"
-                result.steps.append(step("re-derive-control", BLOCKED, "derivation formula unavailable"))
-                RETURN result
-            END IF
-
             -- Corrected-core derivation rule: derive from corrected core
+            -- Formula is locked: overall parity
             new_control = derive_control_bit(corrected_core)
             result.corrected_state = AshState(core_bits = corrected_core, control_bit = new_control)
             result.steps.append(step("re-derive-control", COMPLETED,

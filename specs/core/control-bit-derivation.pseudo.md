@@ -64,7 +64,8 @@ FUNCTION derive_control_bit(core_bits[8]) -> Bit
     PRECONDITION: length(core_bits) == 8
     PRECONDITION: all elements of core_bits are in F2
 
-    control_bit = APPLY derivation_formula(core_bits)
+    control_bit = core_bits[0] XOR core_bits[1] XOR core_bits[2] XOR core_bits[3]
+                  XOR core_bits[4] XOR core_bits[5] XOR core_bits[6] XOR core_bits[7]
 
     POSTCONDITION: control_bit is in F2
     POSTCONDITION: derivation is deterministic
@@ -97,43 +98,64 @@ The implementation must not return a control bit when derivation fails.
 ## Relation to other specifications
 
 - **ash-state-space.pseudo.md** — defines the full 9-coordinate state and references this derivation
-- **core-admissibility.pseudo.md** — defines which 8-bit cores are admissible; derivation applies to both admissible and inadmissible cores but only produces a meaningful control bit when the core is admissible
+- **core-admissibility.pseudo.md** — defines which 8-bit cores are admissible; derivation applies to both admissible and inadmissible cores but only produces a meaningful control bit when the core is admissible or has been corrected to an admissible codeword
 - **state-validity-diagnostics.pseudo.md** — uses the result of derivation to populate the `control_derivation_status` and `expected_control_dimension` fields
 
 ---
 
-## Unresolved closure item — derivation formula
+## Locked design decision — derivation formula (Design Package C)
 
-> **STATUS: REQUIRED DESIGN DECISION — NOT YET LOCKED**
+> **STATUS: LOCKED**
 
-The exact algebraic or parity function that computes the control bit from the 8-bit core has not been formally selected and locked in this repository.
+### Canonical formula
 
-### What is known
+The control-bit derivation function is the **overall parity** of the 8-bit stabilizing core:
 
-- The derivation formula must be a function `F2^8 -> F2`.
-- The 8-bit core is modeled against the structure of the **[8,4,4] extended Hamming code**.
-- The derivation is expected to be an algebraic function consistent with that coding-theoretic structure.
-- Candidate formula families include:
-  - overall parity (XOR of all 8 bits)
-  - a specific syndrome-derived function
-  - a function tied to the generator or parity-check matrix of the [8,4,4] code
+```text
+derive_control_bit(core_bits) = b0 ⊕ b1 ⊕ b2 ⊕ b3 ⊕ b4 ⊕ b5 ⊕ b6 ⊕ b7
+```
 
-### What is not yet decided
+Equivalent algebraic form:
 
-- Which specific function from the candidate family is canonical.
-- Whether the derivation formula varies by realm or is universal across all ASH states.
-- Whether additional algebraic constraints (beyond parity) apply.
+```text
+derive_control_bit(core_bits) = (Σ_i=0^7 bi) mod 2
+```
+
+### Semantic rationale
+
+This formula is canonical because:
+
+1. The 8-bit stabilizing core is locked to the doubly-even `[8,4,4]` extended Hamming code structure.
+2. Every admissible codeword in that structure has Hamming weight `0`, `4`, or `8`.
+3. Therefore every admissible codeword has **even overall parity**, so the derived control bit for any normalized admissible core is always `0`.
+4. This makes the 9th dimension a true **control/parity sentinel** — it is `0` for every valid normalized state and non-zero only when the core has been corrupted or is inadmissible.
+
+### Consequence of the lock
+
+For every admissible normalized ASH state:
+
+```text
+control_bit = 0
+```
+
+The control dimension is therefore:
+
+- a deterministic parity-control coordinate
+- a consistency sentinel
+- a normalization check
+- a self-healing target during correction and re-derivation
+
+It is **not** a free semantic degree of freedom during ordinary normalized operation.
+
+### Formula properties
+
+- **Universal** — the formula does not vary by realm. It applies to all ASH states.
+- **Deterministic** — the same 8-bit core always produces the same control bit.
+- **Consistent with code structure** — the formula is algebraically aligned with the [8,4,4] extended Hamming code: all 16 admissible codewords have even parity, so derivation produces `0` for every admissible core.
 
 ### What downstream implementations must do
 
-Until this closure item is resolved:
-
-1. Implementations must **not invent** a derivation formula.
-2. Implementations must structure their code so the derivation formula is a single replaceable point of definition.
-3. Implementations must be able to report `unable-to-derive` in diagnostics if the formula is not yet provided.
-4. Implementations must not ship a production system that silently uses a placeholder formula without explicit acknowledgment.
-
-### Required resolution path
-
-This closure item must be resolved by an explicit design decision recorded in this file.
-When the formula is locked, this section must be replaced with the formula definition, its justification, and its relation to the [8,4,4] code structure.
+1. Implementations must use **exactly this formula** — overall parity (XOR of all 8 core bits).
+2. Implementations must not substitute a different derivation function.
+3. Implementations must not treat the formula as an open or configurable choice.
+4. The formula is normative. An equivalent implementation (e.g., popcount mod 2, reduction XOR) is permitted only if it produces identical results for all 256 possible inputs in F2^8.

@@ -33,9 +33,9 @@ END ENUM
 
 - **Applies to**: `UNSTABLE`
 - **Meaning**: The core is admissible but the control bit is inconsistent. Recovery consists of re-deriving the control bit from the admissible core.
-- **Preconditions**: Core admissibility is `ADMISSIBLE`. Derivation formula is available (not `UNABLE_TO_DERIVE`).
+- **Preconditions**: Core admissibility is `ADMISSIBLE`. Input is well-formed.
 - **Postconditions**: After re-derivation, the state must classify as `STABLE`. If it does not, the recovery has failed and escalation to `CORRECTABLE` or `DEGRADED` classification is required.
-- **Blocked when**: Derivation formula is not locked. In this case, normalization is `BLOCKED` and the system cannot recover via this path.
+- **Blocked when**: Input is malformed or implementation nonconformance prevents derivation.
 
 ### CORRECT_AND_RE_DERIVE
 
@@ -43,7 +43,7 @@ END ENUM
 - **Meaning**: The core is inadmissible but within correctable distance of a valid codeword. Recovery consists of correcting the core to the nearest codeword, then re-deriving the control bit from the **corrected admissible core**.
 - **Preconditions**: Core admissibility is `INADMISSIBLE_CORRECTABLE`. Correction function is available. Derivation formula is available.
 - **Postconditions**: After correction and re-derivation, the state must classify as `STABLE`. If it does not, the recovery has failed and escalation is required.
-- **Blocked when**: Admissibility law is not locked (no codeword set to correct toward), or derivation formula is not locked.
+- **Blocked when**: Input is malformed or implementation nonconformance prevents correction or derivation.
 - **Corrected-core derivation rule**: The expected control dimension is always derived from the corrected admissible core, not from the raw inadmissible core.
 
 ### FALLBACK_REQUIRED
@@ -106,8 +106,8 @@ Recovery may be blocked when required resources are not available:
 
 | Recovery Category | Blocked When | Fallback Behavior |
 |---|---|---|
-| `RE_DERIVE_CONTROL` | Derivation formula not locked | Normalization is `BLOCKED`; system cannot recover |
-| `CORRECT_AND_RE_DERIVE` | Admissibility law or derivation formula not locked | Normalization is `BLOCKED`; system cannot recover |
+| `RE_DERIVE_CONTROL` | Malformed input or implementation nonconformance | Normalization is `BLOCKED`; system cannot recover |
+| `CORRECT_AND_RE_DERIVE` | Malformed input or implementation nonconformance | Normalization is `BLOCKED`; system cannot recover |
 | `FALLBACK_REQUIRED` | No fallback-policy registry, or registry is empty | Escalate to `CONTAINMENT_REQUIRED` |
 | `CONTAINMENT_REQUIRED` | Containment boundary breached | Escalate to `TERMINAL_NO_RECOVERY` |
 | `ESCALATION_REQUIRED` | No external authority reachable | Escalate to `TERMINAL_NO_RECOVERY` |

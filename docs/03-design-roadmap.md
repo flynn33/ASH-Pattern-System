@@ -21,8 +21,8 @@ Complete and stabilize:
 
 Complete the formal layers that sit between the semantic kernel and implementation contracts:
 
-- **control-bit derivation** — define the semantic role, interface, invariants, and diagnostic behavior of the derived control dimension; lock the exact derivation formula (currently an unresolved closure item)
-- **core admissibility** — define which 8-bit core vectors are structurally admissible under the [8,4,4] extended Hamming code; lock the exact codeword set / generator matrix (currently an unresolved closure item)
+- **control-bit derivation** — define the semantic role, interface, invariants, and diagnostic behavior of the derived control dimension (formula locked in Design Package C)
+- **core admissibility** — define which 8-bit core vectors are structurally admissible under the [8,4,4] extended Hamming code (codeword set locked in Design Package C)
 - **state-validity diagnostics** — define a canonical diagnostic record that every implementation must produce for any candidate state
 
 Specifications created for this phase:
@@ -31,12 +31,7 @@ Specifications created for this phase:
 - `specs/core/core-admissibility.pseudo.md`
 - `specs/core/state-validity-diagnostics.pseudo.md`
 
-**Status**: Specification structure complete. Two unresolved closure items remain:
-
-1. the exact derivation formula for `derive_control_bit`
-2. the exact codeword set for core admissibility
-
-These must be resolved before Phase 2 can be considered implementation-ready.
+**Status**: Complete. The two algebraic closure items (derivation formula and codeword set) were resolved in Design Package C.
 
 ### Phase 1.75 — define resilient software semantics (Design Package B)
 
@@ -55,14 +50,22 @@ Specifications created for this phase:
 - `specs/algorithms/recovery-fallback-semantics.pseudo.md`
 - `specs/algorithms/containment-safe-failure-semantics.pseudo.md`
 
-**Status**: Specification structure complete. Unresolved closure items from Phase 1.5 remain:
+**Status**: Complete. Design Package B is formally closed.
 
-1. the exact derivation formula for `derive_control_bit`
-2. the exact codeword set for core admissibility
+A future specification is still needed:
 
-Additionally, a new future specification is needed:
+- the fallback-policy registry (`specs/registries/fallback-policy-registry.md`)
 
-3. the fallback-policy registry (`specs/registries/fallback-policy-registry.md`)
+### Phase 1.85 — lock the algebraic foundation (Design Package C)
+
+Lock the two remaining foundational algebraic items:
+
+- **control-bit derivation formula** — locked to overall parity: `b0 ⊕ b1 ⊕ b2 ⊕ b3 ⊕ b4 ⊕ b5 ⊕ b6 ⊕ b7`
+- **core admissibility law** — locked to the exact [8,4,4] extended Hamming code with normative 16-codeword set and generator matrix G
+
+Consequence: all admissible normalized cores derive `control_bit = 0`. The control dimension is a deterministic parity sentinel.
+
+**Status**: Complete. Design Package C is the algebraic-lock package. Both items are now locked.
 
 ### Phase 2 — lock the implementation contracts
 
@@ -101,11 +104,10 @@ For each target implementation repo, the coding agent should receive:
 
 ## Immediate next design step
 
-The current design milestone is to **close remaining Phase 1.5 algebraic items and define the fallback-policy registry**:
+Design Packages A, B, and C are complete. The algebraic foundation is fully locked. The current design milestone is to **prepare for Phase 2**:
 
-1. **Lock the control-bit derivation formula** — select and record the exact algebraic function `F2^8 -> F2` in `specs/core/control-bit-derivation.pseudo.md`
-2. **Lock the core admissibility law** — select and record the exact generator matrix and codeword enumeration for the [8,4,4] extended Hamming code in `specs/core/core-admissibility.pseudo.md`
-3. **Define the fallback-policy registry** — create `specs/registries/fallback-policy-registry.md` specifying how fallback candidates are registered, ordered, and selected
-4. **Verify end-to-end diagnostic completeness** — confirm that the full chain from state validity through classification, recovery, fallback, containment, and safe halt produces complete, auditable diagnostics
+1. **Define the fallback-policy registry** — create `specs/registries/fallback-policy-registry.md` specifying how fallback candidates are registered, ordered, and selected
+2. **Verify end-to-end diagnostic completeness** — confirm that the full chain from state validity through classification, recovery, fallback, containment, and safe halt produces complete, auditable diagnostics
+3. **Begin Phase 2** — lock implementation contracts with confidence that the semantic and algebraic foundation is complete
 
-Once these items are resolved, the repository can proceed to Phase 2 (locking implementation contracts) with confidence that downstream repositories have a complete semantic foundation for resilient software.
+The repository now has a complete semantic foundation for resilient software: state model, classification, recoverability, recovery/fallback/containment algorithms, and locked algebraic definitions.

@@ -28,8 +28,9 @@ The corrected-core derivation rule is authoritative: expected control semantics 
    - `containment-safe-failure-semantics.pseudo.md` — containment and safe-failure behavior
 5. read `specs/interfaces/semantic-contracts.md`
 6. read `governance/repository-governance.md`
-7. check for **unresolved closure items** in any spec file — these are foundational design decisions not yet locked
-8. only then begin target-specific design and implementation planning
+7. confirm that the locked algebraic definitions (parity formula, 16-codeword set) match the canonical specs
+8. check for any remaining unresolved items (e.g., fallback-policy registry)
+9. only then begin target-specific design and implementation planning
 
 ## What the coding agent must preserve
 
@@ -60,34 +61,34 @@ The coding agent must not:
 - make one platform's file structure into the engine's identity
 - replace semantic planning with direct side effects
 - treat convenience behavior as canonical if the specs do not say so
-- invent a control-bit derivation formula if the specification marks it as an unresolved closure item
-- invent an admissibility codeword set if the specification marks it as an unresolved closure item
-- guess any foundational semantic that is explicitly marked as unresolved in this repository
-- silently use a placeholder value for an unresolved closure item in production code
+- substitute a different control-bit derivation formula for the locked parity formula
+- substitute a different admissibility codeword set for the locked normative 16-codeword set
+- treat the locked algebraic definitions as configurable, optional, or open to local variation
+- guess any foundational semantic that is explicitly marked as unresolved in this repository (e.g., the fallback-policy registry)
 - silently heal or mutate state without producing a diagnostic record
 - skip containment when the recovery/fallback specifications require it
 - allow a `FAILED` state to continue normal operations without escalation
 - allow transitions from `SAFE_HALT` to any other state
 
-## Unresolved closure items
+## Locked design decisions
 
-Some specifications in this repository contain explicitly marked **unresolved closure items**. These are foundational design decisions that have not yet been locked.
+The following foundational algebraic items are **locked** (Design Package C) and must be implemented exactly:
 
-The coding agent must:
+- **Control-bit derivation formula** — overall parity: `b0 ⊕ b1 ⊕ b2 ⊕ b3 ⊕ b4 ⊕ b5 ⊕ b6 ⊕ b7` (see `specs/core/control-bit-derivation.pseudo.md`)
+- **Admissibility law** — the exact [8,4,4] extended Hamming code with normative 16-codeword set and generator matrix G (see `specs/core/core-admissibility.pseudo.md`)
+- **Corrected-core derivation rule** — for correctable cores, expected control is derived from the corrected admissible core, not the raw core
 
-1. **Identify** all unresolved closure items before beginning implementation.
-2. **Report** them as blockers if they affect the target implementation.
-3. **Structure code** so that each unresolved item is a single replaceable point of definition (not scattered across the codebase).
-4. **Use diagnostic reporting** (e.g., `UNABLE_TO_DERIVE`, `admissibility-law-not-provided`) rather than placeholder values.
-5. **Never ship production code** that silently uses a guessed value for an unresolved closure item.
+These are not open choices. The coding agent must not substitute alternatives.
 
-As of the current repository state, the known unresolved closure items are:
+## Remaining unresolved items
 
-- **Derivation formula** — the exact algebraic function `F2^8 -> F2` for `derive_control_bit` (see `specs/core/control-bit-derivation.pseudo.md`)
-- **Admissibility law** — the exact codeword set / generator matrix for core admissibility (see `specs/core/core-admissibility.pseudo.md`)
-- **Fallback-policy registry** — the canonical registry for fallback candidates (see future `specs/registries/fallback-policy-registry.md`)
+- **Fallback-policy registry** — the canonical registry for fallback candidates (see future `specs/registries/fallback-policy-registry.md`). Until this is defined, implementations must report `fallback-registry-unavailable` in diagnostics and escalate to containment when fallback is needed.
 
-These items must be resolved by explicit design decisions recorded in the specification files before any downstream implementation can be considered complete.
+## Design package status
+
+- **Design Package A** — complete (state-layer formal foundation)
+- **Design Package B** — formally closed (resilient software semantics layer)
+- **Design Package C** — complete (algebraic lock package)
 
 ## Required delivery shape for implementation repos
 

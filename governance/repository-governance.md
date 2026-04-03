@@ -45,11 +45,12 @@ Specifications that define foundational state-layer behavior (control-bit deriva
 Downstream implementation repositories must not:
 
 - invent foundational semantics that are not defined in this repository
-- guess values for unresolved closure items (e.g., derivation formulas, codeword sets)
-- silently use placeholder values for unresolved closure items in production code
+- substitute alternative values for locked algebraic definitions (the control-bit derivation formula and the admissibility codeword set are locked design decisions)
+- guess values for any remaining unresolved items (e.g., fallback-policy registry)
+- silently use placeholder values for unresolved items in production code
 - treat convenience behavior as canonical if the specifications do not define it
 
-If a specification marks a rule as an **unresolved closure item**, that item must be resolved by an explicit design decision recorded in this repository before any downstream implementation may treat it as settled.
+If a specification marks a rule as an **unresolved item**, that item must be resolved by an explicit design decision recorded in this repository before any downstream implementation may treat it as settled. Locked design decisions (marked as **LOCKED** in the specs) are normative and must be implemented exactly.
 
 ## Admission rule for future files
 
