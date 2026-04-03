@@ -2,9 +2,9 @@
 
 ## What this repository is
 
-This repository is the **canonical agnostic specification baseline** for the ASH Pattern System.
+This repository is the **canonical agnostic specification baseline** for the ASH Pattern System — a platform-agnostic framework for **self-healing, self-correcting, safe-failure, fallback, and deterministic recovery** in software systems.
 
-Its job is to define the engine in a way that survives translation across:
+Its job is to define the system's resilient software semantics in a way that survives translation across:
 
 - languages
 - operating systems
@@ -22,6 +22,8 @@ That means the repository must make the following explicit:
 - what an ASH state is
 - how the control dimension is derived
 - what makes a state valid
+- how states are classified for resilient behavior (stable, unstable, correctable, degraded, contained, failed, safe-halt)
+- what recovery, fallback, containment, and safe-failure actions are required for each state class
 - what transitions are allowed
 - how topology is expanded
 - how axioms are evaluated

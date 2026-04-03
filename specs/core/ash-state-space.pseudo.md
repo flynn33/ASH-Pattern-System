@@ -115,6 +115,19 @@ END FUNCTION
 Ordinary transition logic must not directly mutate the control bit as if it were just another free coordinate.
 Any change in the control bit during ordinary evolution must come through re-derivation from the core state.
 
+## Corrected-core derivation rule
+
+When a core is `INADMISSIBLE_CORRECTABLE`, the expected control dimension for normalization, validity, and recovery semantics is defined on the **corrected admissible core**, not on the raw inadmissible core.
+
+The sequence is:
+1. Extract raw core from candidate state
+2. Classify admissibility
+3. If correctable: correct to nearest admissible codeword
+4. Derive expected control from the corrected admissible core
+5. Diagnostics may report both the raw core and the corrected core for transparency
+
+This rule ensures semantic consistency between normalization (which corrects before deriving) and diagnostics (which must predict what normalization would produce).
+
 ## Required invariants
 
 1. normalization is deterministic
@@ -128,3 +141,4 @@ Any change in the control bit during ordinary evolution must come through re-der
 - `specs/core/control-bit-derivation.pseudo.md` — defines `derive_control_bit`, the function that computes the 9th coordinate from the 8-bit core
 - `specs/core/core-admissibility.pseudo.md` — defines `classify_core_admissibility`, the function that determines whether an 8-bit core is a valid codeword under the [8,4,4] extended Hamming code structure
 - `specs/core/state-validity-diagnostics.pseudo.md` — defines the diagnostic record produced when state validity is evaluated
+- `specs/core/system-state-classification.pseudo.md` — canonical mapping of admissibility/control conditions to runtime behavior classes

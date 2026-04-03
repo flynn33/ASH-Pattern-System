@@ -8,11 +8,23 @@ It is the agnostic specification repository built around the corrected ASH state
 
 ## Repository purpose
 
+The ASH Pattern System is a **platform-agnostic and code-agnostic framework** for:
+
+- **self-healing software** — systems that detect and correct their own state errors
+- **self-correcting software** — systems that restore valid state from corrupted state
+- **safe-failure behavior** — systems that halt safely when correction is impossible
+- **fallback behavior** — systems that select known-good states when correction is ambiguous
+- **deterministic recovery planning** — systems that plan recovery actions from structured diagnostics
+- **resilient system design** — systems that degrade gracefully through containment rather than fail silently
+
 This repository defines:
 
 - the canonical ASH state space in **F2^9**
 - the stabilizing algebraic role of the first 8 coordinates
 - the derived role of the 9th control/parity dimension
+- system-state classification (stable, unstable, correctable, degraded, contained, failed, safe-halt)
+- recoverability semantics and deterministic recovery-category mapping
+- recovery, fallback, containment, and safe-failure algorithms
 - deterministic transition semantics
 - deterministic topology expansion semantics
 - axiom evaluation semantics
@@ -62,7 +74,11 @@ The 9th coordinate is therefore **not** treated as an ordinary peer bit for unre
 - `specs/core/control-bit-derivation.pseudo.md` — control-bit derivation semantics and closure status
 - `specs/core/core-admissibility.pseudo.md` — core admissibility rules and state classification
 - `specs/core/state-validity-diagnostics.pseudo.md` — canonical state-validity diagnostic model
+- `specs/core/system-state-classification.pseudo.md` — canonical system-state classes and class-to-action mapping
+- `specs/core/recoverability-semantics.pseudo.md` — recoverability categories and deterministic recovery mapping
 - `specs/core/realm-identity.pseudo.md` — realm identity and encoding semantics
+- `specs/algorithms/recovery-fallback-semantics.pseudo.md` — deterministic recovery and fallback selection
+- `specs/algorithms/containment-safe-failure-semantics.pseudo.md` — containment and safe-failure behavior
 - `specs/algorithms/transition-system.pseudo.md` — transition semantics
 - `specs/algorithms/topology-expansion.pseudo.md` — topology generation semantics
 - `specs/algorithms/axiom-evaluation.pseudo.md` — axiom evaluation semantics

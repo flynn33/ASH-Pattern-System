@@ -25,6 +25,7 @@ This record is the foundation for:
 TYPE StateValidityDiagnostic
     input_state              : AshStateExpanded or raw 9-element vector
     extracted_core           : Vector[8] over F2
+    corrected_core           : Vector[8] over F2 or NOT_APPLICABLE
     observed_control_dimension : Bit
     expected_control_dimension : Bit or UNABLE_TO_DERIVE
     admissibility_status     : AdmissibilityStatus
@@ -43,7 +44,12 @@ END TYPE
 The raw candidate state as received by the diagnostic function. This is the unmodified input before any extraction or derivation.
 
 #### `extracted_core`
-The 8-bit stabilizing core extracted from the input state (coordinates `b0..b7`).
+The 8-bit stabilizing core extracted from the input state (coordinates `b0..b7`). This is the raw, unmodified core before any correction.
+
+#### `corrected_core`
+If the extracted core is `INADMISSIBLE_CORRECTABLE`, this field contains the corrected admissible core (the nearest valid codeword). If the core is already `ADMISSIBLE` or is not correctable, this field is `NOT_APPLICABLE`.
+
+The **corrected-core derivation rule** requires that `expected_control_dimension` be derived from `corrected_core` (not `extracted_core`) when correction applies. This ensures that the diagnostic predicts the same control value that normalization would produce.
 
 #### `observed_control_dimension`
 The value of the 9th coordinate (`b8`) as it appears in the input state.
@@ -133,14 +139,30 @@ FUNCTION diagnose_state(candidate) -> StateValidityDiagnostic
     diagnostic.extracted_core = extract_core_bits(candidate)
     diagnostic.observed_control_dimension = extract_control_bit(candidate)
 
-    -- Step 2: Classify core admissibility
+    -- Step 2: Classify core admissibility and apply corrected-core derivation rule
     diagnostic.admissibility_status = classify_core_admissibility(diagnostic.extracted_core)
     diagnostic.rule_ids.append("ASH-STATE-SPACE-VALIDITY-1")
 
-    -- Step 3: Attempt control-bit derivation
-    IF derivation_formula_is_locked() THEN
+    -- Step 2a: Determine the core to use for control-bit derivation
+    -- Corrected-core derivation rule: for correctable cores, derive from the corrected core
+    IF diagnostic.admissibility_status == INADMISSIBLE_CORRECTABLE THEN
+        diagnostic.corrected_core = correct_to_nearest_codeword(diagnostic.extracted_core)
+        derivation_core = diagnostic.corrected_core
+        diagnostic.notes.append("Core corrected for derivation: " + diagnostic.extracted_core + " -> " + diagnostic.corrected_core)
+    ELSE
+        diagnostic.corrected_core = NOT_APPLICABLE
+        derivation_core = diagnostic.extracted_core
+    END IF
+
+    -- Step 3: Attempt control-bit derivation (from corrected core where applicable)
+    IF diagnostic.admissibility_status IN [INADMISSIBLE_DETECTABLE, INADMISSIBLE_UNRECOVERABLE] THEN
+        -- Core is not correctable; derivation is not meaningful
+        diagnostic.control_derivation_status = DERIVATION_ERROR
+        diagnostic.expected_control_dimension = UNABLE_TO_DERIVE
+        diagnostic.notes.append("Control derivation not meaningful for uncorrectable inadmissible core")
+    ELSE IF derivation_formula_is_locked() THEN
         TRY
-            diagnostic.expected_control_dimension = derive_control_bit(diagnostic.extracted_core)
+            diagnostic.expected_control_dimension = derive_control_bit(derivation_core)
 
             IF diagnostic.observed_control_dimension == diagnostic.expected_control_dimension THEN
                 diagnostic.control_derivation_status = MATCH

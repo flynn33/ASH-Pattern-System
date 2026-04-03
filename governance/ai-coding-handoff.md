@@ -4,10 +4,13 @@
 
 This document tells a coding agent how to use this repository when building a target implementation.
 
+The ASH Pattern System is a **resilient software semantics framework** — not just an abstract state model. It defines the semantic foundation for self-healing, self-correcting, safe-failure, fallback, and deterministic recovery behavior. Every implementation must preserve these resilience semantics.
+
 ## Handoff rule
 
 Treat this repository as the semantic authority.
 Do not infer core semantics from convenience, local idiom, or language defaults.
+The corrected-core derivation rule is authoritative: expected control semantics for correctable cores are defined on the corrected admissible core.
 
 ## Required coding-agent workflow
 
@@ -18,7 +21,11 @@ Do not infer core semantics from convenience, local idiom, or language defaults.
    - `control-bit-derivation.pseudo.md` — the control-bit derivation spec and its closure status
    - `core-admissibility.pseudo.md` — the admissibility rules and their closure status
    - `state-validity-diagnostics.pseudo.md` — the canonical diagnostic model
-4. read all files in `specs/algorithms/`
+   - `system-state-classification.pseudo.md` — canonical system-state classes and class-to-action mapping
+   - `recoverability-semantics.pseudo.md` — recoverability categories and recovery mapping
+4. read all files in `specs/algorithms/`, paying particular attention to:
+   - `recovery-fallback-semantics.pseudo.md` — deterministic recovery and fallback selection
+   - `containment-safe-failure-semantics.pseudo.md` — containment and safe-failure behavior
 5. read `specs/interfaces/semantic-contracts.md`
 6. read `governance/repository-governance.md`
 7. check for **unresolved closure items** in any spec file — these are foundational design decisions not yet locked
@@ -37,6 +44,12 @@ The coding agent must preserve:
 - deterministic topology expansion
 - full axiom diagnostics
 - explicit separation between generation planning and materialization
+- system-state classification (all 7 canonical classes)
+- deterministic recoverability mapping (class-to-recovery-category)
+- deterministic recovery and fallback behavior
+- containment and safe-failure behavior
+- the corrected-core derivation rule (expected control from corrected admissible core for correctable states)
+- diagnosable recovery — no silent healing
 
 ## What the coding agent must not do
 
@@ -51,6 +64,10 @@ The coding agent must not:
 - invent an admissibility codeword set if the specification marks it as an unresolved closure item
 - guess any foundational semantic that is explicitly marked as unresolved in this repository
 - silently use a placeholder value for an unresolved closure item in production code
+- silently heal or mutate state without producing a diagnostic record
+- skip containment when the recovery/fallback specifications require it
+- allow a `FAILED` state to continue normal operations without escalation
+- allow transitions from `SAFE_HALT` to any other state
 
 ## Unresolved closure items
 
@@ -68,6 +85,7 @@ As of the current repository state, the known unresolved closure items are:
 
 - **Derivation formula** — the exact algebraic function `F2^8 -> F2` for `derive_control_bit` (see `specs/core/control-bit-derivation.pseudo.md`)
 - **Admissibility law** — the exact codeword set / generator matrix for core admissibility (see `specs/core/core-admissibility.pseudo.md`)
+- **Fallback-policy registry** — the canonical registry for fallback candidates (see future `specs/registries/fallback-policy-registry.md`)
 
 These items must be resolved by explicit design decisions recorded in the specification files before any downstream implementation can be considered complete.
 

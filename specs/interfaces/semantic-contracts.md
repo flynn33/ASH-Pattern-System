@@ -25,6 +25,22 @@ Must:
 - validate state consistency and produce a `StateValidityDiagnostic` as defined in `state-validity-diagnostics.pseudo.md`
 - report diagnosable failure when normalization cannot proceed (e.g., inadmissible core beyond correctable distance, or derivation formula not yet locked)
 - never silently invent missing semantics — if a specification marks a rule as an unresolved closure item, the implementation must not guess a value and must report the gap in diagnostics
+- classify system state using the classes defined in `system-state-classification.pseudo.md`
+- classify recoverability using the categories defined in `recoverability-semantics.pseudo.md`
+- apply the corrected-core derivation rule: for correctable cores, expected control is derived from the corrected admissible core, not the raw inadmissible core
+
+### `RecoveryEngine`
+Must:
+
+- implement deterministic recovery as defined in `recovery-fallback-semantics.pseudo.md`
+- implement deterministic fallback selection against the canonical fallback-policy registry
+- implement containment as defined in `containment-safe-failure-semantics.pseudo.md`
+- implement safe halt as defined in `containment-safe-failure-semantics.pseudo.md`
+- produce a `RecoveryDiagnostic` for every recovery, fallback, containment, and safe-halt action
+- never silently heal — all recovery must produce diagnosable records
+- escalate monotonically when recovery fails (fallback failure -> containment, containment breach -> safe halt)
+- respect the deterministic class-to-action mapping from `system-state-classification.pseudo.md`
+- produce minimum diagnostic content for every action as specified in `recovery-fallback-semantics.pseudo.md` and `containment-safe-failure-semantics.pseudo.md`
 
 ### `RealmEncoder`
 Must:
