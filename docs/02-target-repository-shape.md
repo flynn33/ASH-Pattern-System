@@ -72,6 +72,9 @@ Contains algorithmic semantics expressed in platform-neutral pseudocode and pros
 ### `specs/registries/`
 Contains canonical registries that govern deterministic policy-driven behavior (e.g., fallback selection).
 
+### `specs/verification/`
+Contains invariant specifications, conformance categories, and implementation acceptance criteria for downstream verification.
+
 ### `specs/interfaces/`
 Contains contracts, diagnostic schemas, and rule taxonomies that downstream implementations must satisfy.
 

@@ -94,7 +94,7 @@ Rebuilt/revalidated:
 - `specs/verification/conformance-categories.md` (rebuilt on 9D terms)
 - `specs/verification/implementation-acceptance.md` (rebuilt on 9D terms with honest codeword-set handling)
 
-**Status**: Complete. The contract and verification layers are now authoritative for the full 9D research baseline. The codeword set is partially closed — established as a subgroup of `(F2^9, ⊕)`, with exact generators and exhaustive enumeration pending extraction from published research. Codeword-dependent acceptance uses CONFORMANT WITH CAVEATS posture.
+**Status**: Complete. The contract and verification layers are now authoritative for the full 9D research baseline. The codeword set `C ⊂ F2^9` is fully closed — exact generators and exhaustive enumeration have been extracted from published research (see `specs/core/codeword-set.pseudo.md`).
 
 ### Phase 4 — create platform build handoff packages
 
@@ -107,13 +107,12 @@ For each target implementation repo, the coding agent should receive:
 - packaging constraints
 - performance constraints if applicable
 
-**Status**: Ready to begin. The codeword set's algebraic structure (subgroup of `F2^9`) is locked. Platform handoff may proceed under CONFORMANT WITH CAVEATS acceptance posture for codeword-dependent features until the exact generators and exhaustive enumeration are extracted from published research.
+**Status**: Ready to begin. The codeword set `C` is fully closed with exact generators and exhaustive enumeration extracted from published research. Platform handoff may proceed without codeword-set caveats.
 
 ## Immediate next design step
 
 R1, R2, and R3 are complete. The contract and verification layers are rebuilt on the 9D research baseline.
 
-The immediate next steps are:
+The immediate next step is:
 
-1. **Complete codeword-set closure** — extract the exact generators and exhaustive enumeration of `C ⊂ F2^9` from the published research materials into `specs/core/codeword-set.pseudo.md`. The algebraic structure (subgroup of `F2^9`) is already locked; the remaining work is extraction from published sources, not discovery
-2. **Begin Phase 4** — create platform build handoff packages (may proceed now under CONFORMANT WITH CAVEATS acceptance for codeword-dependent features)
+1. **Begin Phase 4** — create platform build handoff packages. The codeword set is fully closed; all specification layers are complete and authoritative on the 9D research baseline

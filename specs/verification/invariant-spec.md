@@ -4,7 +4,7 @@
 
 This specification defines the **canonical invariant set** that every downstream implementation of the ASH Pattern System must verify. All invariants are grounded in the full 9-dimensional research baseline.
 
-**Open research-closure item**: The codeword set `C ⊂ F2^9` is partially closed — its algebraic structure (subgroup of `(F2^9, ⊕)`) is locked, but exact generators and exhaustive enumeration remain pending extraction from published research. Invariants that depend on the specific codeword set are marked accordingly — they apply to whatever codeword set is provided but cannot be exhaustively tested until the generators are specified.
+**Codeword-set closure**: The codeword set `C ⊂ F2^9` is fully closed — a [9, 4, 4] doubly-even linear code with 16 members, extracted from published research (see `specs/core/codeword-set.pseudo.md`). All codeword-dependent invariants can now be fully assessed against the specified set.
 
 ---
 

@@ -48,7 +48,6 @@ The state is a well-formed 9-bit vector but is not reachable from any known vali
 ### UNCLASSIFIED
 
 Admissibility cannot be determined, either because:
-- The codeword set is not fully specified (pending research closure)
 - The state is malformed (not a valid 9-bit F2 vector)
 - Implementation nonconformance prevents classification
 
