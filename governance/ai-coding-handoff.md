@@ -61,7 +61,7 @@ The coding agent must not:
 
 - reintroduce the superseded 8+1 decomposition (8-bit core + derived 9th bit) as canonical
 - invent codewords not grounded in the research baseline
-- treat the superseded parity formula or 16-codeword set as canonical
+- treat the superseded parity formula or the 8+1-era interpretation of the codeword set as canonical (the canonical codeword set is the [9, 4, 4] code in `F2^9` specified in `codeword-set.pseudo.md` — not the superseded [8,4,4] code with a derived 9th bit)
 - make one platform's file structure into the system's identity
 - replace semantic planning with direct side effects
 - treat convenience behavior as canonical if the specs do not say so
