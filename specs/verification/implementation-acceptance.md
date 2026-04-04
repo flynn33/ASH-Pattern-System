@@ -12,17 +12,13 @@ This specification defines the **minimum acceptance threshold** for a downstream
 
 A downstream implementation is **accepted as conformant** if and only if:
 
-1. **All non-codeword-dependent invariants pass** — every invariant in `invariant-spec.md` that does not depend on the exhaustive codeword-set closure must be verified and must pass.
+1. **All invariants pass** — every invariant in `invariant-spec.md` must be verified and must pass.
 
-2. **Codeword-dependent invariants are satisfied for the provided codeword set** — if a codeword set is provided (even partial), the implementation must satisfy codeword-dependent invariants against that set.
+2. **All 5 conformance categories are covered** — every category in `conformance-categories.md` must be represented in the test suite.
 
-3. **All 5 conformance categories are covered** — every category in `conformance-categories.md` must be represented in the test suite.
+3. **Per-module contracts are satisfied** — every module contract in `specs/interfaces/contracts/` must be satisfied as grounded in the 9D baseline.
 
-4. **Per-module contracts are satisfied** — every module contract in `specs/interfaces/contracts/` must be satisfied as grounded in the 9D baseline.
-
-5. **Diagnostics are complete** — the diagnostic chain is conformant with the shared schema and taxonomy.
-
-6. **Open research items are handled honestly** — if the codeword set is not fully specified, the implementation must handle `UNCLASSIFIED` admissibility status correctly and must not substitute an invented codeword set.
+4. **Diagnostics are complete** — the diagnostic chain is conformant with the shared schema and taxonomy.
 
 ---
 
@@ -61,10 +57,10 @@ The following may **not be waived, deferred, or locally overridden**:
 ## Acceptance judgment language
 
 ### CONFORMANT
-All non-codeword-dependent invariants pass, all 5 categories are covered, all contracts are satisfied, diagnostics are complete, and open research items are handled honestly.
+All invariants pass, all 5 categories are covered, all contracts are satisfied, and diagnostics are complete.
 
 ### CONFORMANT WITH CAVEATS
-All of the above, plus: one or more non-codeword-related caveats exist that do not affect core conformance. The caveat must name the specific open item. Note: as of codeword-set closure, there are no current caveats requiring this judgment level for codeword-dependent features.
+All of the above, plus: one or more caveats exist that do not affect core conformance. The caveat must name the specific item.
 
 ### NON-CONFORMANT
 Any acceptance condition is not met. The judgment must include: failing invariants (by ID), failing categories, and recommendations for remediation.

@@ -32,7 +32,7 @@ The **research baseline** is canonical — not the superseded 8+1 drift formaliz
 5. read `specs/interfaces/semantic-contracts.md` and all files in `specs/interfaces/contracts/`
 6. read `governance/repository-governance.md`
 7. confirm that the canonical specs use the full 9D research baseline (not the superseded 8+1 model)
-8. check for any remaining unresolved or pending-research-closure items
+8. confirm that all specification layers are complete and no stale or superseded content is treated as current
 9. only then begin target-specific design and implementation planning
 
 ## What the coding agent must preserve

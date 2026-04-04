@@ -47,7 +47,7 @@ This specification defines the **canonical invariant set** that every downstream
 ### INV-CODEWORD-004 (codeword-set-dependent)
 **Statement**: The codeword set used by the implementation is grounded in the research baseline — no invented codewords.
 **Test criterion**: Every codeword used by the implementation matches the research-baseline source.
-**Note**: Full verification requires the codeword-set closure to be resolved.
+**Note**: The codeword set is fully closed. Full verification against the complete 16-codeword set is required.
 **Source**: `codeword-set.pseudo.md`
 
 ---
