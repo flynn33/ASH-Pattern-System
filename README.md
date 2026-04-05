@@ -33,6 +33,7 @@ This repository defines:
 - resilient software semantics (classification, recovery, fallback, containment, safe failure) — rebuilt on 9D baseline
 - implementation contracts for all 9 required semantic modules — rebuilt on 9D baseline in R3
 - invariant-based verification requirements for downstream conformance — rebuilt on 9D baseline in R3
+- downstream build handoff templates for desktop, mobile, and service target classes
 
 This repository does **not** define:
 
@@ -103,6 +104,11 @@ Canonical motion between states is **XOR-by-codeword**: `x' = x ⊕ c` where `c 
 - `specs/verification/invariant-spec.md` — canonical invariant set for downstream conformance verification
 - `specs/verification/conformance-categories.md` — 5 conformance categories for verification grouping
 - `specs/verification/implementation-acceptance.md` — acceptance criteria and judgment language
+- `handoff-templates/README.md` — downstream build handoff template layer overview
+- `handoff-templates/common-downstream-handoff-requirements.md` — universal downstream handoff requirements
+- `handoff-templates/desktop-implementation-handoff-template.md` — desktop target class template
+- `handoff-templates/mobile-implementation-handoff-template.md` — mobile target class template
+- `handoff-templates/service-implementation-handoff-template.md` — service/backend target class template
 - `governance/repository-governance.md` — governance rules for this repository
 - `governance/ai-coding-handoff.md` — handoff instructions for coding agents
 

@@ -96,23 +96,25 @@ Rebuilt/revalidated:
 
 **Status**: Complete. The contract and verification layers are now authoritative for the full 9D research baseline. The codeword set `C ⊂ F2^9` is fully closed — exact generators and exhaustive enumeration have been extracted from published research (see `specs/core/codeword-set.pseudo.md`).
 
-### Phase 4 — create platform build handoff packages
+### Phase 4 — create platform build handoff packages (active)
 
-For each target implementation repo, the coding agent should receive:
+Create the downstream build handoff template layer defining what each target-class implementation repository must contain:
 
-- this repository (post-R3, fully revalidated)
-- target platform constraints
-- target language constraints
-- runtime constraints
-- packaging constraints
-- performance constraints if applicable
+- **Common requirements** — universal handoff structure, semantic-module mapping, invariant/conformance verification inputs, diagnostics integration, materialization-boundary expectations, packaging/build/deployment decision surface, proof-of-conformance deliverables
+- **Target-class templates** — desktop, mobile, and service/backend handoff templates
 
-**Status**: Ready to begin. The codeword set `C` is fully closed with exact generators and exhaustive enumeration extracted from published research. Platform handoff may proceed without codeword-set caveats.
+Handoff templates define structure and conformance expectations. They do not prescribe languages, frameworks, or implementation code. The canonical agnostic repository remains the semantic authority.
+
+Handoff template files created:
+
+- `handoff-templates/README.md`
+- `handoff-templates/common-downstream-handoff-requirements.md`
+- `handoff-templates/desktop-implementation-handoff-template.md`
+- `handoff-templates/mobile-implementation-handoff-template.md`
+- `handoff-templates/service-implementation-handoff-template.md`
+
+**Status**: Active / in progress.
 
 ## Immediate next design step
 
-R1, R2, and R3 are complete. The contract and verification layers are rebuilt on the 9D research baseline.
-
-The immediate next step is:
-
-1. **Begin Phase 4** — create platform build handoff packages. The codeword set is fully closed; all specification layers are complete and authoritative on the 9D research baseline
+R1, R2, and R3 are complete. The codeword set is fully closed. Phase 4 (platform build handoff templates) is the active phase. The handoff-template layer is being built to define downstream repository structure and conformance expectations for each target class.

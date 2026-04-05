@@ -51,6 +51,12 @@ ash-pattern-system/
 │           ├── generation-planner-contract.md
 │           ├── artifact-emitter-contract.md
 │           └── diagnostics-module-contract.md
+├── handoff-templates/
+│   ├── README.md
+│   ├── common-downstream-handoff-requirements.md
+│   ├── desktop-implementation-handoff-template.md
+│   ├── mobile-implementation-handoff-template.md
+│   └── service-implementation-handoff-template.md
 └── governance/
     ├── repository-governance.md
     └── ai-coding-handoff.md
@@ -77,6 +83,9 @@ Contains invariant specifications, conformance categories, and implementation ac
 
 ### `specs/interfaces/`
 Contains contracts, diagnostic schemas, and rule taxonomies that downstream implementations must satisfy.
+
+### `handoff-templates/`
+Contains downstream build handoff templates that define what each target-class implementation repository must contain. Templates define structure, required deliverables, and proof-of-conformance inputs — not implementation code.
 
 ### `governance/`
 Contains repository rules and handoff rules for coding agents.

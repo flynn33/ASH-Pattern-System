@@ -105,14 +105,28 @@ The following layers have been **rebuilt on the 9D research baseline** and are a
 - **R1 — Foundational Math Reset** — complete
 - **R2 — State/Recovery Realignment** — complete
 - **R3 — Contract and Verification Rebuild** — complete
+- **Phase 4 — Platform Build Handoff** — active / in progress
+
+## Downstream build handoff templates
+
+The `handoff-templates/` directory contains downstream build handoff templates that define what each target-class implementation repository must contain.
+
+**Coding agent workflow for downstream implementations:**
+
+1. Read the canonical specifications, contracts, and verification requirements first
+2. Read `handoff-templates/common-downstream-handoff-requirements.md` for universal handoff expectations
+3. Read the appropriate target-class template (`desktop-`, `mobile-`, or `service-implementation-handoff-template.md`)
+4. Use the template to structure the downstream repository, plan deliverables, and track conformance
+
+Handoff templates constrain downstream repository structure and proof-of-conformance inputs. They do **not** override canonical specifications, contracts, or verification requirements. The canonical agnostic repository remains the semantic authority.
 
 ## Required delivery shape for implementation repos
 
-A downstream implementation handoff should include, at minimum:
+A downstream implementation handoff should include, at minimum, all deliverables specified in `handoff-templates/common-downstream-handoff-requirements.md`:
 
-- mapping from spec modules to implementation modules
-- invariant-based test plan
-- materialization boundary design
-- diagnostics design
-- target-runtime constraints
-- packaging and build decisions for that target repo
+- module mapping document
+- verification report
+- diagnostics conformance report
+- materialization-boundary report
+- deviation log
+- acceptance judgment
