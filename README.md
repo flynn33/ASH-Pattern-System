@@ -6,7 +6,7 @@ This repository is the **platform-neutral, language-neutral source of truth** fo
 
 It is the agnostic specification repository grounded in the **full 9-dimensional ASH research math**.
 
-> **Post-R3 status**: This repository is grounded in the full 9D ASH research baseline (R1). State/recovery semantics (R2) and contract/verification layers (R3) have been rebuilt on the 9D foundation. The codeword set `C ⊂ F2^9` is fully closed — exact generators and exhaustive enumeration have been extracted from published research (see `specs/core/codeword-set.pseudo.md`). All specification layers are complete.
+> **Post-R3 status**: This repository is grounded in the full 9D ASH research baseline (R1). State/recovery semantics (R2) and contract/verification layers (R3) have been rebuilt on the 9D foundation. The codeword set `C ⊂ F2^9` is fully closed — exact generators and exhaustive enumeration have been extracted from published research (see `specs/core/codeword-set.pseudo.md`). The canonical semantic, contract, and verification layers are complete. The downstream build handoff template layer is active / in progress.
 
 ## Repository purpose
 
