@@ -1,6 +1,6 @@
 # AI Coding Handoff
 
-> **Post-R3 status**: The ASH Pattern System is grounded in the **full 9-dimensional research baseline**. The contract and verification layers have been rebuilt on the 9D foundation (R3). The codeword set `C ⊂ F2^9` is fully closed — exact generators and exhaustive enumeration have been extracted from published research. The canonical semantic, contract, and verification layers are complete. The downstream build handoff template layer is active / in progress.
+> **Post-R3 status**: The ASH Pattern System is grounded in the **full 9-dimensional research baseline**. The contract and verification layers have been rebuilt on the 9D foundation (R3). The codeword set `C ⊂ F2^9` is fully closed — exact generators and exhaustive enumeration have been extracted from published research. The canonical semantic, contract, verification, and downstream build handoff template layers are complete. The canonical main repository is now closed as the agnostic specification baseline and operates in maintenance mode; platform-specific implementation work is out of scope for main.
 
 ## Purpose
 
@@ -32,7 +32,7 @@ The **research baseline** is canonical — not the superseded 8+1 drift formaliz
 5. read `specs/interfaces/semantic-contracts.md` and all files in `specs/interfaces/contracts/`
 6. read `governance/repository-governance.md` and `governance/github-agents-governance.md` (the latter documents the sentinel agent layer that gates math-critical changes, blocks 8+1 reintroduction, and guards canonical-repo boundary drift)
 7. confirm that the canonical specs use the full 9D research baseline (not the superseded 8+1 model)
-8. confirm that the canonical semantic, contract, and verification layers are complete, that Phase 4 downstream handoff-template work is treated as active / in progress (not complete), and that no stale or superseded content is treated as current
+8. confirm that the canonical semantic, contract, verification, and downstream build handoff template layers are complete, that the canonical main repository is treated as the closed agnostic baseline (platform-specific implementation work belongs in downstream implementation repositories, not in main), and that no stale or superseded content is treated as current
 9. only then begin target-specific design and implementation planning
 
 ## What the coding agent must preserve
@@ -105,7 +105,7 @@ The following layers have been **rebuilt on the 9D research baseline** and are a
 - **R1 — Foundational Math Reset** — complete
 - **R2 — State/Recovery Realignment** — complete
 - **R3 — Contract and Verification Rebuild** — complete
-- **Phase 4 — Platform Build Handoff** — active / in progress
+- **Phase 4 — Platform Build Handoff** — complete
 
 ## Downstream build handoff templates
 

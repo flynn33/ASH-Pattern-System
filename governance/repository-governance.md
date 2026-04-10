@@ -57,6 +57,15 @@ If a specification marks a rule as an **unresolved item**, that item must be res
 A new file belongs in this repository only if it strengthens the semantic source of truth.
 If it mainly expresses one platform's build, runtime, or packaging concerns, it belongs in a downstream implementation repository instead.
 
+## Main-repository closeout
+
+The canonical main repository is closed as the agnostic specification baseline. It remains canonical and implementation-free.
+
+- Main remains canonical. The canonical semantic, contract, verification, and downstream build handoff template layers are the authoritative source of truth for the ASH Pattern System.
+- Main remains implementation-free. Platform-specific source code, build files, package manifests, lockfiles, and platform source trees do not belong in the canonical main repository. Those artifacts belong in downstream implementation repositories that consume the canonical baseline.
+- Future edits to the canonical main repository are limited to canonical corrections, ambiguity resolution, validation and governance maintenance, and other source-of-truth upkeep — typically revealed by downstream implementation work.
+- The sentinel agent layer in `governance/github-agents-governance.md` enforces the canonical-authority boundary and the implementation-free invariant at the CI boundary.
+
 ## GitHub governance agents
 
 A sentinel agent layer is defined in `governance/github-agents-governance.md` and enforced via workflows under `.github/workflows/`. The agents detect canonical-repo boundary drift, guard the locked research-baseline math, block reintroduction of superseded canonical language, and provide a reusable conformance workflow for downstream repositories. The agents are gatekeepers only — they do not own or redefine canonical truth.
