@@ -28,7 +28,7 @@ The Alignment Agent enforces this policy.
 
 ## Agents
 
-Four agents are defined. Three guard the canonical repository; the fourth is a reusable workflow for downstream implementation repositories.
+Seven agents/workflows are defined. Six guard the canonical repository directly on `push`/`pull_request`; one is a reusable workflow for downstream implementation repositories.
 
 ### 1. Alignment Agent
 
@@ -171,15 +171,55 @@ jobs:
       # require-all: false
 ```
 
-## Relationship to `no-ai-attribution.yml`
+### 5. No AI Attribution Agent
 
-The existing `.github/workflows/no-ai-attribution.yml` workflow is a separate concern and is not modified by this agent layer. It continues to enforce its own rules on commit authors, committers, message bodies, and file contents.
+**Workflow:** `.github/workflows/no-ai-attribution.yml`
+**Behavior:** blocking.
+**Triggers:** every `push` and `pull_request` on any branch.
+
+Checks:
+
+- AI-attribution markers in commit messages
+- AI-associated author/committer identities
+- AI-attribution markers in changed file content
+
+This workflow remains mandatory and blocking. It is separate from semantic/math boundary checks and enforces repository policy on commit and content attribution.
+
+### 6. Wiki Maintenance Agent
+
+**Workflow:** `.github/workflows/wiki-maintenance-agent.yml`
+**Script:** `.github/scripts/wiki_maintenance_check.py`
+**Behavior:** blocking when promoted from report-only.
+**Triggers:** every `push` and `pull_request` on any branch.
+
+Checks:
+
+- Required wiki pages exist under `wiki/` and are non-empty with top headings
+- `wiki/Home.md` and `wiki/_Sidebar.md` contain links to required canonical wiki pages
+- Internal wiki links resolve
+- Drift signal warning when canonical docs/specs/governance/agent surfaces changed but no `wiki/` page changed
+- On `push` to `main`, when `wiki/` changed, syncs `wiki/` content into the GitHub Wiki repository (`<repo>.wiki.git`)
+
+### 7. Docs Maintenance Agent
+
+**Workflow:** `.github/workflows/docs-maintenance-agent.yml`
+**Script:** `.github/scripts/docs_maintenance_check.py`
+**Behavior:** blocking when promoted from report-only.
+**Triggers:** every `push` and `pull_request` on any branch.
+
+Checks:
+
+- Required canonical docs/governance/handoff files exist and are non-empty
+- Required headings remain present in key canonical documents
+- README baseline markers and repository-map path references remain valid
+- Internal markdown links across README/docs/governance/handoff/wiki resolve
+- Drift signal warning when canonical docs/specs change without a README update
 
 ## Rollout state
 
-The agent layer lands in **report-only mode** on first commit. Each agent workflow declares `env: REPORT_ONLY: "1"`. The Python scripts honor this environment variable and always exit 0 when it is set, while still printing the full violation report and GitHub annotations so maintainers can see what would have been blocked.
+The new sentinel checks land in **report-only mode** on first commit where applicable. Workflows that use `env: REPORT_ONLY: "1"` and corresponding Python scripts honor this environment variable by printing full reports while exiting 0.
 
-Promotion from report-only to blocking is a separate follow-up commit that flips `REPORT_ONLY: "1"` to `REPORT_ONLY: "0"` in each of the four workflow files. Promotion may only happen after a clean run on `main` — that is, after report-only output on `main` shows zero unexpected findings. A first-pass regex or path rule that fires incorrectly must be tightened (in intermediate commits) before promotion.
+Promotion from report-only to blocking is a separate follow-up commit that flips `REPORT_ONLY: "1"` to `REPORT_ONLY: "0"` in each report-only workflow file (`alignment-agent.yml`, `canonical-semantic-integrity-agent.yml`, `math-integrity-agent.yml`, `wiki-maintenance-agent.yml`, `docs-maintenance-agent.yml`). Promotion may only happen after a clean run on `main` — that is, after report-only output on `main` shows zero unexpected findings. A first-pass regex or path rule that fires incorrectly must be tightened (in intermediate commits) before promotion.
 
 ### Known report-only findings at initial landing
 

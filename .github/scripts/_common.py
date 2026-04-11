@@ -1,7 +1,6 @@
 """Shared helpers for ASH Pattern System governance agent scripts.
 
-All four sentinel scripts (alignment, semantic-integrity, math-integrity,
-downstream-conformance) reuse this module for:
+Sentinel scripts reuse this module for:
   - report-only mode handling
   - repo-root resolution
   - repo walking with .git/ exclusion

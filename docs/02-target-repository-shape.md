@@ -57,9 +57,39 @@ ash-pattern-system/
 │   ├── desktop-implementation-handoff-template.md
 │   ├── mobile-implementation-handoff-template.md
 │   └── service-implementation-handoff-template.md
+├── wiki/
+│   ├── Home.md
+│   ├── _Sidebar.md
+│   ├── Getting-Started.md
+│   ├── Canonical-Math-Baseline.md
+│   ├── Specification-Layers.md
+│   ├── Recovery-and-Safety-Semantics.md
+│   ├── Contracts-and-Verification.md
+│   ├── Governance-and-Agents.md
+│   ├── Downstream-Handoff-Guide.md
+│   ├── Wiki-Maintenance-Playbook.md
+│   └── Glossary.md
+├── .github/
+│   ├── workflows/
+│   │   ├── alignment-agent.yml
+│   │   ├── canonical-semantic-integrity-agent.yml
+│   │   ├── math-integrity-agent.yml
+│   │   ├── downstream-conformance-agent.yml
+│   │   ├── no-ai-attribution.yml
+│   │   ├── wiki-maintenance-agent.yml
+│   │   └── docs-maintenance-agent.yml
+│   └── scripts/
+│       ├── _common.py
+│       ├── alignment_check.py
+│       ├── semantic_integrity_check.py
+│       ├── math_integrity_check.py
+│       ├── downstream_conformance_check.py
+│       ├── wiki_maintenance_check.py
+│       └── docs_maintenance_check.py
 └── governance/
     ├── repository-governance.md
-    └── ai-coding-handoff.md
+    ├── ai-coding-handoff.md
+    └── github-agents-governance.md
 ```
 
 ## Structural rules
@@ -86,6 +116,12 @@ Contains contracts, diagnostic schemas, and rule taxonomies that downstream impl
 
 ### `handoff-templates/`
 Contains downstream build handoff templates that define what each target-class implementation repository must contain. Templates define structure, required deliverables, and proof-of-conformance inputs — not implementation code.
+
+### `wiki/`
+Contains the version-controlled source for GitHub Wiki pages. Wiki content summarizes canonical semantics and governance and must stay aligned with repository source-of-truth files.
+
+### `.github/`
+Contains sentinel workflow definitions and governance scripts that enforce canonical boundary, semantic integrity, math integrity, attribution policy, and documentation/wiki upkeep.
 
 ### `governance/`
 Contains repository rules and handoff rules for coding agents.

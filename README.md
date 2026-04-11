@@ -109,9 +109,14 @@ Canonical motion between states is **XOR-by-codeword**: `x' = x ⊕ c` where `c 
 - `handoff-templates/desktop-implementation-handoff-template.md` — desktop target class template
 - `handoff-templates/mobile-implementation-handoff-template.md` — mobile target class template
 - `handoff-templates/service-implementation-handoff-template.md` — service/backend target class template
+- `wiki/Home.md` — GitHub Wiki home source (version-controlled in `wiki/`)
+- `wiki/Wiki-Maintenance-Playbook.md` — wiki upkeep and refresh policy
 - `governance/repository-governance.md` — governance rules for this repository
 - `governance/ai-coding-handoff.md` — handoff instructions for coding agents
-- `governance/github-agents-governance.md` — GitHub-native sentinel agent layer (alignment, semantic integrity, math integrity, downstream conformance)
+- `governance/github-agents-governance.md` — GitHub-native sentinel agent layer (alignment, semantic integrity, math integrity, downstream conformance, no-AI-attribution, wiki maintenance, docs maintenance)
+- `.github/workflows/no-ai-attribution.yml` — CI gate that blocks AI attribution markers
+- `.github/workflows/wiki-maintenance-agent.yml` — CI gate that validates wiki completeness, links, and drift
+- `.github/workflows/docs-maintenance-agent.yml` — CI gate that validates README/docs/governance integrity
 
 ## Intended use
 
