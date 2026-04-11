@@ -83,7 +83,8 @@ jobs:
             exit 0
           fi
 
-          rsync -a --delete wiki/ "$WIKI_DIR/"
+          # Preserve destination .git metadata while mirroring wiki pages.
+          rsync -a --delete --exclude '.git' wiki/ "$WIKI_DIR/"
 
           cd "$WIKI_DIR"
           if git diff --quiet; then
