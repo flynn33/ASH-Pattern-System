@@ -1,4 +1,4 @@
-# Realm Identity — canonical specification (Research Baseline)
+# Realm Identity — canonical specification (Canonical Baseline)
 
 ## Purpose
 
@@ -9,7 +9,7 @@ Each of the 512 states in F2^9 corresponds to a realm. Realm identity encodes th
 
 ## Inputs
 
-Realm identity is derived from a **full 9-bit ASH state** in F2^9.
+Realm identity is computed from a **full 9-bit ASH state** in F2^9.
 
 ## Realm record
 
@@ -55,5 +55,5 @@ A downstream implementation may use different formatting conventions so long as 
 
 ## Relation to other specifications
 
-- **ash-state-space.pseudo.md** — defines the canonical F2^9 state space from which realm identity is derived
+- **ash-state-space.pseudo.md** — defines the canonical F2^9 state space from which realm identity is computed
 - **codeword-transformation-semantics.pseudo.md** — codeword transformations map between realms

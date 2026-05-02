@@ -21,22 +21,21 @@ It does not define the syntax a language must use to express them.
 The engine must first produce an abstract, inspectable generation plan.
 Only then may a downstream adapter materialize files, modules, services, views, or packages.
 
-### 4. Derived control, not arbitrary mutation
+### 4. Full-state semantics, not arbitrary mutation
 
-The 9th ASH dimension is a derived control/parity dimension.
-It is not treated as a regular peer coordinate under ordinary transitions.
+All 9 coordinates participate in the canonical state model.
+Ordinary transitions operate on the full 9-bit state via XOR-by-codeword.
 
 ### 5. Stabilization is part of the model
 
-The first 8 coordinates are not just a convenient storage layout.
-They are the stabilizing algebraic substrate of the ASH state model.
+The full 9-bit state is not just a convenient storage layout.
+It is the stabilizing algebraic substrate of the ASH state model.
 
 ### 6. Determinism matters
 
 Equal inputs must produce equal semantic outputs for:
 
 - normalization
-- control derivation
 - realm identity
 - transition application
 - topology expansion

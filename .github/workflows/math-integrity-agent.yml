@@ -1,6 +1,6 @@
 name: Math Integrity Agent
 
-# Sentinel workflow. Protects the locked 9D research baseline math.
+# Sentinel workflow. Protects the locked 9D canonical baseline math.
 #
 # On any change to a math-critical path (see .github/scripts/math_integrity_check.py
 # and governance/github-agents-governance.md for the list), this agent requires:

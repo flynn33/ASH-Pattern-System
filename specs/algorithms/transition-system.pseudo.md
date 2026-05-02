@@ -1,8 +1,8 @@
-# Transition System — canonical specification (Research Baseline)
+# Transition System — canonical specification (Canonical Baseline)
 
 ## Purpose
 
-The transition system defines how an ASH state evolves. In the research baseline, the canonical transition mechanism is **XOR-by-codeword** on the full 9-bit state in F2^9.
+The transition system defines how an ASH state evolves. The canonical transition mechanism is **XOR-by-codeword** on the full 9-bit state in F2^9.
 
 ## Transition model
 

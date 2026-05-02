@@ -1,4 +1,4 @@
-# RealmEncoder Contract — implementation contract (9D Research Baseline)
+# RealmEncoder Contract — implementation contract (Canonical Baseline)
 
 ## Purpose
 

@@ -2,9 +2,9 @@
 
 ## Purpose
 
-This specification defines **branching and leaf expansion** as a **first-class canonical capability** of the ASH Pattern System, grounded in the research baseline.
+This specification defines **branching and leaf expansion** as a **first-class canonical capability** of the ASH Pattern System.
 
-Branching is not an optional decoration or a secondary feature. It is a fundamental aspect of the ASH model's generative and structural behavior.
+Branching is not an optional decoration or a secondary feature. It is a fundamental aspect of the ASH Pattern System's generative and structural behavior.
 
 ## Canonical status
 
@@ -12,7 +12,7 @@ Branching / leaf expansion is **canonical and first-class** in the ASH Pattern S
 
 ## Branching concept
 
-In the research baseline, branching refers to the process by which the ASH state structure expands through **decoherence-tree** or **L-system style** generative processes:
+In the canonical system, branching refers to the process by which the ASH state structure expands through **decoherence-tree** or **L-system style** generative processes:
 
 - A state (vertex) in the ASH state space may serve as a **branch point** from which new structural elements emerge
 - The branching process is governed by the algebraic structure of the state space and the codeword set
@@ -30,19 +30,19 @@ In the research baseline, branching refers to the process by which the ASH state
 
 - Codeword transformations (`x' = x ⊕ c`) define the motion between states
 - Branching uses the codeword structure to determine how expansion proceeds from a given state
-- The relationship between branching and codeword orbits is a key structural property of the ASH model
+- The relationship between branching and codeword orbits is a key structural property of the ASH Pattern System
 
 ## Relation to the averaging operator
 
 - The averaging operator projects functions onto C-invariant subspaces
 - Branching behavior may interact with the invariant structure identified by the averaging operator
-- The precise interaction between branching and averaging is part of the deeper ASH model semantics defined in the research baseline
+- The precise interaction between branching and averaging is part of the deeper canonical semantics defined across these specifications
 
 ## Platform-neutral semantics
 
 This specification defines branching at the semantic level only:
 
-- **What** branching means in the ASH model
+- **What** branching means in the ASH Pattern System
 - **That** branching is first-class and canonical
 - **How** branching relates to the state space, codewords, and averaging operator
 
@@ -60,7 +60,7 @@ This specification does not define:
 
 ## Boundaries of this specification
 
-This specification establishes branching as a canonical first-class capability and defines its relationship to the rest of the ASH model. Specific tree construction strategies remain implementation-defined unless a future canonical specification standardizes them explicitly.
+This specification establishes branching as a canonical first-class capability and defines its relationship to the rest of the canonical system. Specific tree construction strategies remain implementation-defined unless a future canonical specification standardizes them explicitly.
 
 ## Relation to other specifications
 

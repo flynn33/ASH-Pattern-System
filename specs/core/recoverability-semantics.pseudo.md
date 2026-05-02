@@ -1,4 +1,4 @@
-# Recoverability Semantics — canonical specification (Research Baseline)
+# Recoverability Semantics — canonical specification (Canonical Baseline)
 
 ## Purpose
 
@@ -28,7 +28,7 @@ END ENUM
 - **Applies to**: `UNSTABLE`
 - **Meaning**: The state is transformation-compatible but not in a recognized valid configuration. Recovery consists of restoring the state to a valid configuration using the codeword structure.
 - **Preconditions**: State is `TRANSFORMATION_COMPATIBLE`. A normalization path exists.
-- **Blocked when**: Codeword set is not fully specified, preventing normalization.
+- **Blocked when**: a normalization path cannot be computed from the canonical definitions.
 
 ### APPLY_CORRECTION
 - **Applies to**: `CORRECTABLE`
@@ -74,7 +74,7 @@ END FUNCTION
 
 | Recovery Category | Blocked When | Fallback Behavior |
 |---|---|---|
-| `NORMALIZE_STATE` | Codeword set not fully specified | Normalization is `BLOCKED`; escalate to containment |
+| `NORMALIZE_STATE` | Normalization path not computable | Normalization is `BLOCKED`; escalate to containment |
 | `APPLY_CORRECTION` | Correction path not computable | Escalate to `FALLBACK_REQUIRED` |
 | `FALLBACK_REQUIRED` | No registry or no candidates | Escalate to `CONTAINMENT_REQUIRED` |
 | `CONTAINMENT_REQUIRED` | Containment boundary breached | Escalate to `TERMINAL_NO_RECOVERY` |

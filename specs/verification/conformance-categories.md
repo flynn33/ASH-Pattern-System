@@ -1,17 +1,17 @@
-# Conformance Categories — canonical verification requirements (9D Research Baseline)
+# Conformance Categories — canonical verification requirements (Canonical Baseline)
 
 ## Purpose
 
 This specification groups the canonical invariants from `invariant-spec.md` into **5 conformance categories**. Each category represents a distinct verification bucket that downstream implementations must satisfy.
 
-**Open research-closure item**: Invariants that depend on the specific codeword set `C ⊂ F2^9` are marked in `invariant-spec.md`. Full verification of codeword-dependent invariants requires the codeword-set closure to be resolved.
+**Codeword-set closure**: Invariants that depend on the specific codeword set `C ⊂ F2^9` are marked in `invariant-spec.md`. Full verification of codeword-dependent invariants must use the closed 16-member canonical set.
 
 ---
 
 ## Category 1: Algebraic/State Conformance
 
 ### Scope
-Verifies that the implementation correctly represents, normalizes, classifies, and validates full 9-bit ASH states using the research-baseline algebraic structure.
+Verifies that the implementation correctly represents, normalizes, classifies, and validates full 9-bit ASH states using the canonical algebraic structure.
 
 ### Invariant families
 - `INV-STATE-001` through `INV-STATE-003`

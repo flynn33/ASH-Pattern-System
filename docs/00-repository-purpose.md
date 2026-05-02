@@ -20,7 +20,7 @@ This repository must provide enough semantic clarity that a coding agent can bui
 That means the repository must make the following explicit:
 
 - what an ASH state is
-- how the control dimension is derived
+- how the full 9-bit state is normalized
 - what makes a state valid
 - how states are classified for resilient behavior (stable, unstable, correctable, degraded, contained, failed, safe-halt)
 - what recovery, fallback, containment, and safe-failure actions are required for each state class

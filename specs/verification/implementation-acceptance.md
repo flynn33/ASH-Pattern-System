@@ -1,10 +1,10 @@
-# Implementation Acceptance — canonical verification requirements (9D Research Baseline)
+# Implementation Acceptance — canonical verification requirements (Canonical Baseline)
 
 ## Purpose
 
-This specification defines the **minimum acceptance threshold** for a downstream implementation to be considered conformant with the ASH Pattern System, grounded in the full 9D research baseline.
+This specification defines the **minimum acceptance threshold** for a downstream implementation to be considered conformant with the ASH Pattern System and its full 9D canonical baseline.
 
-**Codeword-set closure**: The codeword set `C ⊂ F2^9` is fully closed. `C` is a [9, 4, 4] doubly-even linear code with 16 members, extracted from published research (see `specs/core/codeword-set.pseudo.md`). All codeword-dependent invariants can now be fully assessed. Implementations must use exactly the specified 16-codeword set.
+**Codeword-set closure**: The codeword set `C ⊂ F2^9` is fully closed. `C` is a [9, 4, 4] doubly-even linear code with 16 members, fully enumerated in `specs/core/codeword-set.pseudo.md`. All codeword-dependent invariants can now be fully assessed. Implementations must use exactly the specified 16-codeword set.
 
 ---
 
@@ -16,7 +16,7 @@ A downstream implementation is **accepted as conformant** if and only if:
 
 2. **All 5 conformance categories are covered** — every category in `conformance-categories.md` must be represented in the test suite.
 
-3. **Per-module contracts are satisfied** — every module contract in `specs/interfaces/contracts/` must be satisfied as grounded in the 9D baseline.
+3. **Per-module contracts are satisfied** — every module contract in `specs/interfaces/contracts/` must be satisfied against the canonical 9D baseline.
 
 4. **Diagnostics are complete** — the diagnostic chain is conformant with the shared schema and taxonomy.
 
@@ -32,7 +32,7 @@ A downstream implementation is **non-conformant** if any of the following:
 4. The materialization boundary is violated
 5. Diagnostics are incomplete or non-conformant with the schema/taxonomy
 6. Silent healing occurs (recovery without diagnostics)
-7. The implementation invents codewords not grounded in the research baseline
+7. The implementation invents or extends codewords beyond the canonical 16-member set
 
 ---
 

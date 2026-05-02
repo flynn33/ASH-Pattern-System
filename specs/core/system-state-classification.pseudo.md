@@ -1,4 +1,4 @@
-# System-State Classification — canonical specification (Research Baseline)
+# System-State Classification — canonical specification (Canonical Baseline)
 
 ## Purpose
 

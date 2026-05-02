@@ -1,4 +1,4 @@
-# ASH State Space — canonical specification (Research Baseline)
+# ASH State Space — canonical specification (Canonical Baseline)
 
 ## Design decision
 
@@ -15,7 +15,7 @@ There are **512 states** (vertices / realms) in the state space.
 
 ## Structural interpretation
 
-All 9 coordinates participate in the algebraic structure of the ASH state space. No single coordinate is structurally privileged as a "derived" dimension at the foundational level.
+All 9 coordinates participate in the algebraic structure of the ASH state space. No single coordinate is structurally privileged at the foundational level.
 
 The state space structure is defined by the **codeword set** `C ⊂ F2^9`, which determines:
 
@@ -24,9 +24,9 @@ The state space structure is defined by the **codeword set** `C ⊂ F2^9`, which
 - the averaging operator and its invariant subspaces
 - the branching / expansion topology
 
-### Observation about published examples
+### Observation about the canonical codeword set
 
-Some published ASH example codewords have their 9th coordinate set to `0`. This is a property of the canonical codeword set and does not change the definition of the state space as a full 9-coordinate structure.
+All canonical codewords have their 9th coordinate set to `0`. This is a property of the canonical codeword set and does not change the definition of the state space as a full 9-coordinate structure.
 
 ## Canonical state record
 
@@ -88,7 +88,7 @@ END FUNCTION
 
 ## Validity and admissibility
 
-Validity and admissibility for the full 9D model are defined by:
+Validity and admissibility for the canonical 9-bit model are defined by:
 
 - **Codeword-orbit membership** — whether a state is reachable from known valid states via codeword transformations
 - **Admissibility classification** — VALID, TRANSFORMATION_COMPATIBLE, TRANSFORMATION_INCOMPATIBLE, or UNCLASSIFIED

@@ -1,14 +1,14 @@
-# State Admissibility — canonical specification (Research Baseline)
+# State Admissibility — canonical specification (Canonical Baseline)
 
 ## Purpose
 
-This specification defines **admissibility and validity** for full 9-bit states in the ASH Pattern System, grounded in the research baseline.
+This specification defines **admissibility and validity** for full 9-bit states in the ASH Pattern System.
 
-Admissibility determines whether a given 9-bit state is structurally valid within the ASH model and whether it is compatible with the codeword transformation structure.
+Admissibility determines whether a given 9-bit state is structurally valid within the ASH Pattern System and whether it is compatible with the codeword transformation structure.
 
 ## Admissibility concept
 
-In the full 9D research model, admissibility is defined in terms of the state's relationship to the **codeword orbit structure** rather than membership in an 8-bit sub-code.
+In the canonical 9-bit model, admissibility is defined in terms of the state's relationship to the **codeword orbit structure**.
 
 ### Codeword orbits
 
@@ -29,13 +29,13 @@ ENUM AdmissibilityStatus
     VALID                        -- state is well-formed and transformation-compatible
     TRANSFORMATION_COMPATIBLE    -- state is reachable via codeword orbit from a known valid state
     TRANSFORMATION_INCOMPATIBLE  -- state is not reachable via any codeword orbit from known valid states
-    UNCLASSIFIED                 -- admissibility cannot be determined (e.g., codeword set not fully specified)
+    UNCLASSIFIED                 -- admissibility cannot be determined because the input or implementation cannot be classified
 END ENUM
 ```
 
 ### VALID
 
-The state is a well-formed 9-bit vector in F2^9 and is recognized as a structurally valid state in the ASH model. Valid states are the normal operating states of the system.
+The state is a well-formed 9-bit vector in F2^9 and is recognized as a structurally valid state in the ASH Pattern System. Valid states are the normal operating states of the system.
 
 ### TRANSFORMATION_COMPATIBLE
 
@@ -78,10 +78,10 @@ FUNCTION classify_state_admissibility(state[9], codeword_set C) -> Admissibility
         RETURN TRANSFORMATION_COMPATIBLE
     END IF
 
-    IF codeword_set_is_fully_specified() THEN
-        RETURN TRANSFORMATION_INCOMPATIBLE
-    ELSE
+    IF implementation_cannot_evaluate_canonical_codeword_set() THEN
         RETURN UNCLASSIFIED
+    ELSE
+        RETURN TRANSFORMATION_INCOMPATIBLE
     END IF
 END FUNCTION
 ```
@@ -97,14 +97,14 @@ END FUNCTION
 This specification does not:
 - Define alternate admissibility models outside the canonical codeword-orbit framing
 - Privilege a reduced sub-vector as the canonical basis for admissibility
-- Assume a specific linear code structure unless the research baseline establishes one
-- Invent admissibility rules not grounded in the research materials
+- Assume a linear code structure other than the canonical 16-member set
+- Invent admissibility rules not grounded in the canonical specifications
 
 ## Invariants
 
-1. **Completeness**: every 9-bit vector in F2^9 maps to exactly one admissibility status (given a fully specified codeword set)
+1. **Completeness**: every well-formed 9-bit vector in F2^9 maps to exactly one admissibility status under the canonical codeword set
 2. **Determinism**: the same state and codeword set always produce the same admissibility status
-3. **Research grounding**: admissibility rules are derived from the codeword structure defined by the research baseline
+3. **Canonical closure**: admissibility rules are derived from the fixed codeword structure defined by this repository
 4. **Full-state evaluation**: admissibility is evaluated on the full 9-bit state
 
 ## Relation to other specifications

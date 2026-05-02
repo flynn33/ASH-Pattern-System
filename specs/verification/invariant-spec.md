@@ -1,10 +1,10 @@
-# Invariant Specification — canonical verification requirements (9D Research Baseline)
+# Invariant Specification — canonical verification requirements (Canonical Baseline)
 
 ## Purpose
 
-This specification defines the **canonical invariant set** that every downstream implementation of the ASH Pattern System must verify. All invariants are grounded in the full 9-dimensional research baseline.
+This specification defines the **canonical invariant set** that every downstream implementation of the ASH Pattern System must verify. All invariants are defined against the full 9-dimensional canonical baseline.
 
-**Codeword-set closure**: The codeword set `C ⊂ F2^9` is fully closed — a [9, 4, 4] doubly-even linear code with 16 members, extracted from published research (see `specs/core/codeword-set.pseudo.md`). All codeword-dependent invariants can now be fully assessed against the specified set.
+**Codeword-set closure**: The codeword set `C ⊂ F2^9` is fully closed — a [9, 4, 4] doubly-even linear code with 16 members, fully enumerated in `specs/core/codeword-set.pseudo.md`. All codeword-dependent invariants can now be fully assessed against the specified set.
 
 ---
 
@@ -45,8 +45,8 @@ This specification defines the **canonical invariant set** that every downstream
 **Source**: `codeword-transformation-semantics.pseudo.md`
 
 ### INV-CODEWORD-004 (codeword-set-dependent)
-**Statement**: The codeword set used by the implementation is grounded in the research baseline — no invented codewords.
-**Test criterion**: Every codeword used by the implementation matches the research-baseline source.
+**Statement**: The codeword set used by the implementation matches the canonical 16-member set — no invented codewords.
+**Test criterion**: Every codeword used by the implementation matches the canonical enumeration.
 **Note**: The codeword set is fully closed. Full verification against the complete 16-codeword set is required.
 **Source**: `codeword-set.pseudo.md`
 

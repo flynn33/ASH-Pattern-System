@@ -4,7 +4,7 @@
 
 This repository is the platform-neutral, language-neutral specification baseline for the ASH Pattern System.
 
-Its canonical math is grounded in the ASH Model source of truth: the full 9-bit state space `F2^9`, the fixed 16-member codeword set `C ⊂ F2^9`, XOR-by-codeword transitions, the averaging operator `T² = T`, and first-class branching semantics.
+Its canonical math is self-contained in this repository: the full 9-bit state space `F2^9`, the fixed 16-member codeword set `C ⊂ F2^9`, XOR-by-codeword transitions, the averaging operator `T² = T`, and first-class branching semantics.
 
 ## Repository purpose
 
@@ -22,7 +22,7 @@ This repository defines:
 - canonical XOR-by-codeword transitions, averaging, branching, topology expansion, and realm identity
 - canonical admissibility, diagnostics, classification, recoverability, fallback, containment, and safe-failure semantics
 - canonical contracts, diagnostic schema, taxonomy, and verification requirements
-- governance, GitHub agents, wiki material, and handoff templates that reinforce the same source of truth
+- governance, GitHub agents, wiki material, and handoff templates that reinforce the same canonical baseline
 
 This repository does not define:
 
@@ -36,7 +36,7 @@ This repository does not define:
 - `docs/00-repository-purpose.md` — repository role and boundaries
 - `docs/01-design-philosophy.md` — governing design principles
 - `docs/02-target-repository-shape.md` — canonical repository structure
-- `docs/03-design-roadmap.md` — current source-of-truth alignment roadmap
+- `docs/03-design-roadmap.md` — current canonical alignment roadmap
 - `specs/core/` — state, codeword, diagnostic, classification, recovery, and identity specifications
 - `specs/algorithms/` — transformation, averaging, branching, recovery, containment, topology, and planning semantics
 - `specs/registries/` — canonical fallback policy registry
@@ -52,8 +52,8 @@ This repository does not define:
 
 ## Intended use
 
-An implementation agent should use this repository as the semantic authority for ASH Pattern System behavior and use the ASH Model grounding captured here as the math source of truth.
+An implementation agent should use this repository as the semantic authority for ASH Pattern System behavior.
 
-If an implementation disagrees with this repository, the specification here wins. If repository wording drifts from the ASH Model source grounding, the repository must be corrected to match the source of truth.
+If an implementation disagrees with this repository, the specification here wins. If repository wording drifts internally, the repository must be corrected to match its canonical baseline.
 
-The repository remains in maintenance mode as a canonical baseline: future edits should preserve alignment with the ASH Model and improve clarity, enforcement, and downstream conformance.
+The repository remains in maintenance mode as a canonical baseline: future edits should preserve internal mathematical consistency and improve clarity, enforcement, and downstream conformance.

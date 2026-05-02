@@ -1,8 +1,8 @@
-# State-Validity Diagnostics — canonical specification (Research Baseline)
+# State-Validity Diagnostics — canonical specification (Canonical Baseline)
 
 ## Purpose
 
-This specification defines the **canonical diagnostic model** for ASH state validity in the full 9-dimensional research baseline.
+This specification defines the **canonical diagnostic model** for ASH state validity in the full 9-dimensional canonical baseline.
 
 Every downstream implementation must be able to produce a structured diagnostic record that explains, for any candidate state:
 
@@ -60,19 +60,19 @@ Whether the state can participate in codeword transformations.
 ENUM TransformationCompatibility
     COMPATIBLE       -- state is within a codeword orbit
     INCOMPATIBLE     -- state is outside all known codeword orbits
-    UNKNOWN          -- cannot determine (codeword set not fully specified)
+    UNKNOWN          -- cannot determine because orbit compatibility could not be evaluated
 END ENUM
 ```
 
 #### `normalization_status`
-Whether the state can be or has been normalized within the 9D model.
+Whether the state can be or has been normalized within the canonical 9-bit model.
 
 ```text
 ENUM NormalizationStatus
     ALREADY_VALID        -- state is valid, no normalization needed
     NORMALIZABLE         -- state can be restored to a valid state via codeword-based correction
     NOT_NORMALIZABLE     -- state cannot be restored via codeword operations
-    BLOCKED              -- normalization cannot proceed (e.g., codeword set not fully specified)
+    BLOCKED              -- normalization cannot proceed because required canonical evaluation data is unavailable
 END ENUM
 ```
 
@@ -170,7 +170,7 @@ END FUNCTION
 
 Every downstream implementation must be capable of producing a `StateValidityDiagnostic` for any candidate 9-bit state, even when:
 
-- The codeword set is not fully specified (use `UNCLASSIFIED` / `BLOCKED`)
+- Canonical orbit evaluation cannot be completed (use `UNCLASSIFIED` / `BLOCKED`)
 - The candidate state is malformed (report in notes)
 - Orbit information is not computable (use `NONE`)
 

@@ -35,13 +35,13 @@ The boundary between `GenerationPlanner` and `ArtifactEmitter` is a **locked des
 - The plan is the sole interface between planner and emitter.
 - Planning and materialization must not be collapsed into a single opaque step.
 
-## Research-baseline algebraic conformance
+## Canonical algebraic conformance
 
 A downstream implementation **must**:
 
 - treat the full F2^9 state space as canonical
 - use XOR-by-codeword transformations as the canonical state transformation mechanism
-- ground the codeword set in the research baseline (see `specs/core/codeword-set.pseudo.md`)
+- use the canonical 16-member codeword set defined in `specs/core/codeword-set.pseudo.md`
 - use full 9-bit state admissibility (see `specs/core/state-admissibility.pseudo.md`)
 - preserve full-state canonical processing throughout diagnosis, recovery, and transition behavior
 
@@ -61,7 +61,7 @@ A downstream implementation must not:
 - replace semantic validation with superficial metadata checks
 - bypass full-state admissibility classification
 - silently treat a transformation-incompatible state as valid
-- invent module behavior not grounded in the research-baseline specifications
+- invent module behavior not grounded in the canonical specifications
 - substitute alternate state decompositions for canonical processing
 
 ## Portability rule

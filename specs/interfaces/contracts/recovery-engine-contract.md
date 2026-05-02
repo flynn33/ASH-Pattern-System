@@ -1,8 +1,8 @@
-# RecoveryEngine Contract — implementation contract (9D Research Baseline)
+# RecoveryEngine Contract — implementation contract (Canonical Baseline)
 
 ## Purpose
 
-The `RecoveryEngine` module implements deterministic recovery, fallback, containment, and safe-halt behavior for the ASH Pattern System. It consumes state classifications and diagnostics from `StateModel` and executes the appropriate recovery action — all grounded in the full 9-dimensional research baseline.
+The `RecoveryEngine` module implements deterministic recovery, fallback, containment, and safe-halt behavior for the ASH Pattern System. It consumes state classifications and diagnostics from `StateModel` and executes the appropriate recovery action according to the canonical 9-dimensional baseline.
 
 ## Canonical responsibility
 
@@ -76,7 +76,7 @@ The `RecoveryEngine` module is the single authority for:
 3. No silent healing — every recovery action produces a diagnostic
 4. Fallback is registry-driven — no ad hoc fallback selection
 5. Safe halt is terminal — no transitions from SAFE_HALT
-6. Recovery operates on full 9-bit states — no decomposition into core + derived bit
+6. Recovery operates on full 9-bit states — no alternate state decomposition
 
 ## Prohibited shortcuts
 

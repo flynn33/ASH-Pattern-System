@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Math Integrity Agent — ASH Pattern System sentinel.
 
-Protects the locked 9D research baseline math.
+Protects the locked 9D canonical baseline math.
 
 Checks when any math-critical path is in the changed set:
   (a) A math-change note must exist in the same push/PR under

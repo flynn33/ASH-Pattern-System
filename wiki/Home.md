@@ -7,7 +7,7 @@ The ASH Pattern System repository is the canonical, platform-neutral specificati
 | Area | Status |
 |---|---|
 | Math baseline | Canonical and aligned to `F2^9` |
-| Core semantics | Active source-of-truth layer |
+| Core semantics | Active canonical layer |
 | Contracts and verification | Active conformance layer |
 | Governance and GitHub agents | Active enforcement layer |
 | Downstream handoff templates | Active delivery layer |
@@ -17,7 +17,7 @@ The ASH Pattern System repository is the canonical, platform-neutral specificati
 
 ```mermaid
 flowchart LR
-    A[Research baseline F2^9] --> B[Core state specs]
+    A[Canonical F2^9 baseline] --> B[Core state specs]
     B --> C[Algorithm semantics]
     C --> D[Interface contracts]
     D --> E[Verification invariants]

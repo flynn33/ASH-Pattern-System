@@ -16,11 +16,11 @@ Use this sequence to understand the repository from canonical intent to downstre
 
 | Question | Canonical answer |
 |---|---|
-| What is this repository? | A platform-neutral semantic source of truth for ASH. |
+| What is this repository? | A platform-neutral canonical specification repository for ASH. |
 | Is this an implementation repo? | No. Implementation code belongs in downstream repos. |
 | What state model is canonical? | Full `F2^9`, 512-state space. |
 | What transformation is canonical? | XOR-by-codeword with `C subset F2^9`. |
-| Where does the math come from? | The ASH Model source grounding summarized in the canonical specs. |
+| Where does the math come from? | The canonical specifications and enumerations in this repository. |
 | What proves downstream conformance? | Invariants + category coverage + contract satisfaction + diagnostic completeness. |
 
 ## What To Read In The Repository

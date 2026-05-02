@@ -1,6 +1,6 @@
 # Recovery and Safety Semantics
 
-The ASH model is resilient because it defines deterministic behavior for recovery, fallback, containment, and terminal halt.
+The ASH Pattern System is resilient because it defines deterministic behavior for recovery, fallback, containment, and terminal halt.
 
 ## Canonical System-State Classes
 

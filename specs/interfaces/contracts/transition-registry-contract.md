@@ -1,4 +1,4 @@
-# TransitionRegistry Contract — implementation contract (9D Research Baseline)
+# TransitionRegistry Contract — implementation contract (Canonical Baseline)
 
 ## Purpose
 

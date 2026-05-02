@@ -38,4 +38,4 @@ When a math-critical edit is proposed via a pull request, the Math Integrity Age
 
 ## Scope boundary
 
-A math-change note exists only to document what changed in the locked research baseline and to record human sign-off. It is not a design document or a specification. Canonical changes still belong in the appropriate file under `specs/`.
+A math-change note exists only to document what changed in the locked canonical baseline and to record human sign-off. It is not a design document or a specification. Canonical changes still belong in the appropriate file under `specs/`.

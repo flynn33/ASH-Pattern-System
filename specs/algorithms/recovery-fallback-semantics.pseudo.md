@@ -1,4 +1,4 @@
-# Recovery and Fallback Semantics — canonical specification (Research Baseline)
+# Recovery and Fallback Semantics — canonical specification (Canonical Baseline)
 
 ## Purpose
 

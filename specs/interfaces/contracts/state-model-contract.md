@@ -1,8 +1,8 @@
-# StateModel Contract — implementation contract (9D Research Baseline)
+# StateModel Contract — implementation contract (Canonical Baseline)
 
 ## Purpose
 
-The `StateModel` module is the foundational implementation module for the ASH Pattern System. It owns the canonical state representation, normalization, validity diagnostics, system-state classification, and recoverability classification — all grounded in the full 9-dimensional research baseline.
+The `StateModel` module is the foundational implementation module for the ASH Pattern System. It owns the canonical state representation, normalization, validity diagnostics, system-state classification, and recoverability classification for the full 9-dimensional canonical baseline.
 
 ## Canonical responsibility
 
@@ -31,7 +31,7 @@ The `StateModel` module is the single authority for:
 
 ### State representation
 - States are full 9-bit vectors in F2^9 — all 9 coordinates participate in the algebraic structure
-- No coordinate is structurally privileged as a "derived" dimension at the foundational level
+- No coordinate is structurally privileged at the foundational level
 
 ### Normalization
 - Normalization operates on the full 9-bit state using the codeword structure

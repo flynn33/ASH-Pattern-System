@@ -2,13 +2,13 @@
 
 ## Goal
 
-Keep every repository surface aligned to the ASH Model source of truth so that the canonical repository, its governance agents, its wiki, and its downstream handoff material all describe the same math and semantics.
+Keep every repository surface aligned to the canonical baseline so that the repository, its governance agents, its wiki, and its downstream handoff material all describe the same math and semantics.
 
 ## Research math realignment sequence
 
-### 1. Source grounding
+### 1. Canonical basis
 
-The baseline comes from the ASH Model source materials captured in this repository's canonical specs:
+The baseline is defined by this repository's canonical specs:
 
 - full state space `F2^9`
 - fixed 16-member codeword set `C ⊂ F2^9`
@@ -16,11 +16,11 @@ The baseline comes from the ASH Model source materials captured in this reposito
 - averaging operator with `T² = T`
 - first-class branching semantics
 
-`specs/core/codeword-set.pseudo.md` is the main source-grounding bridge: it traces the canonical codeword set back to the ASH Model simulation vectors and research-paper statements.
+`specs/core/codeword-set.pseudo.md` is the main internal anchor for the canonical codeword set.
 
 ### 2. Core and algorithm alignment
 
-The core and algorithm specifications must remain direct expressions of the source-of-truth math:
+The core and algorithm specifications must remain direct expressions of the canonical math:
 
 - `specs/core/*`
 - `specs/algorithms/*`
@@ -60,7 +60,7 @@ The main repository remains the canonical baseline and stays in maintenance mode
 
 Future work in this repository is limited to:
 
-- source-grounded semantic corrections
+- semantic corrections that preserve the canonical baseline
 - clarity improvements across docs, governance, and wiki
 - stronger contract and verification alignment
 - GitHub agent and maintenance-rule improvements

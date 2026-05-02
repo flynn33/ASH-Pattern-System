@@ -96,7 +96,7 @@ ash-pattern-system/
 
 ### `docs/`
 
-Contains explanatory and planning documents that describe the repository as rebuilt under the ASH Model baseline.
+Contains explanatory and planning documents that describe the repository as a self-contained canonical baseline.
 
 ### `specs/core/`
 
@@ -125,7 +125,7 @@ Contains downstream handoff templates that define required structure, deliverabl
 
 ### `wiki/`
 
-Contains the version-controlled source for GitHub Wiki pages. Wiki content summarizes canonical semantics and governance and must stay aligned with repository source-of-truth files.
+Contains the version-controlled source for GitHub Wiki pages. Wiki content summarizes canonical semantics and governance and must stay aligned with canonical repository files.
 
 ### `.github/`
 

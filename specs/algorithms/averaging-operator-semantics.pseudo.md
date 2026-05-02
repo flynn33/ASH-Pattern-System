@@ -2,9 +2,9 @@
 
 ## Purpose
 
-This specification defines the **canonical averaging operator** for the ASH Pattern System, grounded in the research baseline.
+This specification defines the **canonical averaging operator** for the ASH Pattern System.
 
-The averaging operator is the fundamental tool for projecting functions on the state space onto the subspace of functions that are invariant under codeword transformations. It is central to stability, invariant behavior, and the algebraic structure of the ASH model.
+The averaging operator is the fundamental tool for projecting functions on the state space onto the subspace of functions that are invariant under codeword transformations. It is central to stability, invariant behavior, and the algebraic structure of the ASH Pattern System.
 
 ## Canonical definition
 
@@ -81,10 +81,10 @@ END FUNCTION
 
 ## Boundaries of this specification
 
-This specification defines the averaging operator as it appears in the research baseline. It does not:
+This specification defines the averaging operator as part of the canonical baseline. It does not:
 
-- Overstate the operator's role beyond what the research materials justify
-- Infer additional algebraic properties not established in the research baseline
+- Overstate the operator's role beyond what the canonical specifications justify
+- Infer additional algebraic properties not established in the canonical specifications
 - Prescribe how downstream implementations must use the operator beyond preserving its mathematical definition
 
 ## Relation to other specifications
@@ -92,4 +92,4 @@ This specification defines the averaging operator as it appears in the research 
 - **codeword-set.pseudo.md** — defines the canonical codeword set `C` over which the averaging operator sums
 - **codeword-transformation-semantics.pseudo.md** — defines the `x ⊕ c` transformation that the averaging operator is built on
 - **ash-state-space.pseudo.md** — defines the canonical F2^9 state space
-- **branching-semantics.pseudo.md** — branching and averaging interact in the full ASH model
+- **branching-semantics.pseudo.md** — branching and averaging interact in the full canonical system

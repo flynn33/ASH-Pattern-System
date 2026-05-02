@@ -4,13 +4,13 @@
 
 This document tells a coding agent how to use the repository when implementing, auditing, or extending the ASH Pattern System in a downstream target.
 
-The ASH Pattern System is a resilient software semantics framework grounded in the ASH Model source-of-truth math. The canonical state space is `F2^9` with 512 vertices, a fixed 16-member codeword set `C ⊂ F2^9`, XOR-by-codeword transformations, an averaging operator with `T² = T`, and first-class branching semantics.
+The ASH Pattern System is a resilient software semantics framework defined by the canonical math in this repository. The canonical state space is `F2^9` with 512 vertices, a fixed 16-member codeword set `C ⊂ F2^9`, XOR-by-codeword transformations, an averaging operator with `T² = T`, and first-class branching semantics.
 
 ## Handoff rule
 
 Treat this repository as the semantic authority.
 Do not infer core semantics from convenience, local idiom, or language defaults.
-When a mathematical question is ambiguous, resolve it against the ASH Model source grounding captured in this repository before proceeding.
+When a mathematical question is ambiguous, resolve it against the canonical specifications in this repository before proceeding.
 
 ## Required coding-agent workflow
 
@@ -33,7 +33,7 @@ When a mathematical question is ambiguous, resolve it against the ASH Model sour
 5. Read `specs/interfaces/semantic-contracts.md`, all files in `specs/interfaces/contracts/`, and all files in `specs/verification/`.
 6. Read `governance/repository-governance.md` and `governance/github-agents-governance.md`.
 7. Read `handoff-templates/` when the task is a downstream implementation handoff or audit.
-8. When a math detail needs source grounding, use the ASH Model evidence cited in `specs/core/codeword-set.pseudo.md`.
+8. When a math detail needs grounding, use the canonical definitions and enumerations in `specs/core/codeword-set.pseudo.md` and the related core specs.
 9. Only then begin target-specific design and implementation planning.
 
 ## What the coding agent must preserve
@@ -60,12 +60,12 @@ The coding agent must preserve:
 
 The coding agent must not:
 
-- invent codewords not grounded in the research baseline
+- invent or extend codewords beyond the canonical 16-member set
 - replace the full-state `F2^9` model with any alternate foundational decomposition
 - make one platform's file structure into the system's identity
 - replace semantic planning with direct side effects
 - treat convenience behavior as canonical if the specs do not say so
-- guess foundational math that lacks source grounding
+- guess foundational math that lacks explicit canonical definition
 - silently heal or mutate state without producing a diagnostic record
 - skip containment when the recovery/fallback specifications require it
 - allow a `FAILED` state to continue normal operations without escalation
@@ -81,7 +81,7 @@ The following are canonical:
 - **Branching** — first-class canonical capability
 - **Recovery and safety** — deterministic diagnostics, fallback, containment, and safe halt on full 9-bit states
 
-**Codeword-set closure**: The codeword set `C ⊂ F2^9` is fully closed. `C` is a [9, 4, 4] doubly-even linear code with 16 members, extracted from published research materials. Implementations must use exactly the specified 16-codeword set and must not invent or extend codewords.
+**Codeword-set closure**: The codeword set `C ⊂ F2^9` is fully closed. `C` is a [9, 4, 4] doubly-even linear code with 16 members, fully enumerated in `specs/core/codeword-set.pseudo.md`. Implementations must use exactly the specified 16-codeword set and must not invent or extend codewords.
 
 ## Downstream implementation handoff
 

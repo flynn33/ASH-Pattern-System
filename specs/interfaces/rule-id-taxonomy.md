@@ -1,4 +1,4 @@
-# Rule-ID Taxonomy — canonical specification (9D Research Baseline)
+# Rule-ID Taxonomy — canonical specification (Canonical Baseline)
 
 ## Purpose
 

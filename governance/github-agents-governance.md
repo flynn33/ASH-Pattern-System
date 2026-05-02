@@ -98,7 +98,7 @@ The following subset is checked for continued presence of direct 9D baseline mar
 
 #### Why math changes require human review
 
-The canonical ASH Pattern System math is a locked research baseline. The 9D state space, the specific codeword set `C ⊂ F2^9`, the averaging operator, and the branching topology carry cascade effects across admissibility, recovery, classification, verification, and downstream conformance.
+The canonical ASH Pattern System math is a locked canonical baseline. The 9D state space, the specific codeword set `C ⊂ F2^9`, the averaging operator, and the branching topology carry cascade effects across admissibility, recovery, classification, verification, and downstream conformance.
 
 #### Math-change note requirement
 
@@ -181,4 +181,4 @@ Agent blocking behavior is controlled by the `REPORT_ONLY` environment variable 
 - `REPORT_ONLY="1"` prints full findings but exits successfully
 - `REPORT_ONLY="0"` makes the workflow blocking
 
-Promotion to blocking should happen only after the repository is clean against the current ASH Model baseline and the corresponding rules are tuned to avoid false positives.
+Promotion to blocking should happen only after the repository is clean against the current canonical baseline and the corresponding rules are tuned to avoid false positives.

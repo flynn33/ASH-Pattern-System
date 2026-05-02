@@ -6,9 +6,9 @@ This repository is the current canonical specification of the ASH Pattern System
 
 ## Governance rules
 
-### 1. ASH Model alignment
+### 1. Canonical math alignment
 
-All canonical math and state semantics in this repository must stay aligned with the ASH Model baseline.
+All canonical math and state semantics in this repository must remain internally consistent and aligned across specs, contracts, verification, governance, and maintenance surfaces.
 
 ### 2. Spec-first rule
 
@@ -28,7 +28,7 @@ When algorithmic examples are needed, use pseudocode or specification prose. Pla
 
 ### 6. Admission rule for future files
 
-A new file belongs in this repository only if it strengthens the current semantic source of truth or enforces it operationally. Governance agents, wiki source pages, and downstream handoff templates are allowed when they remain aligned with the canonical math and semantics.
+A new file belongs in this repository only if it strengthens the current canonical baseline or enforces it operationally. Governance agents, wiki source pages, and downstream handoff templates are allowed when they remain aligned with the canonical math and semantics.
 
 ### 7. No placeholder semantics
 
@@ -54,7 +54,7 @@ This repository must not contain:
 
 This repository remains the canonical baseline and stays implementation-free.
 
-- Main remains aligned to the ASH Model source of truth.
+- Main remains aligned to its canonical baseline.
 - Main may include governance agents, wiki material, and handoff templates when they reinforce the canonical baseline rather than replace it.
 - Main must not be used to host platform builds, runtime packages, emitted artifacts, or implementation-specific source trees.
-- Future edits are limited to canonical corrections, clearer source grounding, contract and verification upkeep, and enforcement improvements.
+- Future edits are limited to canonical corrections, clearer specification language, contract and verification upkeep, and enforcement improvements.

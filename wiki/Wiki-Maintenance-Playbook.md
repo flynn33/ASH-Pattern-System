@@ -2,7 +2,7 @@
 
 This playbook defines how wiki content is maintained as part of canonical repository upkeep.
 
-## Source Of Truth
+## Canonical Wiki Source
 
 The `wiki/` directory in the main repository is the source-controlled canonical wiki content set.
 

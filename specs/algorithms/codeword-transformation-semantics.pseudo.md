@@ -2,9 +2,9 @@
 
 ## Purpose
 
-This specification defines the **canonical state transformation** for the ASH Pattern System, grounded in the research baseline.
+This specification defines the **canonical state transformation** for the ASH Pattern System.
 
-In the ASH model, ordinary motion between states is defined as **XOR by a codeword**. This is the foundational transformation operation from which all state evolution derives.
+In the ASH Pattern System, ordinary motion between states is defined as **XOR by a codeword**. This is the foundational transformation operation from which all state evolution derives.
 
 ## Canonical transformation
 
@@ -62,10 +62,10 @@ END FUNCTION
 
 The codeword transformation is defined entirely by the XOR operation on F2^9. Implementations must not:
 
-- Infer extra per-coordinate derivation rules from the structure of published example codewords
+- Infer extra per-coordinate derivation rules beyond the canonical generators and enumerated codewords
 - Partition canonical transformation into alternate semantic stages that change the `x ⊕ c` rule
-- Add transformation rules that are not grounded in the research baseline
-- Treat any single coordinate as structurally special at the transformation level unless the research baseline explicitly requires it
+- Add transformation rules that are not grounded in the canonical specifications
+- Treat any single coordinate as structurally special at the transformation level unless a canonical specification explicitly requires it
 
 ## Invariants
 
