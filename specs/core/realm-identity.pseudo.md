@@ -1,9 +1,5 @@
 # Realm Identity — canonical specification (Research Baseline)
 
-> **Realigned in Research Math Realignment Package R1.**
-> Realm identity now maps from the full 9-bit state / vertex model.
-> The previous encoding based on separate "stabilized 8-bit core + derived control bit" is superseded.
-
 ## Purpose
 
 Realm identity is the stable semantic encoding of an ASH state.
@@ -24,7 +20,7 @@ TYPE RealmIdentity
 END TYPE
 ```
 
-The realm record encodes the full 9-bit state as a single signature. There is no separate "core signature" and "control signature" — the full state is the identity source.
+The realm record encodes the full 9-bit state as a single signature.
 
 ## Semantic rule
 

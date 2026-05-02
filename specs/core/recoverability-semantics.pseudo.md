@@ -1,8 +1,5 @@
 # Recoverability Semantics — canonical specification (Research Baseline)
 
-> **Rewritten in R2 — State/Recovery Realignment.**
-> Recovery categories are now expressed in full 9-bit state terms using codeword-based correction, not 8+1 control-bit re-derivation.
-
 ## Purpose
 
 This specification defines the **recoverability layer** of the ASH Pattern System.
@@ -90,7 +87,7 @@ END FUNCTION
 3. **Monotonic escalation** — blocked recovery always escalates to a more severe category
 4. **No silent recovery** — every recovery action must produce a diagnostic record
 5. **Finality** — `TERMINAL_NO_RECOVERY` is the completed terminal state
-6. **No 8+1 dependency** — recovery categories are expressed in full 9-bit state terms
+6. **Full-state semantics** — recovery categories are expressed in full 9-bit state terms
 
 ## Relation to other specifications
 

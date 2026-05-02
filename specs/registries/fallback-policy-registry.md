@@ -23,10 +23,10 @@ FALLBACK-{DOMAIN}-{SEQUENCE}
 ```
 
 Where:
-- `{DOMAIN}` is a short uppercase token identifying the policy domain (e.g., `CORE`, `REALM`, `TRANSITION`)
+- `{DOMAIN}` is a short uppercase token identifying the policy domain (e.g., `STATE`, `REALM`, `TRANSITION`)
 - `{SEQUENCE}` is a 3-digit zero-padded number, monotonically increasing within the domain
 
-Examples: `FALLBACK-CORE-001`, `FALLBACK-REALM-001`, `FALLBACK-TRANSITION-003`
+Examples: `FALLBACK-STATE-001`, `FALLBACK-REALM-001`, `FALLBACK-TRANSITION-003`
 
 Policy identifiers must be globally unique and stable — once assigned, they must not be reassigned to a different policy.
 
@@ -36,7 +36,7 @@ Policy identifiers must be globally unique and stable — once assigned, they mu
 TYPE FallbackPolicyEntry
     policy_id                : String (format: FALLBACK-{DOMAIN}-{SEQUENCE})
     applicability_conditions : List of condition predicates
-    candidate_state_reference : AshState (a known-good admissible state)
+    candidate_state_reference : AshState (a known-good valid state)
     ordering_rank            : Integer (lower = higher priority)
     validation_requirements  : List of validation predicates
     escalation_on_failure    : EscalationAction
@@ -53,7 +53,7 @@ The unique identifier for this registry entry. Must conform to the policy identi
 A list of predicates that determine whether this entry is a candidate for a given degraded state. A candidate is eligible only if all applicability conditions are satisfied.
 
 #### `candidate_state_reference`
-The known-good admissible state that this entry proposes as a fallback target. This state must be an admissible codeword with correctly derived control bit (`control_bit = 0` per the locked parity formula).
+The known-good valid state that this entry proposes as a fallback target. This state must diagnose as `VALID` and classify as `STABLE` under the canonical 9-bit model.
 
 #### `ordering_rank`
 An integer that determines selection priority among eligible candidates. Lower rank = higher priority. Ties are broken by lexicographic ordering of `policy_id`.
@@ -100,7 +100,7 @@ FUNCTION select_fallback_candidate(diagnostic: StateValidityDiagnostic, state_cl
     FOR EACH candidate IN candidates
         validation = diagnose_state(candidate.candidate_state_reference)
 
-        IF validation.is_valid_normalized_state == TRUE THEN
+        IF validation.is_valid == TRUE THEN
             RETURN candidate
         ELSE
             IF candidate.escalation_on_failure == ESCALATE_TO_CONTAINMENT THEN
@@ -116,10 +116,10 @@ END FUNCTION
 
 ## Candidate eligibility rules
 
-1. A candidate state must be an admissible codeword from the locked [8,4,4] normative codeword set.
-2. A candidate state must have a correctly derived control bit (which is `0` for all admissible states per the locked parity formula).
-3. A candidate entry is eligible for a given degraded state only if all of its `applicability_conditions` are satisfied against the current diagnostic.
-4. A candidate that does not satisfy all applicability conditions must not be considered.
+1. A candidate state must be a canonical 9-bit ASH state that diagnoses as `VALID`.
+2. A candidate entry is eligible for a given degraded state only if all of its `applicability_conditions` are satisfied against the current diagnostic.
+3. A candidate that does not satisfy all applicability conditions must not be considered.
+4. A candidate selected for use must remain `STABLE` when re-diagnosed during post-selection validation.
 
 ## Deterministic ordering rules
 
@@ -131,7 +131,7 @@ END FUNCTION
 ## Post-selection validation requirements
 
 1. After selecting a candidate, the system must re-diagnose the candidate state.
-2. The re-diagnosis must classify the candidate state as `STABLE` (admissible core, correct control bit, no errors).
+2. The re-diagnosis must classify the candidate state as `STABLE` under the canonical 9-bit diagnostic rules.
 3. If the candidate does not classify as `STABLE`, its `escalation_on_failure` action determines the next step.
 4. Post-selection validation must not be skipped, deferred, or silently omitted.
 

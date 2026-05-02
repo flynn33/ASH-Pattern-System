@@ -27,7 +27,7 @@ Example: `ASH-STATE-VALIDITY-001`
 |---|---|---|
 | `ASH-STATE` | State-space structure, validity, normalization | `ash-state-space.pseudo.md`, `state-validity-diagnostics.pseudo.md` |
 | `ASH-CODEWORD` | Codeword structure, transformation, orbit membership | `codeword-set.pseudo.md`, `codeword-transformation-semantics.pseudo.md` |
-| `ASH-ADMISSIBILITY` | Core admissibility, codeword classification, correction | `core-admissibility.pseudo.md` |
+| `ASH-ADMISSIBILITY` | State admissibility, codeword classification, correction | `state-admissibility.pseudo.md` |
 | `ASH-CLASSIFICATION` | System-state classification, class-to-action mapping | `system-state-classification.pseudo.md` |
 | `ASH-RECOVERY` | Recoverability semantics, recovery actions | `recoverability-semantics.pseudo.md`, `recovery-fallback-semantics.pseudo.md` |
 | `ASH-FALLBACK` | Fallback policy, candidate selection, registry | `fallback-policy-registry.md`, `recovery-fallback-semantics.pseudo.md` |
@@ -74,10 +74,10 @@ Example: `ASH-STATE-VALIDITY-001`
 
 | Rule ID | Meaning | Source |
 |---|---|---|
-| `ASH-STATE-VALIDITY-001` | Core must be structurally admissible | `ash-state-space.pseudo.md` |
-| `ASH-STATE-VALIDITY-002` | Control bit must be consistent with derivation rule | `ash-state-space.pseudo.md` |
-| `ASH-CODEWORD-STRUCTURE-001` | Codeword set must be research-baseline grounded | `codeword-set.pseudo.md` |
-| `ASH-ADMISSIBILITY-CLASSIFICATION-001` | Every F2^8 vector maps to exactly one admissibility class | `core-admissibility.pseudo.md` |
+| `ASH-STATE-STRUCTURE-001` | An ASH state is a full 9-bit vector in `F2^9` | `ash-state-space.pseudo.md` |
+| `ASH-STATE-VALIDITY-001` | A valid state is admissible and already normalized | `state-validity-diagnostics.pseudo.md` |
+| `ASH-CODEWORD-STRUCTURE-001` | Codeword set must match the canonical 16-member set | `codeword-set.pseudo.md` |
+| `ASH-ADMISSIBILITY-CLASSIFICATION-001` | Every candidate state maps to exactly one admissibility class | `state-admissibility.pseudo.md` |
 | `ASH-CLASSIFICATION-MAPPING-001` | Every state maps to exactly one system-state class | `system-state-classification.pseudo.md` |
 | `ASH-RECOVERY-ACTION-001` | Recovery category is deterministic from state class | `recoverability-semantics.pseudo.md` |
 | `ASH-FALLBACK-SELECTION-001` | Fallback must be selected from canonical registry | `fallback-policy-registry.md` |

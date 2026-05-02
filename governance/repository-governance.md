@@ -2,70 +2,49 @@
 
 ## Repository role
 
-This repository is the canonical semantic definition of the ASH Pattern System.
-It is not a language implementation repository.
+This repository is the current canonical specification of the ASH Pattern System. It exists to describe the system's math, semantics, contracts, and verification requirements without tying them to a platform implementation.
 
 ## Governance rules
 
-### 1. Language neutrality
+### 1. ASH Model alignment
 
-No programming language may be described as the canonical identity of the engine in this repository.
+All canonical math and state semantics in this repository must stay aligned with the ASH Model baseline.
 
-### 2. Platform neutrality
+### 2. Spec-first rule
 
-No operating system, runtime family, or device category may be described as the canonical platform identity of the engine in this repository.
+Changes that affect semantics must be made in the specification documents first. Implementations follow the specifications; they do not redefine them.
 
-### 3. Spec-first rule
+### 3. Platform neutrality
 
-Changes that affect semantics must be made in the specification documents first.
-Implementation repositories must follow the specifications, not redefine them.
+No programming language, operating system, runtime family, device category, or toolchain may be described as the canonical identity of the system.
 
-### 4. Pseudocode rule
+### 4. Current-baseline rule
 
-When algorithmic examples are needed, use pseudocode unless a target-specific handoff explicitly requires implementation syntax.
+This repository carries the current canonical baseline only. Legacy formulations and explanatory packaging that exists only to discuss older repository states do not belong here.
 
-### 5. Semantic clarity rule
+### 5. Pseudocode rule
 
-A document is only complete if a downstream coding agent can determine:
+When algorithmic examples are needed, use pseudocode or specification prose. Platform syntax belongs in implementation repositories.
 
-- what the model means
-- what invariants must hold
-- what boundary separates planning from materialization
-- what behaviors are prohibited
+### 6. Admission rule for future files
 
-### 6. Standalone baseline rule
+A new file belongs in this repository only if it strengthens the current semantic source of truth. Files centered on build packaging, workflow automation, repository scaffolding, or target-specific delivery shape do not belong here.
 
-This repository stands on its own as a canonical agnostic baseline.
-It should not depend on explanation through older implementation layouts.
+### 7. No placeholder semantics
 
-### 7. State-layer closure discipline
+Canonical documents must not rely on guessed values, implicit defaults, or unresolved placeholders when describing normative behavior.
 
-Specifications that define foundational state-layer behavior (control-bit derivation, core admissibility, state-validity diagnostics) are authoritative.
+## Repository boundary
 
-Downstream implementation repositories must not:
+This repository may contain:
 
-- invent foundational semantics that are not defined in this repository
-- substitute alternative values for locked algebraic definitions (the control-bit derivation formula and the admissibility codeword set are locked design decisions)
-- guess values for any remaining unresolved items (e.g., fallback-policy registry)
-- silently use placeholder values for unresolved items in production code
-- treat convenience behavior as canonical if the specifications do not define it
+- Markdown specifications and governance
+- pseudocode specifications
+- small supporting text or JSON artifacts that clarify canonical semantics
 
-If a specification marks a rule as an **unresolved item**, that item must be resolved by an explicit design decision recorded in this repository before any downstream implementation may treat it as settled. Locked design decisions (marked as **LOCKED** in the specs) are normative and must be implemented exactly.
+This repository must not contain:
 
-## Admission rule for future files
-
-A new file belongs in this repository only if it strengthens the semantic source of truth.
-If it mainly expresses one platform's build, runtime, or packaging concerns, it belongs in a downstream implementation repository instead.
-
-## Main-repository closeout
-
-The canonical main repository is closed as the agnostic specification baseline. It remains canonical and implementation-free.
-
-- Main remains canonical. The canonical semantic, contract, verification, and downstream build handoff template layers are the authoritative source of truth for the ASH Pattern System.
-- Main remains implementation-free. Platform-specific source code, build files, package manifests, lockfiles, and platform source trees do not belong in the canonical main repository. Those artifacts belong in downstream implementation repositories that consume the canonical baseline.
-- Future edits to the canonical main repository are limited to canonical corrections, ambiguity resolution, validation and governance maintenance, and other source-of-truth upkeep — typically revealed by downstream implementation work.
-- The sentinel agent layer in `governance/github-agents-governance.md` enforces the canonical-authority boundary and the implementation-free invariant at the CI boundary.
-
-## GitHub governance agents
-
-A sentinel agent layer is defined in `governance/github-agents-governance.md` and enforced via workflows under `.github/workflows/`. The agents detect canonical-repo boundary drift, guard the locked research-baseline math, block reintroduction of superseded canonical language, and provide a reusable conformance workflow for downstream repositories. The agents are gatekeepers only — they do not own or redefine canonical truth.
+- platform-specific source code
+- build or delivery scaffolding that is not part of the ASH Pattern System itself
+- workflow automation packages that are not part of the ASH Pattern System itself
+- historical pre-remediation specifications retained only for comparison

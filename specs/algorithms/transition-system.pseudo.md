@@ -1,9 +1,5 @@
 # Transition System — canonical specification (Research Baseline)
 
-> **Realigned in Research Math Realignment Package R1.**
-> Transitions now operate on the full 9-bit state via XOR-by-codeword.
-> The previous model ("acts on 8-bit core, then re-derives control bit") is superseded.
-
 ## Purpose
 
 The transition system defines how an ASH state evolves. In the research baseline, the canonical transition mechanism is **XOR-by-codeword** on the full 9-bit state in F2^9.
@@ -16,7 +12,7 @@ A transition applies a **codeword transformation** to the full 9-bit state:
 x' = x ⊕ c    where x ∈ F2^9, c ∈ C ⊂ F2^9
 ```
 
-The transition operates on all 9 coordinates simultaneously. There is no separate "apply to core, then re-derive control" step at the foundational level.
+The transition operates on all 9 coordinates simultaneously.
 
 See `specs/algorithms/codeword-transformation-semantics.pseudo.md` for the canonical transformation definition.
 

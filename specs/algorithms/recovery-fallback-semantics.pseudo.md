@@ -1,8 +1,5 @@
 # Recovery and Fallback Semantics — canonical specification (Research Baseline)
 
-> **Rewritten in R2 — State/Recovery Realignment.**
-> Recovery operates on full 9-bit states using codeword-based correction, not 8+1 core/control re-derivation.
-
 ## Purpose
 
 This specification defines the **algorithmic semantics of deterministic recovery and fallback selection** for the ASH Pattern System.

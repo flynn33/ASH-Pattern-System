@@ -95,8 +95,8 @@ END FUNCTION
 ## What this specification does NOT define
 
 This specification does not:
-- Reuse the superseded [8,4,4] 8-bit core admissibility framing
-- Define admissibility in terms of an 8-bit sub-code plus a derived control bit
+- Define alternate admissibility models outside the canonical codeword-orbit framing
+- Privilege a reduced sub-vector as the canonical basis for admissibility
 - Assume a specific linear code structure unless the research baseline establishes one
 - Invent admissibility rules not grounded in the research materials
 
@@ -105,7 +105,7 @@ This specification does not:
 1. **Completeness**: every 9-bit vector in F2^9 maps to exactly one admissibility status (given a fully specified codeword set)
 2. **Determinism**: the same state and codeword set always produce the same admissibility status
 3. **Research grounding**: admissibility rules are derived from the codeword structure defined by the research baseline
-4. **No 8+1 decomposition**: admissibility is evaluated on the full 9-bit state, not on an 8-bit sub-vector
+4. **Full-state evaluation**: admissibility is evaluated on the full 9-bit state
 
 ## Relation to other specifications
 

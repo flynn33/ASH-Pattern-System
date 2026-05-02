@@ -1,9 +1,5 @@
 # ASH State Space — canonical specification (Research Baseline)
 
-> **Realigned in Research Math Realignment Package R1.**
-> This file now reflects the full 9-dimensional ASH research model.
-> The previous 8+1 formalization (8-bit "stabilizing algebraic core" + derived 9th "control/parity bit") is superseded.
-
 ## Design decision
 
 The ASH state space is **F2^9** — the set of all 9-bit binary vectors.
@@ -30,7 +26,7 @@ The state space structure is defined by the **codeword set** `C ⊂ F2^9`, which
 
 ### Observation about published examples
 
-Some published ASH example codewords have their 9th coordinate set to `0`. This is an observable property of those specific codewords. It does **not** justify promoting the 9th coordinate to a canonical "derived control/parity dimension" or inferring that `b8` must always be derived from `b0..b7` by a parity formula. The research baseline treats all 9 coordinates as part of the full algebraic structure.
+Some published ASH example codewords have their 9th coordinate set to `0`. This is a property of the canonical codeword set and does not change the definition of the state space as a full 9-coordinate structure.
 
 ## Canonical state record
 
@@ -116,9 +112,3 @@ See `specs/core/codeword-set.pseudo.md` for the canonical codeword structure.
 - `specs/algorithms/averaging-operator-semantics.pseudo.md` — canonical averaging operator `T` with `T² = T`
 - `specs/algorithms/branching-semantics.pseudo.md` — canonical branching / leaf expansion
 - `specs/core/realm-identity.pseudo.md` — realm identity encoding from full 9-bit state
-
-### Superseded specifications (not canonical after R1)
-
-- `specs/core/control-bit-derivation.pseudo.md` — superseded 8+1 control-bit model
-- `specs/core/core-admissibility.pseudo.md` — superseded 8-bit [8,4,4] admissibility model
-- `specs/core/state-validity-diagnostics.pseudo.md` — superseded 8+1 diagnostic model

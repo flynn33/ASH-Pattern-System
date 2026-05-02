@@ -84,8 +84,8 @@ The `RecoveryEngine` module is the single authority for:
 - Must not skip containment when specifications require it
 - Must not select fallback states outside the canonical registry
 - Must not allow transitions from SAFE_HALT
-- Must not decompose recovery into 8-bit core operations plus control-bit re-derivation
-- Must not assume a specific exhaustive codeword set if research-baseline closure is pending
+- Must not substitute alternate state partitions for canonical recovery behavior
+- Must not substitute a local codeword set or fallback ordering for the canonical definitions
 
 ## Relation to other contracts and specifications
 

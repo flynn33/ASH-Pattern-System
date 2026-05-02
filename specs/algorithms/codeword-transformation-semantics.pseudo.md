@@ -31,7 +31,7 @@ where `⊕` denotes coordinate-wise XOR (addition in F2).
 
 - Codewords are **9-bit vectors** in F2^9.
 - The codeword set `C` is a subset of F2^9 defining the allowed transformations.
-- Codewords are full 9-bit objects — they are **not** decomposed into an 8-bit component plus a derived 9th bit at the foundational level.
+- Codewords are treated as full 9-bit objects in canonical processing.
 - The specific codeword set `C` for the ASH Pattern System is a [9, 4, 4] doubly-even linear code with 16 members, fully specified in `codeword-set.pseudo.md`.
 
 ## Pseudocode
@@ -62,8 +62,8 @@ END FUNCTION
 
 The codeword transformation is defined entirely by the XOR operation on F2^9. Implementations must not:
 
-- Infer a derived parity/control dimension from the structure of published example codewords
-- Decompose the 9-bit state into an 8-bit "core" and a derived 9th bit for transformation purposes
+- Infer extra per-coordinate derivation rules from the structure of published example codewords
+- Partition canonical transformation into alternate semantic stages that change the `x ⊕ c` rule
 - Add transformation rules that are not grounded in the research baseline
 - Treat any single coordinate as structurally special at the transformation level unless the research baseline explicitly requires it
 

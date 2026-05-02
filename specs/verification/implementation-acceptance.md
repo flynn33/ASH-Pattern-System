@@ -28,7 +28,7 @@ A downstream implementation is **non-conformant** if any of the following:
 
 1. Any non-codeword-dependent invariant fails
 2. Any conformance category is missing from the test suite
-3. The implementation decomposes the 9-bit state into an 8-bit core + derived 9th bit for canonical processing
+3. The implementation departs from full-state canonical processing of the 9-bit model
 4. The materialization boundary is violated
 5. Diagnostics are incomplete or non-conformant with the schema/taxonomy
 6. Silent healing occurs (recovery without diagnostics)
@@ -50,7 +50,7 @@ The following may **not be waived, deferred, or locally overridden**:
 | Rule-ID taxonomy conformance | `rule-id-taxonomy.md` |
 | SAFE_HALT terminal finality | `containment-safe-failure-semantics.pseudo.md` |
 | Monotonic escalation | `recoverability-semantics.pseudo.md` |
-| No 8+1 decomposition as canonical | R1 realignment decision |
+| Full-state canonical processing | `ash-state-space.pseudo.md`, `state-model-contract.md` |
 
 ---
 

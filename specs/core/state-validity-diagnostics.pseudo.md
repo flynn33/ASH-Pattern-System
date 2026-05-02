@@ -1,9 +1,5 @@
 # State-Validity Diagnostics — canonical specification (Research Baseline)
 
-> **Rewritten in R2 — State/Recovery Realignment.**
-> This file now defines diagnostics for the full 9D research model.
-> The previous 8+1 diagnostic structure (extracted_core, control_derivation_status, corrected_core, etc.) is superseded.
-
 ## Purpose
 
 This specification defines the **canonical diagnostic model** for ASH state validity in the full 9-dimensional research baseline.
@@ -105,7 +101,7 @@ Optional information about the state's codeword orbit, if computable:
 Set to `NONE` if orbit information is not available or not applicable.
 
 #### `rule_ids`
-A list of specification rule identifiers that were evaluated during diagnosis. Must conform to the rule-ID taxonomy when the taxonomy is revalidated in R3.
+A list of specification rule identifiers that were evaluated during diagnosis. Must conform to the rule-ID taxonomy defined in `specs/interfaces/rule-id-taxonomy.md`.
 
 #### `notes`
 Human-readable diagnostic strings providing additional context.

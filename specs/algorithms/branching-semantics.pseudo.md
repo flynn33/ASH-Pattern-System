@@ -60,7 +60,7 @@ This specification does not define:
 
 ## Boundaries of this specification
 
-This specification establishes branching as a canonical first-class capability and defines its relationship to the rest of the ASH model. The detailed branching algorithms, expansion rules, and tree-structure semantics will be formalized in later realignment packages (R2) as the full research baseline is integrated.
+This specification establishes branching as a canonical first-class capability and defines its relationship to the rest of the ASH model. Specific tree construction strategies remain implementation-defined unless a future canonical specification standardizes them explicitly.
 
 ## Relation to other specifications
 

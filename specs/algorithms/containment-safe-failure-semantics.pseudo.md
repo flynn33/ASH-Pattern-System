@@ -214,5 +214,5 @@ Containment and safe-halt diagnostics conform to the shared diagnostic envelope 
 - **state-validity-diagnostics.pseudo.md** — provides the diagnostic records consumed by containment and safe-halt logic
 - **state-admissibility.pseudo.md** — provides admissibility classification
 - **codeword-set.pseudo.md** — provides the codeword structure that determines recoverability
-- **diagnostic-schema.md** — defines the shared diagnostic envelope this specification conforms to (pending R3 revalidation)
-- **rule-id-taxonomy.md** — defines the canonical rule-ID pattern for the `rule_ids` field (pending R3 revalidation)
+- **diagnostic-schema.md** — defines the shared diagnostic envelope this specification conforms to
+- **rule-id-taxonomy.md** — defines the canonical rule-ID pattern for the `rule_ids` field

@@ -42,7 +42,7 @@ The `StateModel` module is the single authority for:
 ### Admissibility classification
 - Admissibility is determined by codeword-orbit membership relative to the canonical codeword set
 - Statuses: VALID, TRANSFORMATION_COMPATIBLE, TRANSFORMATION_INCOMPATIBLE, UNCLASSIFIED
-- Must not assume a specific exhaustive codeword set if research-baseline closure is still pending
+- Must use the canonical 16-member codeword set defined in `codeword-set.pseudo.md`
 
 ### System-state classification
 - Map diagnostic results to one of: STABLE, UNSTABLE, CORRECTABLE, DEGRADED, CONTAINED, FAILED, SAFE_HALT
@@ -63,18 +63,18 @@ The `StateModel` module is the single authority for:
 1. Normalization is deterministic — same input always produces same result
 2. Classification is total — every state maps to exactly one class
 3. All 9 coordinates participate in the algebraic structure
-4. If the codeword set is not fully specified, UNCLASSIFIED is a valid admissibility status
+4. Codeword-based classification uses the canonical 16-member set without local substitution
 
 ## Prohibited shortcuts
 
-- Must not decompose the 9-bit state into an 8-bit "core" and a derived 9th bit for canonical processing
-- Must not assume a specific exhaustive codeword set if research-baseline closure is pending
+- Must not substitute alternate state partitions for canonical processing
+- Must not substitute a local codeword set for the canonical 16-member set
 - Must not silently treat a transformation-incompatible state as valid
 
 ## Relation to other contracts and specifications
 
 - `ash-state-space.pseudo.md` — canonical F2^9 state definition
-- `codeword-set.pseudo.md` — canonical codeword structure (exhaustive closure pending research)
+- `codeword-set.pseudo.md` — canonical codeword structure
 - `state-admissibility.pseudo.md` — full 9-bit admissibility
 - `state-validity-diagnostics.pseudo.md` — 9D diagnostic model
 - `system-state-classification.pseudo.md` — system-state classes

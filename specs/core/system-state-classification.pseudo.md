@@ -1,8 +1,5 @@
 # System-State Classification — canonical specification (Research Baseline)
 
-> **Rewritten in R2 — State/Recovery Realignment.**
-> Classification is now based on full 9-bit state diagnostics and codeword-structure compatibility, not on 8-bit core admissibility + control-bit mismatch.
-
 ## Purpose
 
 This specification defines the **canonical system-state classes** for the ASH Pattern System.
@@ -139,7 +136,7 @@ END FUNCTION
 2. **Determinism** — the same diagnostic always produces the same classification
 3. **Monotonic severity** — STABLE < UNSTABLE < CORRECTABLE < DEGRADED < CONTAINED < FAILED < SAFE_HALT
 4. **Terminal finality** — SAFE_HALT is irrevocable
-5. **No 8+1 dependency** — classification is based on full 9-bit state diagnostics
+5. **Full-state semantics** — classification is based on full 9-bit state diagnostics
 
 ## Relation to other specifications
 
