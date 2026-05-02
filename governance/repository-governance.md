@@ -28,7 +28,7 @@ When algorithmic examples are needed, use pseudocode or specification prose. Pla
 
 ### 6. Admission rule for future files
 
-A new file belongs in this repository only if it strengthens the current semantic source of truth. Files centered on build packaging, workflow automation, repository scaffolding, or target-specific delivery shape do not belong here.
+A new file belongs in this repository only if it strengthens the current semantic source of truth or enforces it operationally. Governance agents, wiki source pages, and downstream handoff templates are allowed when they remain aligned with the canonical math and semantics.
 
 ### 7. No placeholder semantics
 
@@ -40,11 +40,21 @@ This repository may contain:
 
 - Markdown specifications and governance
 - pseudocode specifications
+- GitHub workflows and small governance scripts that enforce canonical integrity
+- wiki source pages and downstream handoff templates aligned to the canonical baseline
 - small supporting text or JSON artifacts that clarify canonical semantics
 
 This repository must not contain:
 
 - platform-specific source code
 - build or delivery scaffolding that is not part of the ASH Pattern System itself
-- workflow automation packages that are not part of the ASH Pattern System itself
 - historical pre-remediation specifications retained only for comparison
+
+## Main-repository closeout
+
+This repository remains the canonical baseline and stays implementation-free.
+
+- Main remains aligned to the ASH Model source of truth.
+- Main may include governance agents, wiki material, and handoff templates when they reinforce the canonical baseline rather than replace it.
+- Main must not be used to host platform builds, runtime packages, emitted artifacts, or implementation-specific source trees.
+- Future edits are limited to canonical corrections, clearer source grounding, contract and verification upkeep, and enforcement improvements.

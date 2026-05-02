@@ -1,0 +1,35 @@
+name: Canonical Semantic Integrity Agent
+
+# Sentinel workflow. Checks:
+#   - No non-canonical math-language reintroduction in active canonical files
+#   - No language claiming handoff templates override or are canonical authority
+#   - No contradictory status language across README, roadmap, and ai-coding-handoff
+#
+# See governance/github-agents-governance.md for full policy.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+env:
+  REPORT_ONLY: "1"
+
+jobs:
+  semantic-integrity:
+    name: Canonical semantic integrity check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run canonical semantic integrity check
+        run: python3 .github/scripts/semantic_integrity_check.py
