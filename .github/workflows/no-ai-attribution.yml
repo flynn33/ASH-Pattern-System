@@ -26,9 +26,10 @@ jobs:
           else
             # For pushes, check commits in the push
             if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
-              # New branch — check all commits
-              RANGE="${{ github.sha }}"
-              COMMITS=$(git log --format="%H" "$RANGE")
+              DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
+              git fetch --no-tags --prune origin "+refs/heads/${DEFAULT_BRANCH}:refs/remotes/origin/${DEFAULT_BRANCH}"
+              BASE_SHA=$(git merge-base "origin/${DEFAULT_BRANCH}" "${{ github.sha }}")
+              RANGE="${BASE_SHA}..${{ github.sha }}"
             else
               RANGE="${{ github.event.before }}..${{ github.sha }}"
             fi
@@ -37,7 +38,7 @@ jobs:
           PATTERN='(?i)(co-authored-by:\s*.*(claude|anthropic|chatgpt|openai|copilot|gemini|bard|gpt-4|gpt-3|ai assistant|codewhisperer|tabnine|cursor|windsurf|devin))|(\b(generated|written|authored|created|produced|assisted)\s+(by|with|using)\s+(ai|artificial intelligence|claude|chatgpt|gpt|copilot|gemini|llm|large language model|machine learning|ml model))|(\bai[- ](generated|assisted|authored|written|created|produced)\b)|(noreply@anthropic\.com|noreply@openai\.com)'
 
           FAILED=0
-          for COMMIT in $(git log --format="%H" $RANGE 2>/dev/null || git log --format="%H" ${{ github.sha }} -1); do
+          for COMMIT in $(git log --format="%H" "$RANGE" 2>/dev/null || git log --format="%H" ${{ github.sha }} -1); do
             MSG=$(git log --format="%B" -1 "$COMMIT")
             if echo "$MSG" | grep -qPi "$PATTERN"; then
               echo "::error::AI attribution found in commit $COMMIT"
@@ -67,7 +68,10 @@ jobs:
             RANGE="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
           else
             if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
-              RANGE="${{ github.sha }}"
+              DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
+              git fetch --no-tags --prune origin "+refs/heads/${DEFAULT_BRANCH}:refs/remotes/origin/${DEFAULT_BRANCH}"
+              BASE_SHA=$(git merge-base "origin/${DEFAULT_BRANCH}" "${{ github.sha }}")
+              RANGE="${BASE_SHA}..${{ github.sha }}"
             else
               RANGE="${{ github.event.before }}..${{ github.sha }}"
             fi
@@ -76,7 +80,7 @@ jobs:
           AUTHOR_PATTERN='(?i)(claude|anthropic|chatgpt|openai|copilot|gemini|bard|codewhisperer|tabnine|devin|cursor-ai|windsurf)'
 
           FAILED=0
-          for COMMIT in $(git log --format="%H" $RANGE 2>/dev/null || git log --format="%H" ${{ github.sha }} -1); do
+          for COMMIT in $(git log --format="%H" "$RANGE" 2>/dev/null || git log --format="%H" ${{ github.sha }} -1); do
             AUTHOR=$(git log --format="%an <%ae>" -1 "$COMMIT")
             COMMITTER=$(git log --format="%cn <%ce>" -1 "$COMMIT")
 
@@ -109,7 +113,10 @@ jobs:
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             FILES=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}")
           elif [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
-            FILES=$(git diff --name-only --diff-filter=A HEAD)
+            DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
+            git fetch --no-tags --prune origin "+refs/heads/${DEFAULT_BRANCH}:refs/remotes/origin/${DEFAULT_BRANCH}"
+            BASE_SHA=$(git merge-base "origin/${DEFAULT_BRANCH}" "${{ github.sha }}")
+            FILES=$(git diff --name-only "${BASE_SHA}" "${{ github.sha }}")
           else
             FILES=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}")
           fi
@@ -118,6 +125,11 @@ jobs:
 
           FAILED=0
           for FILE in $FILES; do
+            case "$FILE" in
+              .github/workflows/no-ai-attribution.yml)
+                continue
+                ;;
+            esac
             if [ -f "$FILE" ]; then
               if grep -qPi "$PATTERN" "$FILE" 2>/dev/null; then
                 echo "::error file=$FILE::AI attribution marker found in $FILE"
