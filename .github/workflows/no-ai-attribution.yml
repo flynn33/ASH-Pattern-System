@@ -125,15 +125,14 @@ jobs:
 
           FAILED=0
           for FILE in $FILES; do
-            case "$FILE" in
-              .github/workflows/no-ai-attribution.yml)
-                continue
-                ;;
-            esac
             if [ -f "$FILE" ]; then
-              if grep -qPi "$PATTERN" "$FILE" 2>/dev/null; then
+              MATCHES=$(grep -nPi "$PATTERN" "$FILE" 2>/dev/null || true)
+              if [ "$FILE" = ".github/workflows/no-ai-attribution.yml" ]; then
+                MATCHES=$(echo "$MATCHES" | grep -vE '^[0-9]+:[[:space:]]+(PATTERN|AUTHOR_PATTERN)=' || true)
+              fi
+              if [ -n "$MATCHES" ]; then
                 echo "::error file=$FILE::AI attribution marker found in $FILE"
-                grep -nPi "$PATTERN" "$FILE"
+                echo "$MATCHES"
                 FAILED=1
               fi
             fi
