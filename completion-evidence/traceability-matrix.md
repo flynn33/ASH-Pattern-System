@@ -13,6 +13,7 @@
 | Define axiom, generation, emission, and diagnostic product surfaces. | `ASH-AXIOM-001`, `ASH-GENERATION-001`, `ASH-EMISSION-001`, `ASH-DIAGNOSTIC-001` | `specs/algorithms/axiom-evaluation.pseudo.md`, `generation-planning.pseudo.md`, `specs/interfaces/diagnostic-schema.md` | Required schemas under `schemas/1.0/` | `axioms.jsonl`, `generation-plans.jsonl`, `materialization-boundary.jsonl`, `diagnostics.jsonl` | Schema and conformance validators | PASS |
 | Publish machine-readable product data. | `ASH-CONFORMANCE-001`, `ASH-RELEASE-001` | `MACHINE-READABLE-PRODUCT-REQUIREMENTS.md` package | `schemas/1.0/`, `canonical-data/1.0/`, `product-manifest.json` | All corpus vectors | Product validators | PASS |
 | Build deterministic release candidate. | `ASH-RELEASE-001` | `RELEASE-PROCESS.md` | `release/release-manifest.json`, `release/SHA256SUMS` | Archive verification | `python3 tools/product/build_release_archive.py --verify` | PASS |
+| Maintain secure release and reporting surfaces. | `ASH-SECURITY-001` | `SECURITY.md`, `completion-evidence/security-review.md` | `schemas/1.0/release-evidence.schema.json`, `product-manifest.json` | Release-readiness validation | `python3 tools/product/release_readiness.py --strict --offline` | PASS |
 | Preserve protected governance surfaces. | Protected-surface policy | package `PROTECTED-GOVERNANCE-BOUNDARY.md` | `completion-evidence/protected-surface-baseline.json` | N/A | Protected verifier PASS | PASS |
 
 ## Notes

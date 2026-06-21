@@ -726,6 +726,10 @@
     },
     {
       "classification": "INFORMATIVE",
+      "path": "tools/product/release_readiness.py"
+    },
+    {
+      "classification": "INFORMATIVE",
       "path": "tools/product/tests/test_aps_product.py"
     },
     {

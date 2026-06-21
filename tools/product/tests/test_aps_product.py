@@ -3,6 +3,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 from tools.product import aps_product
@@ -141,6 +142,109 @@ class ProductOutputTests(unittest.TestCase):
             indexed_paths = {entry["path"] for entry in index["artifacts"]}
             self.assertNotIn("release/artifact.zip", indexed_paths)
 
+    def test_schema_validation_rejects_valid_example_with_unknown_field(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            aps_product.build_product_tree(root, source_commit="0" * 40)
+            example_path = root / "examples/valid/ash-state-minimal.json"
+            example = json.loads(example_path.read_text(encoding="utf-8"))
+            example["unexpected"] = True
+            example_path.write_text(json.dumps(example), encoding="utf-8")
+
+            errors = aps_product.validate_schema_surfaces(root)
+
+            self.assertTrue(any("unexpected" in error for error in errors), errors)
+
+    def test_schema_validation_rejects_invalid_source_commit_format(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            aps_product.build_product_tree(root, source_commit="not-a-commit")
+
+            errors = aps_product.validate_schema_surfaces(root)
+
+            self.assertTrue(any("source_commit" in error for error in errors), errors)
+
+    def test_traceability_validation_requires_all_rule_ids(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            aps_product.build_product_tree(root, source_commit="0" * 40)
+            evidence = root / "completion-evidence"
+            evidence.mkdir()
+            (evidence / "traceability-matrix.md").write_text(
+                "# Traceability Matrix\n\n`ASH-STATE-001`\n",
+                encoding="utf-8",
+            )
+
+            errors = aps_product.validate_traceability_surfaces(root)
+
+            self.assertTrue(any("ASH-SECURITY-001" in error for error in errors), errors)
+
+    def test_release_archive_cli_uses_explicit_source_commit_and_cleans_work_files(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir) / "source"
+            output = Path(tmpdir) / "release"
+            source_commit = "2" * 40
+            root.mkdir()
+            aps_product.build_product_tree(root, source_commit=source_commit)
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(Path("tools/product/build_release_archive.py")),
+                    "--root",
+                    str(root),
+                    "--output",
+                    str(output),
+                    "--source-commit",
+                    source_commit,
+                    "--verify",
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+
+            self.assertEqual(0, result.returncode, result.stdout)
+            self.assertFalse((output / "staging").exists())
+            self.assertFalse((output / "ash-pattern-system-1.0.0-rc.1.second.zip").exists())
+            manifest = json.loads((output / "release-manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(source_commit, manifest["source_commit"])
+            with zipfile.ZipFile(output / "ash-pattern-system-1.0.0-rc.1.zip") as archive:
+                archived_manifest = json.loads(archive.read("product-manifest.json"))
+            self.assertEqual(source_commit, archived_manifest["source_commit"])
+
+    def test_release_archive_cli_stamps_staged_product_manifest(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir) / "source"
+            output = Path(tmpdir) / "release"
+            release_commit = "3" * 40
+            stale_commit = "4" * 40
+            root.mkdir()
+            aps_product.build_product_tree(root, source_commit=stale_commit)
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(Path("tools/product/build_release_archive.py")),
+                    "--root",
+                    str(root),
+                    "--output",
+                    str(output),
+                    "--source-commit",
+                    release_commit,
+                    "--verify",
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+
+            self.assertEqual(0, result.returncode, result.stdout)
+            self.assertEqual(stale_commit, json.loads((root / "product-manifest.json").read_text())["source_commit"])
+            with zipfile.ZipFile(output / "ash-pattern-system-1.0.0-rc.1.zip") as archive:
+                archived_manifest = json.loads(archive.read("product-manifest.json"))
+            self.assertEqual(release_commit, archived_manifest["source_commit"])
+
     def test_required_command_entrypoints_support_self_test(self):
         commands = [
             "generate_canonical_data.py",
@@ -152,6 +256,7 @@ class ProductOutputTests(unittest.TestCase):
             "validate_traceability.py",
             "build_release_archive.py",
             "verify_release_archive.py",
+            "release_readiness.py",
         ]
         for command in commands:
             with self.subTest(command=command):

@@ -119,15 +119,7 @@ def validate_schemas(argv: list[str]) -> int:
     args = parser.parse_args(argv)
     if args.self_test:
         return self_test("validate-schemas")
-    errors = []
-    for name in aps_product.SCHEMA_ENTRY_POINTS:
-        path = args.root / "schemas" / aps_product.SCHEMA_VERSION / f"{name}.schema.json"
-        if not path.is_file():
-            errors.append(f"missing schema: {name}")
-            continue
-        schema = json.loads(path.read_text(encoding="utf-8"))
-        if schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
-            errors.append(f"schema has wrong meta-schema: {name}")
+    errors = aps_product.validate_schema_surfaces(args.root)
     if errors:
         print("Schema validation failed.")
         for error in errors:
@@ -144,11 +136,11 @@ def validate_rule_registry(argv: list[str]) -> int:
     args = parser.parse_args(argv)
     if args.self_test:
         return self_test("validate-rule-registry")
-    path = args.root / "canonical-data" / aps_product.CANONICAL_DATA_VERSION / "rule-registry.json"
-    data = json.loads(path.read_text(encoding="utf-8"))
-    ids = [item["rule_id"] for item in data.get("rules", [])]
-    if len(ids) != len(set(ids)):
-        print("Rule registry contains duplicate rule IDs.")
+    errors = aps_product.validate_rule_registry_surfaces(args.root)
+    if errors:
+        print("Rule registry validation failed.")
+        for error in errors:
+            print(f"- {error}")
         return 1
     print("Rule registry validation passed.")
     return 0
@@ -161,9 +153,11 @@ def validate_traceability(argv: list[str]) -> int:
     args = parser.parse_args(argv)
     if args.self_test:
         return self_test("validate-traceability")
-    matrix = args.root / "completion-evidence" / "initial-traceability-matrix.md"
-    if not matrix.is_file():
-        print("Traceability matrix is missing.")
+    errors = aps_product.validate_traceability_surfaces(args.root)
+    if errors:
+        print("Traceability validation failed.")
+        for error in errors:
+            print(f"- {error}")
         return 1
     print("Traceability validation passed.")
     return 0
@@ -175,28 +169,63 @@ def build_release_archive(argv: list[str]) -> int:
     parser.add_argument("--verify", action="store_true")
     parser.add_argument("--root", type=Path, default=repo_root())
     parser.add_argument("--output", type=Path, default=repo_root() / "release")
+    parser.add_argument("--source-commit")
     args = parser.parse_args(argv)
     if args.self_test:
         return self_test("build-release-archive")
     staging = args.output / "staging"
-    aps_product.copy_release_inputs(args.root, staging)
-    archive = args.output / "ash-pattern-system-1.0.0-rc.1.zip"
-    result = aps_product.build_release_archive(staging, archive)
-    manifest = aps_product.release_manifest(staging, result, source_commit=current_commit(args.root))
-    manifest_path = args.output / "release-manifest.json"
-    aps_product.write_json(manifest_path, manifest)
-    (args.output / "SHA256SUMS").write_text(
-        f"{result['sha256']}  {archive.name}\n"
-        f"{aps_product.sha256_file(manifest_path)}  {manifest_path.name}\n",
-        encoding="utf-8",
-    )
-    if args.verify:
-        second = args.output / "ash-pattern-system-1.0.0-rc.1.second.zip"
-        second_result = aps_product.build_release_archive(staging, second)
-        if result["sha256"] != second_result["sha256"]:
-            print("Release archive is not reproducible.")
-            return 1
+    second = args.output / "ash-pattern-system-1.0.0-rc.1.second.zip"
+    source_commit = args.source_commit or current_commit(args.root)
+    if not aps_product.HEX_SHA_RE.fullmatch(source_commit):
+        print("source commit must be a full lowercase commit SHA")
+        return 1
+    try:
+        aps_product.copy_release_inputs(args.root, staging)
+        aps_product.stamp_product_manifest(staging, source_commit)
+        archive = args.output / "ash-pattern-system-1.0.0-rc.1.zip"
+        result = aps_product.build_release_archive(staging, archive)
+        manifest = aps_product.release_manifest(staging, result, source_commit=source_commit)
+        manifest_path = args.output / "release-manifest.json"
+        aps_product.write_json(manifest_path, manifest)
+        (args.output / "SHA256SUMS").write_text(
+            f"{result['sha256']}  {archive.name}\n"
+            f"{aps_product.sha256_file(manifest_path)}  {manifest_path.name}\n",
+            encoding="utf-8",
+        )
+        if args.verify:
+            second_result = aps_product.build_release_archive(staging, second)
+            if result["sha256"] != second_result["sha256"]:
+                print("Release archive is not reproducible.")
+                return 1
+    finally:
+        if staging.exists():
+            shutil.rmtree(staging)
+        if second.exists():
+            second.unlink()
     print(f"Release archive built: {archive}")
+    return 0
+
+
+def release_readiness(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--strict", action="store_true")
+    parser.add_argument("--offline", action="store_true")
+    parser.add_argument("--root", type=Path, default=repo_root())
+    parser.add_argument("--source-commit")
+    args = parser.parse_args(argv)
+    if args.self_test:
+        return self_test("release-readiness")
+    if args.source_commit and not aps_product.HEX_SHA_RE.fullmatch(args.source_commit):
+        print("source commit must be a full lowercase commit SHA")
+        return 1
+    errors = aps_product.release_readiness_errors(args.root, args.source_commit)
+    if errors:
+        print("Release readiness failed.")
+        for error in errors:
+            print(f"- {error}")
+        return 1
+    print("Release readiness passed.")
     return 0
 
 
@@ -232,6 +261,7 @@ COMMANDS = {
     "validate_traceability": validate_traceability,
     "build_release_archive": build_release_archive,
     "verify_release_archive": verify_release_archive,
+    "release_readiness": release_readiness,
 }
 
 
