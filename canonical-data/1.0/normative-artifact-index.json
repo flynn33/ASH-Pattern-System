@@ -361,6 +361,30 @@
       "path": "conformance/1.0/vectors/transformations.jsonl"
     },
     {
+      "classification": "CONFORMANCE",
+      "path": "conformance/acceptance-judgment.md"
+    },
+    {
+      "classification": "CONFORMANCE",
+      "path": "conformance/deviation-log.md"
+    },
+    {
+      "classification": "CONFORMANCE",
+      "path": "conformance/diagnostics-conformance.md"
+    },
+    {
+      "classification": "CONFORMANCE",
+      "path": "conformance/materialization-boundary.md"
+    },
+    {
+      "classification": "CONFORMANCE",
+      "path": "conformance/module-mapping.md"
+    },
+    {
+      "classification": "CONFORMANCE",
+      "path": "conformance/verification-report.md"
+    },
+    {
       "classification": "INFORMATIVE",
       "path": "docs/00-repository-purpose.md"
     },
