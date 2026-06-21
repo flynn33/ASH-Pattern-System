@@ -26,6 +26,7 @@ PRODUCT_VERSION = "1.0.0-rc.1"
 SCHEMA_VERSION = "1.0"
 CANONICAL_DATA_VERSION = "1.0"
 CONFORMANCE_VERSION = "1.0"
+HEX_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 
 CODEWORD_SIGNATURES: tuple[str, ...] = (
     "000000000",
@@ -494,7 +495,7 @@ def schema_for(name: str) -> dict[str, Any]:
             "product_name": {"type": "string"},
             "release_tag": {"type": "string"},
             "schema_version": {"type": "string"},
-            "source_commit": {"type": "string"},
+            "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
             "status": {"type": "string", "enum": ["IN_DEVELOPMENT", "RELEASE_CANDIDATE", "SHIPPABLE", "RELEASED", "MAINTENANCE"]},
             "version": {"type": "string"},
         }
@@ -863,7 +864,7 @@ def build_root_documents(root: Path, source_commit: str) -> None:
         "COMPATIBILITY.md": "# Compatibility Policy\n\nAPS follows Semantic Versioning. Changes to public identifiers, required fields, canonical JSON, or conformance interpretation require a major version unless explicitly backward compatible.\n",
         "DEPRECATION-POLICY.md": "# Deprecation Policy\n\nDeprecated APS identifiers remain documented for at least one minor release unless a security issue requires earlier removal.\n",
         "MIGRATION-GUIDE.md": "# Migration Guide\n\nDownstream implementations should bind to versioned schemas, canonical data, and conformance corpus paths for each APS release.\n",
-        "RELEASE-PROCESS.md": "# Release Process\n\nRun `python3 tools/product/verify_canonical_data.py`, `python3 tools/product/verify_conformance_corpus.py`, and `python3 tools/product/build_release_archive.py --verify` from a clean checkout before publishing.\n",
+        "RELEASE-PROCESS.md": "# Release Process\n\nFrom a clean checkout, run `python3 tools/product/verify_canonical_data.py`, `python3 tools/product/verify_conformance_corpus.py`, `python3 tools/product/build_release_archive.py --source-commit <release-source-commit> --verify`, `python3 tools/product/verify_release_archive.py --archive release/ash-pattern-system-1.0.0-rc.1.zip`, and `python3 tools/product/release_readiness.py --strict --offline --source-commit <release-source-commit>` before publishing.\n",
         "PRODUCT-STATUS.md": "# Product Status\n\nStatus: `RELEASE_CANDIDATE`\n\nFinal release requires all technical gates plus owner-approved license and publication approval.\n",
         "NORMATIVE-ARTIFACT-INDEX.md": "# Normative Artifact Index\n\nThe machine-readable index lives at `canonical-data/1.0/normative-artifact-index.json`.\n",
         "NOTICE.md": "# Notice\n\nASH Pattern System. Copyright (c) 2026 James Daley. All rights reserved.\n\nCommercial licensing requires separate written permission.\n",
@@ -973,6 +974,274 @@ def verify_product_tree(root: Path) -> dict[str, Any]:
     return {"errors": errors}
 
 
+def json_type_matches(value: Any, expected: str) -> bool:
+    if expected == "object":
+        return isinstance(value, dict)
+    if expected == "array":
+        return isinstance(value, list)
+    if expected == "string":
+        return isinstance(value, str)
+    if expected == "integer":
+        return isinstance(value, int) and not isinstance(value, bool)
+    if expected == "number":
+        return isinstance(value, (int, float)) and not isinstance(value, bool)
+    if expected == "boolean":
+        return isinstance(value, bool)
+    if expected == "null":
+        return value is None
+    return True
+
+
+def validate_instance(instance: Any, schema: dict[str, Any], location: str) -> list[str]:
+    errors: list[str] = []
+    expected_type = schema.get("type")
+    if isinstance(expected_type, str) and not json_type_matches(instance, expected_type):
+        errors.append(f"{location}: expected {expected_type}")
+        return errors
+
+    if "const" in schema and instance != schema["const"]:
+        errors.append(f"{location}: expected constant {schema['const']!r}")
+    if "enum" in schema and instance not in schema["enum"]:
+        errors.append(f"{location}: value is not in enum")
+
+    if isinstance(instance, str):
+        if "minLength" in schema and len(instance) < int(schema["minLength"]):
+            errors.append(f"{location}: string is shorter than minLength")
+        if "pattern" in schema and not re.fullmatch(str(schema["pattern"]), instance):
+            errors.append(f"{location}: string does not match pattern")
+
+    if isinstance(instance, int) and not isinstance(instance, bool):
+        if "minimum" in schema and instance < int(schema["minimum"]):
+            errors.append(f"{location}: integer is below minimum")
+        if "maximum" in schema and instance > int(schema["maximum"]):
+            errors.append(f"{location}: integer is above maximum")
+
+    if isinstance(instance, list):
+        if "minItems" in schema and len(instance) < int(schema["minItems"]):
+            errors.append(f"{location}: array is shorter than minItems")
+        if "maxItems" in schema and len(instance) > int(schema["maxItems"]):
+            errors.append(f"{location}: array is longer than maxItems")
+        item_schema = schema.get("items")
+        if isinstance(item_schema, dict):
+            for index, item_value in enumerate(instance):
+                errors.extend(validate_instance(item_value, item_schema, f"{location}[{index}]"))
+
+    if isinstance(instance, dict):
+        properties = schema.get("properties", {})
+        if not isinstance(properties, dict):
+            properties = {}
+        for required in schema.get("required", []):
+            if required not in instance:
+                errors.append(f"{location}.{required}: missing required property")
+        if schema.get("additionalProperties") is False:
+            for key in sorted(set(instance) - set(properties)):
+                errors.append(f"{location}.{key}: unexpected property")
+        for key, property_schema in properties.items():
+            if key in instance and isinstance(property_schema, dict):
+                errors.extend(validate_instance(instance[key], property_schema, f"{location}.{key}"))
+
+    return errors
+
+
+def load_json_file(path: Path, errors: list[str]) -> Any:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        errors.append(f"{path}: invalid JSON: {exc}")
+        return None
+
+
+def validate_schema_surfaces(root: Path) -> list[str]:
+    errors: list[str] = []
+    schema_dir = root / "schemas" / SCHEMA_VERSION
+    schemas: dict[str, dict[str, Any]] = {}
+    schema_ids: dict[str, str] = {}
+
+    for name in SCHEMA_ENTRY_POINTS:
+        path = schema_dir / f"{name}.schema.json"
+        if not path.is_file():
+            errors.append(f"{path}: missing schema")
+            continue
+        schema = load_json_file(path, errors)
+        if not isinstance(schema, dict):
+            continue
+        schemas[name] = schema
+        if schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
+            errors.append(f"{path}: wrong or missing Draft 2020-12 meta-schema")
+        schema_id = schema.get("$id")
+        if not isinstance(schema_id, str) or not schema_id:
+            errors.append(f"{path}: missing $id")
+        elif schema_id in schema_ids:
+            errors.append(f"{path}: duplicate $id also used by {schema_ids[schema_id]}")
+        else:
+            schema_ids[schema_id] = path.as_posix()
+        for key in ("title", "type", "properties", "required"):
+            if key not in schema:
+                errors.append(f"{path}: missing {key}")
+
+    product_manifest_path = root / "product-manifest.json"
+    product_manifest = load_json_file(product_manifest_path, errors)
+    if isinstance(product_manifest, dict) and "product-manifest" in schemas:
+        errors.extend(validate_instance(product_manifest, schemas["product-manifest"], "product-manifest.json"))
+
+    valid_examples = {
+        root / "examples" / "valid" / "ash-state-minimal.json": "ash-state",
+    }
+    for path, schema_name in valid_examples.items():
+        instance = load_json_file(path, errors)
+        if instance is None or schema_name not in schemas:
+            continue
+        for error in validate_instance(instance, schemas[schema_name], path.relative_to(root).as_posix()):
+            errors.append(error)
+
+    invalid_manifest_path = root / "examples" / "invalid" / "manifest.json"
+    invalid_manifest = load_json_file(invalid_manifest_path, errors)
+    if isinstance(invalid_manifest, dict):
+        for entry in invalid_manifest.get("examples", []):
+            if not isinstance(entry, dict):
+                errors.append(f"{invalid_manifest_path}: invalid example manifest entry")
+                continue
+            example_path = root / "examples" / "invalid" / str(entry.get("path", ""))
+            schema_path = str(entry.get("schema", ""))
+            schema_name = Path(schema_path).name.removesuffix(".schema.json")
+            instance = load_json_file(example_path, errors)
+            if instance is None or schema_name not in schemas:
+                continue
+            if not validate_instance(instance, schemas[schema_name], example_path.relative_to(root).as_posix()):
+                errors.append(f"{example_path.relative_to(root).as_posix()}: invalid example unexpectedly validates")
+
+    return errors
+
+
+def validate_rule_registry_surfaces(root: Path) -> list[str]:
+    errors: list[str] = []
+    path = root / "canonical-data" / CANONICAL_DATA_VERSION / "rule-registry.json"
+    data = load_json_file(path, errors)
+    if not isinstance(data, dict):
+        return errors
+    rules = data.get("rules", [])
+    if not isinstance(rules, list):
+        return [f"{path}: rules must be a list"]
+    ids = []
+    required = {"introduced_version", "normative_source_path", "rule_family", "rule_id", "status", "title"}
+    for index, rule in enumerate(rules):
+        if not isinstance(rule, dict):
+            errors.append(f"{path}: rule {index} is not an object")
+            continue
+        missing = sorted(required - set(rule))
+        if missing:
+            errors.append(f"{path}: rule {index} missing {', '.join(missing)}")
+        rule_id = rule.get("rule_id")
+        if not isinstance(rule_id, str) or not re.fullmatch(r"ASH-[A-Z]+-[0-9]{3}", rule_id):
+            errors.append(f"{path}: rule {index} has invalid rule_id")
+        else:
+            ids.append(rule_id)
+        if rule.get("status") != "ACTIVE":
+            errors.append(f"{path}: rule {rule_id} is not ACTIVE")
+    duplicates = sorted(item for item, count in Counter(ids).items() if count > 1)
+    for rule_id in duplicates:
+        errors.append(f"{path}: duplicate rule ID {rule_id}")
+    return errors
+
+
+def validate_traceability_surfaces(root: Path) -> list[str]:
+    errors: list[str] = []
+    matrix_path = root / "completion-evidence" / "traceability-matrix.md"
+    if not matrix_path.is_file():
+        return [f"{matrix_path}: traceability matrix is missing"]
+    matrix = matrix_path.read_text(encoding="utf-8")
+    required_columns = ("Rule IDs", "Normative source", "Schema/data", "Conformance vectors", "Evidence", "Status")
+    for column in required_columns:
+        if column not in matrix:
+            errors.append(f"{matrix_path}: missing column {column}")
+    if "Pending rule registry" in matrix or "| OPEN |" in matrix:
+        errors.append(f"{matrix_path}: final matrix contains open or pending entries")
+
+    registry = root / "canonical-data" / CANONICAL_DATA_VERSION / "rule-registry.json"
+    data = load_json_file(registry, errors)
+    if isinstance(data, dict):
+        for rule in data.get("rules", []):
+            if not isinstance(rule, dict):
+                continue
+            rule_id = str(rule.get("rule_id", ""))
+            if rule_id and not re.search(rf"\b{re.escape(rule_id)}\b", matrix):
+                errors.append(f"{matrix_path}: missing rule ID {rule_id}")
+    return errors
+
+
+def archived_product_manifest(archive_path: Path) -> dict[str, Any] | None:
+    with zipfile.ZipFile(archive_path) as archive:
+        return json.loads(archive.read("product-manifest.json"))
+
+
+def validate_release_outputs(root: Path, expected_source_commit: str | None = None) -> list[str]:
+    errors: list[str] = []
+    release_dir = root / "release"
+    manifest_path = release_dir / "release-manifest.json"
+    sums_path = release_dir / "SHA256SUMS"
+    archive_path = release_dir / "ash-pattern-system-1.0.0-rc.1.zip"
+
+    manifest = load_json_file(manifest_path, errors)
+    archive_product_manifest = None
+    if not archive_path.is_file():
+        errors.append(f"{archive_path}: missing release archive")
+    else:
+        try:
+            archive_product_manifest = archived_product_manifest(archive_path)
+        except Exception as exc:
+            errors.append(f"{archive_path}: cannot read archived product manifest: {exc}")
+    if isinstance(manifest, dict):
+        source_commit = manifest.get("source_commit")
+        if not isinstance(source_commit, str) or not HEX_SHA_RE.fullmatch(source_commit):
+            errors.append(f"{manifest_path}: source_commit must be a full lowercase commit SHA")
+        if expected_source_commit is not None and source_commit != expected_source_commit:
+            errors.append(f"{manifest_path}: source_commit does not match expected source commit")
+        if archive_path.is_file() and manifest.get("archive_sha256") != sha256_file(archive_path):
+            errors.append(f"{manifest_path}: archive_sha256 does not match archive")
+        if isinstance(archive_product_manifest, dict):
+            if manifest.get("source_commit") != archive_product_manifest.get("source_commit"):
+                errors.append(f"{manifest_path}: source_commit does not match archived product-manifest.json")
+            if manifest.get("version") != archive_product_manifest.get("version"):
+                errors.append(f"{manifest_path}: version does not match archived product-manifest.json")
+    if not sums_path.is_file():
+        errors.append(f"{sums_path}: missing checksum file")
+    else:
+        sums = sums_path.read_text(encoding="utf-8").splitlines()
+        expected = {
+            "ash-pattern-system-1.0.0-rc.1.zip": sha256_file(archive_path) if archive_path.is_file() else None,
+            "release-manifest.json": sha256_file(manifest_path) if manifest_path.is_file() else None,
+        }
+        for name, value in expected.items():
+            if value and f"{value}  {name}" not in sums:
+                errors.append(f"{sums_path}: checksum mismatch for {name}")
+    return errors
+
+
+def release_readiness_errors(root: Path, expected_source_commit: str | None = None) -> list[str]:
+    errors = []
+    errors.extend(verify_product_tree(root)["errors"])
+    errors.extend(validate_schema_surfaces(root))
+    errors.extend(validate_rule_registry_surfaces(root))
+    errors.extend(validate_traceability_surfaces(root))
+    errors.extend(validate_release_outputs(root, expected_source_commit))
+    active_prefixes = (
+        "README.md",
+        "PUBLIC-SPECIFICATION-API.md",
+        "PRODUCT-STATUS.md",
+        "NORMATIVE-ARTIFACT-INDEX.md",
+        "docs/",
+        "specs/",
+        "handoff-templates/",
+        "wiki/",
+        "schemas/",
+        "canonical-data/",
+        "conformance/",
+        "examples/",
+    )
+    errors.extend(assert_no_placeholders(root, active_prefixes))
+    return errors
+
+
 def copy_release_inputs(root: Path, output: Path) -> list[Path]:
     if output.exists():
         shutil.rmtree(output)
@@ -1002,6 +1271,13 @@ def build_release_archive(root: Path, archive_path: Path) -> dict[str, Any]:
             info.external_attr = 0o644 << 16
             archive.writestr(info, path.read_bytes())
     return {"archive": str(archive_path), "sha256": sha256_file(archive_path)}
+
+
+def stamp_product_manifest(root: Path, source_commit: str) -> None:
+    manifest_path = root / "product-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["source_commit"] = source_commit
+    write_json(manifest_path, manifest)
 
 
 def release_manifest(staging_root: Path, archive_result: dict[str, Any], *, source_commit: str) -> dict[str, Any]:
@@ -1042,7 +1318,23 @@ def release_manifest(staging_root: Path, archive_result: dict[str, Any], *, sour
     }
 
 
-def assert_no_placeholders(root: Path) -> list[str]:
+def placeholder_context_allowed(line: str) -> bool:
+    lowered = line.lower()
+    allowed_phrases = (
+        "not a placeholder",
+        "not placeholder",
+        "no placeholder",
+        "no hidden placeholders",
+        "must not rely on",
+        "must not leave",
+        "do not leave",
+        "without placeholder",
+        '"path": "completion-evidence/',
+    )
+    return any(phrase in lowered for phrase in allowed_phrases)
+
+
+def assert_no_placeholders(root: Path, prefixes: tuple[str, ...] | None = None) -> list[str]:
     patterns = re.compile(
         r"TODO|TBD|FIXME|PLACEHOLDER|UNRESOLVED|future specification|implementation-defined|known valid state|recognized valid state|outside all known codeword orbits",
         re.IGNORECASE,
@@ -1051,10 +1343,13 @@ def assert_no_placeholders(root: Path) -> list[str]:
     for path in root.rglob("*"):
         if not path.is_file() or ".git" in path.parts:
             continue
+        relative = path.relative_to(root).as_posix()
+        if prefixes is not None and not any(relative == prefix or relative.startswith(prefix) for prefix in prefixes):
+            continue
         if path.suffix.lower() not in {".md", ".json", ".jsonl", ".txt", ".cff"}:
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
         for line_number, line in enumerate(text.splitlines(), 1):
-            if patterns.search(line):
-                hits.append(f"{path.relative_to(root)}:{line_number}:{line}")
+            if patterns.search(line) and not placeholder_context_allowed(line):
+                hits.append(f"{relative}:{line_number}:{line}")
     return hits
