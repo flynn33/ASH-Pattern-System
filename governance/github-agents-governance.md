@@ -178,7 +178,7 @@ Checks:
 - `wiki/Home.md` and `wiki/_Sidebar.md` contain links to required canonical wiki pages
 - internal wiki links resolve
 - drift signal when canonical docs/specs/governance/agent surfaces change without a wiki update
-- optional GitHub Wiki sync on `push` to `main`
+- required Wiki sync check on pull requests and wiki publication on `push` to `main`
 
 ### 8. Docs Maintenance Agent
 

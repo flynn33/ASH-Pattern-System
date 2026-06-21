@@ -35,6 +35,7 @@ owner screenshots must be stored under `completion-evidence/governance/`.
 - Check for AI Attribution
 - Docs maintenance check
 - Wiki maintenance check
+- Wiki sync
 - Gate Integrity
 - Release Readiness when present
 

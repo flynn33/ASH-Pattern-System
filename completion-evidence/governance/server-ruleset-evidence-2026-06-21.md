@@ -27,6 +27,7 @@ Collected on 2026-06-21 from the GitHub repository rulesets API.
   - `Check for AI Attribution`
   - `Docs maintenance check`
   - `Wiki maintenance check`
+  - `Wiki sync`
 
 Gate Integrity is not required in this bootstrap ruleset because
 `.github/workflows/gate-integrity.yml` is not yet present on protected `main`.
