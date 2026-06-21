@@ -1177,10 +1177,12 @@ def archived_product_manifest(archive_path: Path) -> dict[str, Any] | None:
 def validate_release_outputs(root: Path, expected_source_commit: str | None = None) -> list[str]:
     errors: list[str] = []
     release_dir = root / "release"
+    root_manifest_path = root / "product-manifest.json"
     manifest_path = release_dir / "release-manifest.json"
     sums_path = release_dir / "SHA256SUMS"
     archive_path = release_dir / "ash-pattern-system-1.0.0-rc.1.zip"
 
+    root_product_manifest = load_json_file(root_manifest_path, errors)
     manifest = load_json_file(manifest_path, errors)
     archive_product_manifest = None
     if not archive_path.is_file():
@@ -1198,6 +1200,17 @@ def validate_release_outputs(root: Path, expected_source_commit: str | None = No
             errors.append(f"{manifest_path}: source_commit does not match expected source commit")
         if archive_path.is_file() and manifest.get("archive_sha256") != sha256_file(archive_path):
             errors.append(f"{manifest_path}: archive_sha256 does not match archive")
+        if isinstance(root_product_manifest, dict):
+            if source_commit != root_product_manifest.get("source_commit"):
+                errors.append(
+                    f"{root_manifest_path}: root product-manifest.json source_commit "
+                    "does not match release-manifest.json"
+                )
+            if manifest.get("version") != root_product_manifest.get("version"):
+                errors.append(
+                    f"{root_manifest_path}: root product-manifest.json version "
+                    "does not match release-manifest.json"
+                )
         if isinstance(archive_product_manifest, dict):
             if manifest.get("source_commit") != archive_product_manifest.get("source_commit"):
                 errors.append(f"{manifest_path}: source_commit does not match archived product-manifest.json")
