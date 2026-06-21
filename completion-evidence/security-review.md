@@ -2,8 +2,8 @@
 
 ## Scope
 
-- Product branch: `release/aps-1.0.0-completion-clean`
-- Protected base: `aa917162c915bb5904de3ddec6dbb0a9297300ac`
+- Review branch: `fix/release-evidence-main-alignment`
+- Protected base: `74df3d068d8cb977c3b589ffb39765a432a6d47a`
 - Protected policy: package `controls/protected-surface-policy.json`
 
 ## Checks
@@ -23,4 +23,4 @@
 
 ## Result
 
-No product-branch protected-surface edits, secrets, or local security blockers were found.
+No protected-surface edits, secrets, or local security blockers were found.

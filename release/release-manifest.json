@@ -1,7 +1,7 @@
 {
   "archive_name": "ash-pattern-system-1.0.0-rc.1.zip",
-  "archive_sha256": "fee0485dddc250b8f11dc05b516b64de6fad243cd1b3646c9ecde947816ba6ab",
-  "archive_size_bytes": 5739267,
+  "archive_sha256": "23be577f886760f8d8fef5dbaf9b483c07a002baf6dc0373a2b04961ea811e15",
+  "archive_size_bytes": 5749707,
   "canonical_data_version": "1.0",
   "conformance_corpus_version": "1.0",
   "files": [
@@ -217,8 +217,8 @@
     },
     {
       "path": "canonical-data/1.0/normative-artifact-index.json",
-      "sha256": "ee361c7ea14bee845c057a7d430438a9f90d78dd2e245bb904f399f65b1dfdbf",
-      "size_bytes": 21564
+      "sha256": "009685bcfec43fad677de6161b3c98d0e94d6bc8c58bbb710e4e192a9d309578",
+      "size_bytes": 22180
     },
     {
       "path": "canonical-data/1.0/orbits.json",
@@ -356,6 +356,36 @@
       "size_bytes": 3596288
     },
     {
+      "path": "conformance/acceptance-judgment.md",
+      "sha256": "479a8470a64cd8a79bd091fcadb524df3681ead8ebc8026e7acd791bab804427",
+      "size_bytes": 912
+    },
+    {
+      "path": "conformance/deviation-log.md",
+      "sha256": "97bb7524f755509e98854f65968a65b8aa3e5659eeb0ee4356d29e801b79818f",
+      "size_bytes": 472
+    },
+    {
+      "path": "conformance/diagnostics-conformance.md",
+      "sha256": "3de29592c73c1b193deb33d6c48f23d17ffb7c915c17b5706b31ac537995b87d",
+      "size_bytes": 1061
+    },
+    {
+      "path": "conformance/materialization-boundary.md",
+      "sha256": "30430b1e6104d471ab75062bd068d85800a1176b4436c8e45b93a1667936b34a",
+      "size_bytes": 1151
+    },
+    {
+      "path": "conformance/module-mapping.md",
+      "sha256": "a48fc3b3f37b18ae12083390b7a9df43e521f92e115755f6cfaf04a3a9da47a6",
+      "size_bytes": 2364
+    },
+    {
+      "path": "conformance/verification-report.md",
+      "sha256": "cf5c5f10a8bfc892c4e4313add0e823f602f28a0d5b8311a18670d441483c7c3",
+      "size_bytes": 1011
+    },
+    {
       "path": "docs/00-repository-purpose.md",
       "sha256": "598beb15d19c223c4306846e40ca5f79674c3edcb4ce0d06530c0a639fd4e14e",
       "size_bytes": 2579
@@ -447,7 +477,7 @@
     },
     {
       "path": "product-manifest.json",
-      "sha256": "5945922849a248392fb722ad5c2e2731c254a28553c34165bfc52931cbd0eaf2",
+      "sha256": "6986f0acb3ed2816c47b140af14772a25738cd33667e031e8513918a3ce64bb6",
       "size_bytes": 522
     },
     {
@@ -787,8 +817,8 @@
     },
     {
       "path": "tools/product/aps_product.py",
-      "sha256": "4e1c60eeff04964c10f792d14037a95abd89f332df36a045d248b00f79984c7f",
-      "size_bytes": 62541
+      "sha256": "30c55cf82b8919d2e54755dcbc897337d23c1a30f1d9a7b35835453e028a6aa3",
+      "size_bytes": 63260
     },
     {
       "path": "tools/product/build_release_archive.py",
@@ -817,8 +847,8 @@
     },
     {
       "path": "tools/product/tests/test_aps_product.py",
-      "sha256": "52afcd91beca4ad0f087e08b8545b2177f555e3fb14e4a9e4fb2d20ea6596f95",
-      "size_bytes": 12738
+      "sha256": "bff0684f0b23dcb4470cc1a7cb33a76f20d91179020e569b7a0f0511d90b3626",
+      "size_bytes": 14012
     },
     {
       "path": "tools/product/validate_rule_registry.py",
@@ -916,7 +946,7 @@
       "size_bytes": 488
     }
   ],
-  "included_file_count": 182,
+  "included_file_count": 188,
   "license": "LicenseRef-ASH-Pattern-System-Personal-Academic",
   "product_identifier": "aps",
   "product_name": "ASH Pattern System",
@@ -927,7 +957,7 @@
   },
   "release_tag": "v1.0.0-rc.1",
   "schema_version": "1.0",
-  "source_commit": "09d07b511924cd0d2906f039b56bddb37dd23c2e",
+  "source_commit": "639e0cfe8b1c276e03cd3351e04311fc845936d1",
   "status": "RELEASE_CANDIDATE",
   "version": "1.0.0-rc.1"
 }

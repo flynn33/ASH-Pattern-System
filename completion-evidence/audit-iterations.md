@@ -108,6 +108,50 @@
 - `python3 tools/product/build_release_archive.py --verify` — PASS.
 - `python3 tools/product/verify_release_archive.py --archive release/ash-pattern-system-1.0.0-rc.1.zip` — PASS.
 
+## Iteration 4
+
+- Timestamp: `2026-06-21T16:22:59Z`
+- Base commit: `74df3d068d8cb977c3b589ffb39765a432a6d47a`
+- Branch: `fix/release-evidence-main-alignment`
+- Scope: post-merge release evidence alignment.
+
+### Commands
+
+- `python3 .github/scripts/downstream_conformance_check.py`
+- `python3 tools/product/build_release_archive.py --source-commit 639e0cfe8b1c276e03cd3351e04311fc845936d1 --verify`
+- `python3 tools/product/release_readiness.py --strict --offline --source-commit 639e0cfe8b1c276e03cd3351e04311fc845936d1`
+- `python3 tools/product/verify_release_archive.py --archive release/ash-pattern-system-1.0.0-rc.1.zip`
+- `python3 <package>/tools/verify_protected_surface.py --policy <package>/controls/protected-surface-policy.json --base-ref origin/main --mode product --verify-baseline completion-evidence/protected-surface-baseline.json`
+
+### Failures
+
+- The committed release archive inventory was stale relative to the current merged product tooling files from PR #11.
+- Protected-surface baseline verification failed because `completion-evidence/protected-surface-baseline.json` still recorded the earlier base commit `aa917162c915bb5904de3ddec6dbb0a9297300ac`.
+- `python3 .github/scripts/downstream_conformance_check.py` failed because the top-level downstream conformance evidence files were not present under `conformance/`.
+
+### Root causes
+
+- PR #11 updated release-validation tooling and the root product manifest without rebuilding the release archive and release manifest against the merged `main` baseline.
+- The protected-surface hashes themselves still matched, but the baseline evidence commit field had not been recaptured after the merge sequence.
+- The executable conformance corpus existed under `conformance/1.0/`, but the reusable downstream conformance contract also requires six top-level Markdown evidence documents.
+
+### Remediation
+
+- Added the six required top-level conformance evidence documents and updated `canonical-data/1.0/normative-artifact-index.json`.
+- Committed that product-content update as `639e0cfe8b1c276e03cd3351e04311fc845936d1`.
+- Updated `product-manifest.json` and `release/release-manifest.json` to use release source commit `639e0cfe8b1c276e03cd3351e04311fc845936d1`.
+- Rebuilt `release/ash-pattern-system-1.0.0-rc.1.zip` and `release/SHA256SUMS`.
+- Recaptured `completion-evidence/protected-surface-baseline.json` from current `origin/main`.
+- Refreshed release-readiness, reproducibility, security, and final-acceptance evidence.
+
+### Retest
+
+- Release archive build — PASS.
+- Release readiness — PASS.
+- Release archive verification — PASS.
+- Downstream conformance artifact check — PASS.
+- Protected surface verification — PASS.
+
 ## Remaining findings
 
 - Final public release approval remains owner-controlled.
