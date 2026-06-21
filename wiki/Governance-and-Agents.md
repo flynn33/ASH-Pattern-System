@@ -16,7 +16,7 @@ There are eight agents: seven guard the canonical repository directly, and one (
 | Canonical Semantic Integrity Agent | `.github/workflows/canonical-semantic-integrity-agent.yml` | Blocks non-canonical math-language reintroduction and semantic authority inversion |
 | Math Integrity Agent | `.github/workflows/math-integrity-agent.yml` | Protects locked 9D math-critical paths |
 | Downstream Conformance Agent | `.github/workflows/downstream-conformance-agent.yml` | Reusable `workflow_call` workflow consumed by downstream repos to validate handoff deliverables and conformance; not a push/PR gate on the canonical repo |
-| Attribution Policy Agent | protected attribution workflow | Rejects prohibited attribution markers in commits/authors/files |
+| No AI Attribution Agent | `.github/workflows/no-ai-attribution.yml` | Rejects AI-attribution markers in commits/authors/files |
 | Gate Integrity Agent | `.github/workflows/gate-integrity.yml` | Enforces protected-surface protection, governance-PR isolation, owner approval, and fail-closed gate checks |
 | Wiki Maintenance Agent | `.github/workflows/wiki-maintenance-agent.yml` | Maintains wiki completeness, structure, and drift checks |
 | Docs Maintenance Agent | `.github/workflows/docs-maintenance-agent.yml` | Maintains README/docs/governance quality and reference integrity |
