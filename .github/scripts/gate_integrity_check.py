@@ -13,6 +13,7 @@ import re
 import sys
 import urllib.request
 from dataclasses import dataclass
+from fnmatch import fnmatch
 from typing import Any
 
 
@@ -63,6 +64,10 @@ GOVERNANCE_ALLOWED_PREFIXES = (
     ".github/rulesets/",
     "completion-evidence/governance/",
     "governance/",
+)
+
+PRODUCT_ALLOWED_PROTECTED_ADDITION_GLOBS = (
+    "governance/math-change-notes/*.md",
 )
 
 KNOWN_FILE_STATUSES = {
@@ -121,6 +126,14 @@ def governance_allowed(path: str) -> bool:
     )
 
 
+def product_allowed_protected_addition(path: str, status: str) -> bool:
+    if status != "added":
+        return False
+    if path.endswith("/README.md"):
+        return False
+    return any(fnmatch(path, pattern) for pattern in PRODUCT_ALLOWED_PROTECTED_ADDITION_GLOBS)
+
+
 def collect_changed_paths(records: list[dict[str, Any]]) -> dict[str, str]:
     changed: dict[str, str] = {}
     for item in records:
@@ -173,8 +186,9 @@ def evaluate(
     governance_mode = GOVERNANCE_LABEL in labels
     if not governance_mode:
         for path in protected_changed:
-            violations.append(Violation(path, "Product pull request changes a protected governance surface"))
-        return GateResult(False, tuple(violations), len(changed), len(protected_changed))
+            if not product_allowed_protected_addition(path, changed_status[path]):
+                violations.append(Violation(path, "Product pull request changes a protected governance surface"))
+        return GateResult(not violations, tuple(violations), len(changed), len(protected_changed))
 
     if not head_ref.startswith("governance/"):
         violations.append(Violation(None, "Governance change must use a governance/ branch"))
