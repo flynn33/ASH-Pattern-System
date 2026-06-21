@@ -40,11 +40,8 @@ def walk_files(root: Path, skip_dirs=(".git",)):
 
 
 def read_text(path: Path) -> str:
-    """Read a text file permissively. Returns empty string on failure."""
-    try:
-        return path.read_text(encoding="utf-8", errors="replace")
-    except Exception:
-        return ""
+    """Read a text file. Unreadable input is a failed gate, not absence."""
+    return path.read_text(encoding="utf-8", errors="replace")
 
 
 def split_paragraphs(text: str):
