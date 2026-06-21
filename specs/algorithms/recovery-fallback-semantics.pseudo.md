@@ -1,170 +1,141 @@
-# Recovery and Fallback Semantics — canonical specification (Canonical Baseline)
+# Recovery and Fallback Semantics — canonical specification (1.0 release candidate)
 
 ## Purpose
 
-This specification defines the **algorithmic semantics of deterministic recovery and fallback selection** for the ASH Pattern System.
+This specification defines deterministic correction, fallback replacement, containment escalation, and diagnostic requirements.
 
-Every recovery action must be deterministic, diagnosable, and policy-driven.
+Correction and fallback are separate operations:
+
+- correction applies one canonical codeword inside the current orbit;
+- fallback replacement is an authorized policy action that may replace the state across orbits;
+- containment escalation does not replace state.
 
 ## Correction attempt flow
 
-When the recovery category is `APPLY_CORRECTION` (for `CORRECTABLE` states) or `NORMALIZE_STATE` (for `UNSTABLE` states), the system attempts deterministic correction using the codeword structure.
+`APPLY_CORRECTION` is permitted only for `CORRECTABLE` assessments.
 
 ```text
-FUNCTION attempt_recovery(diagnostic: StateValidityDiagnostic, state_class: SystemStateClass) -> RecoveryResult
-    result = new RecoveryResult()
-    result.original_diagnostic = diagnostic
-    result.recovery_category = classify_recoverability(state_class)
-    result.steps = []
+FUNCTION apply_correction(assessment: StateAssessment) -> RecoveryResult
+    REQUIRE assessment.class == CORRECTABLE
+    REQUIRE assessment.selected_target is not NONE
+    REQUIRE assessment.correction_codeword_id is not NONE
 
-    SWITCH result.recovery_category
+    current = assessment.state
+    target = assessment.selected_target
+    delta = current.state_signature ⊕ target.state_signature
 
-        CASE NORMALIZE_STATE:
-            -- State is transformation-compatible; restore to valid configuration
-            normalized = normalize_via_codeword_structure(diagnostic.input_state)
-            IF normalized is NONE THEN
-                result.outcome = BLOCKED
-                result.reason = "Normalization path not found"
-                result.steps.append(step("normalize", BLOCKED, "no normalization path available"))
-                RETURN result
-            END IF
-
-            result.corrected_state = normalized
-            result.steps.append(step("normalize", COMPLETED, "state normalized via codeword structure"))
-            result.outcome = RECOVERED
-
-        CASE APPLY_CORRECTION:
-            -- State is correctable; apply known correction sequence
-            correction = find_correction_sequence(diagnostic.input_state)
-            IF correction is NONE THEN
-                result.outcome = BLOCKED
-                result.reason = "Correction sequence not computable"
-                result.steps.append(step("correct", BLOCKED, "no correction path found"))
-                RETURN result
-            END IF
-
-            corrected = apply_codeword_chain(diagnostic.input_state, correction)
-            result.corrected_state = corrected
-            result.steps.append(step("correct", COMPLETED,
-                "state corrected via codeword sequence"))
-            result.outcome = RECOVERED
-
-        CASE FALLBACK_REQUIRED:
-            result = select_fallback(diagnostic, result)
-            RETURN result
-
-        OTHERWISE:
-            result.outcome = NOT_APPLICABLE
-            result.reason = "Recovery category handled by another specification"
-            RETURN result
-
-    END SWITCH
-
-    -- Validate recovered state
-    IF result.outcome == RECOVERED THEN
-        validation = diagnose_state(result.corrected_state)
-        result.steps.append(step("validate-recovery", COMPLETED,
-            "post-recovery validation: " + validation.admissibility_status))
-
-        IF NOT validation.is_valid THEN
-            result.outcome = RECOVERY_FAILED
-            result.reason = "Recovered state did not classify as VALID"
-            result.steps.append(step("validate-recovery", FAILED,
-                "post-recovery state is not valid"))
-        END IF
+    IF delta ∉ C THEN
+        RETURN recovery_failure("correction codeword is not canonical")
     END IF
 
-    RETURN result
+    corrected = transform_state(current, delta)
+
+    IF corrected.state_signature != target.state_signature THEN
+        RETURN recovery_failure("correction target mismatch")
+    END IF
+
+    RETURN RecoveryResult(
+        recovery_category = APPLY_CORRECTION,
+        outcome = RECOVERED,
+        original_state = current,
+        target_state = target,
+        codeword_id = codeword_id(delta),
+        diagnostic_chain = correction_diagnostics(assessment, corrected)
+    )
 END FUNCTION
 ```
+
+The correction result must record current state, target state, codeword ID, policy decision, pre-diagnostic, post-diagnostic, and outcome.
+
+## Target-resolution flow
+
+`TARGET_RESOLUTION_REQUIRED` is not a mutation category. The implementation must wait for a validated policy or context change that selects one target, or classify the condition as degraded if candidates become invalid.
 
 ## Fallback selection flow
 
-When the recovery category is `FALLBACK_REQUIRED` (for `DEGRADED` states), the system selects from the canonical fallback-policy registry.
-
-Fallback selection operates against the **canonical fallback-policy registry** (see `specs/registries/fallback-policy-registry.md`). Ordering is deterministic and fully specified by policy identifiers.
+Fallback selection applies to `FALLBACK_REQUIRED`.
 
 ```text
-FUNCTION select_fallback(diagnostic: StateValidityDiagnostic, result: RecoveryResult) -> RecoveryResult
-
-    IF NOT fallback_registry_is_available() THEN
-        result.outcome = ESCALATE_TO_CONTAINMENT
-        result.reason = "No fallback-policy registry available"
-        result.steps.append(step("select-fallback", BLOCKED, "fallback registry unavailable"))
-        RETURN result
+FUNCTION select_fallback(assessment: StateAssessment, instance: FallbackPolicyInstance) -> RecoveryResult
+    IF instance is invalid THEN
+        RETURN containment_escalation("fallback policy instance invalid")
     END IF
 
-    candidates = fallback_registry.get_candidates_for(diagnostic)
+    candidates = evaluate_fallback_candidates(assessment, instance)
 
     IF candidates is empty THEN
-        result.outcome = ESCALATE_TO_CONTAINMENT
-        result.reason = "Fallback registry contains no candidates for this state"
-        result.steps.append(step("select-fallback", BLOCKED, "no fallback candidates"))
-        RETURN result
+        RETURN containment_escalation("no fallback candidate available")
     END IF
 
-    selected = candidates.first_by_policy_order()
-    result.corrected_state = selected.state
-    result.fallback_policy_id = selected.policy_id
-    result.steps.append(step("select-fallback", COMPLETED,
-        "fallback selected: policy=" + selected.policy_id))
-    result.outcome = RECOVERED_VIA_FALLBACK
+    selected = first_candidate_by_policy_order(candidates)
+    reassessment = assess_state(selected.state, assessment.operational_context)
 
-    -- Validate fallback state
-    validation = diagnose_state(result.corrected_state)
-    IF NOT validation.is_valid THEN
-        result.outcome = ESCALATE_TO_CONTAINMENT
-        result.reason = "Fallback state is not valid"
-        result.steps.append(step("validate-fallback", FAILED, "escalating to containment"))
+    IF reassessment.class not in [STABLE, CORRECTABLE, UNSTABLE] THEN
+        RETURN containment_escalation("fallback candidate failed immediate reassessment")
     END IF
 
-    RETURN result
+    RETURN RecoveryResult(
+        recovery_category = FALLBACK_REQUIRED,
+        outcome = RECOVERED_VIA_FALLBACK_REPLACEMENT,
+        original_state = assessment.state,
+        replacement_state = selected.state,
+        fallback_policy_id = selected.policy_id,
+        diagnostic_chain = fallback_diagnostics(assessment, selected, reassessment)
+    )
 END FUNCTION
 ```
 
-## No silent healing
+A cross-orbit replacement must be labeled `RECOVERED_VIA_FALLBACK_REPLACEMENT`. It must never be presented as XOR-by-codeword motion.
 
-All recovery actions must be diagnosable. The system must not silently mutate its own state without producing an explainable diagnostic record.
+## Canonical fallback definitions
 
-## Minimum diagnostic content for recovery and fallback
+The canonical fallback-policy definition registry contains:
+
+| Policy ID | Name | Selection order |
+|---|---|---|
+| `FALLBACK-STATE-001` | Declared Known-Good | configured rank, then realm ID |
+| `FALLBACK-STATE-002` | Last Verified Stable | highest verification sequence, then realm ID |
+| `FALLBACK-STATE-999` | Containment Escalation | no replacement |
+
+Concrete candidate states and evidence are supplied by downstream policy instances. APS validates the instance and selection rule; it does not invent domain-safe states.
+
+## Recovery result
 
 ```text
-TYPE RecoveryDiagnostic
-    recovery_category        : RecoveryCategory
-    original_state_class     : SystemStateClass
-    original_diagnostic      : StateValidityDiagnostic
-    steps                    : List of RecoveryStep
-    outcome                  : RecoveryOutcome
-    corrected_state          : AshState or NONE
-    fallback_policy_id       : String or NONE
-    reason                   : String
-    rule_ids                 : List of String
+TYPE RecoveryResult
+    recovery_category       : RecoveryCategory
+    outcome                 : RecoveryOutcome
+    original_state          : AshState
+    target_state            : AshState or NONE
+    replacement_state       : AshState or NONE
+    codeword_id             : String or NONE
+    fallback_policy_id      : String or NONE
+    diagnostic_chain        : List of DiagnosticEnvelope
 END TYPE
 
 ENUM RecoveryOutcome
     RECOVERED
-    RECOVERED_VIA_FALLBACK
-    BLOCKED
+    RECOVERED_VIA_FALLBACK_REPLACEMENT
+    TARGET_RESOLUTION_BLOCKED
     RECOVERY_FAILED
     ESCALATE_TO_CONTAINMENT
     NOT_APPLICABLE
 END ENUM
 ```
 
-## Prohibition on heuristic guessing
+## No silent recovery
 
-When canonical policy is absent, the system must not guess. It must escalate to containment.
+Every correction, fallback replacement, containment escalation, failed attempt, and blocked action must produce a diagnostic chain. No state mutation may occur without an explicit result record.
 
-## Canonical fallback-policy registry
+## Prohibition on heuristic selection
 
-The fallback-policy registry is defined in `specs/registries/fallback-policy-registry.md`. It governs deterministic fallback selection with normative entry shapes, ordering rules, validation requirements, and escalation behavior.
+When a validated policy is absent, the system must escalate to containment. It must not use random, nearest-neighbor, most-common, recently seen, or undocumented selection.
 
 ## Relation to other specifications
 
-- **system-state-classification.pseudo.md** — provides the system-state class that determines recovery category
-- **recoverability-semantics.pseudo.md** — provides the recovery-category mapping
-- **containment-safe-failure-semantics.pseudo.md** — handles escalation when recovery/fallback fails
-- **state-validity-diagnostics.pseudo.md** — provides diagnostics for pre/post-recovery validation
-- **codeword-set.pseudo.md** — provides the codeword structure used for normalization and correction
-- **state-admissibility.pseudo.md** — provides admissibility classification
-- **fallback-policy-registry.md** — canonical registry for fallback selection
+- **system-state-classification.pseudo.md** — provides `StateAssessment`.
+- **recoverability-semantics.pseudo.md** — maps classes to recovery categories.
+- **containment-safe-failure-semantics.pseudo.md** — handles containment and safe halt.
+- **state-validity-diagnostics.pseudo.md** — provides diagnostic envelopes.
+- **codeword-set.pseudo.md** — provides the codeword structure used for correction.
+- **fallback-policy-registry.md** — defines fallback policy definitions and instance requirements.

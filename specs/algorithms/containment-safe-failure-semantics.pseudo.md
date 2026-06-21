@@ -54,7 +54,7 @@ Containment overrides correction when:
 2. **Correction has already failed** — a previous correction attempt did not produce a `STABLE` state. Repeating the same correction is not permitted.
 3. **Multiple simultaneous errors** — the system detects errors in multiple state dimensions. Correcting one dimension might mask or worsen another.
 
-The determination of propagation risk is a policy decision. If no propagation-risk policy is defined, the system must not assume safety — it must escalate to containment rather than guess.
+The determination of propagation risk is a policy decision. If no propagation-risk policy is defined, the system must not assume safety — it must escalate to containment rather than make an undocumented decision.
 
 ### Containment resolution
 

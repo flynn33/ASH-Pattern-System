@@ -1,23 +1,45 @@
-# System-State Classification — canonical specification (Canonical Baseline)
+# System-State Classification — canonical specification (1.0 release candidate)
 
 ## Purpose
 
-This specification defines the **canonical system-state classes** for the ASH Pattern System.
+This specification defines operational state classes for a well-formed ASH state under a validated operational context.
 
-Classification answers: given a state-validity diagnostic for a full 9-bit state, what should the system do about it?
+Classification is not a property of a state in isolation. It requires a `StateAssessment` that includes structural state, orbit identity, operational context, candidate stable targets, policy decision, and runtime mode.
 
-## Classification criteria
+Malformed input does not receive a system-state class. It receives an input-validation diagnostic and a blocked assessment.
 
-A system-state class is determined by evaluating the state-validity diagnostic (`StateValidityDiagnostic`) which provides:
+## Operational context
 
-1. **Admissibility status** — VALID, TRANSFORMATION_COMPATIBLE, TRANSFORMATION_INCOMPATIBLE, or UNCLASSIFIED
-2. **Transformation compatibility** — COMPATIBLE, INCOMPATIBLE, or UNKNOWN
-3. **Normalization status** — ALREADY_VALID, NORMALIZABLE, NOT_NORMALIZABLE, or BLOCKED
+```text
+TYPE OperationalContext
+    context_id                 : String
+    context_version            : String
+    allowed_stable_states      : List of StateSignature
+    preferred_state            : StateSignature or NONE
+    fallback_policy_instance   : FallbackPolicyInstance
+    propagation_risk_policy    : PropagationRiskPolicy
+    containment_policy         : ContainmentPolicy
+    halt_policy                : HaltPolicy
+    registry_versions          : RegistryVersionSet
+END TYPE
+```
 
-Additional conditions from runtime context:
+The context must validate before classification. Empty stable sets, incompatible registry versions, contradictory policies, or missing fallback instances fail closed.
 
-4. **Containment status** — has the system entered containment mode?
-5. **Halt status** — has the system entered safe halt?
+## State assessment
+
+```text
+TYPE StateAssessment
+    state                   : AshState
+    operational_context_id  : String
+    candidate_targets       : List of AshState
+    selected_target         : AshState or NONE
+    correction_codeword_id  : String or NONE
+    runtime_mode            : RuntimeMode
+    class                   : SystemStateClass
+    diagnostics             : List of DiagnosticReference
+END TYPE
+```
 
 ## Canonical state classes
 
@@ -34,114 +56,118 @@ END ENUM
 ```
 
 ### STABLE
-The system is in normal operating condition.
-- Admissibility: `VALID`
-- Normalization: `ALREADY_VALID`
-- No recovery action required
+
+- State is well formed.
+- State is in `allowed_stable_states`.
+- Runtime mode is not contained, failed, or halted.
 
 ### UNSTABLE
-The state is transformation-compatible but not currently in a recognized valid configuration.
-- Admissibility: `TRANSFORMATION_COMPATIBLE`
-- Normalization: `NORMALIZABLE`
-- Recovery: restore to valid state via codeword-based normalization
+
+- State is well formed.
+- State is not stable.
+- One or more same-orbit stable candidates exist.
+- Policy cannot select exactly one target.
+- No automatic mutation is permitted.
 
 ### CORRECTABLE
-The state can be corrected to a valid state through codeword operations.
-- Admissibility: `TRANSFORMATION_COMPATIBLE`
-- The specific correction path is known
-- Recovery: apply codeword correction sequence to reach a valid state
+
+- State is well formed.
+- State is not stable.
+- A unique policy-selected stable target exists in the same orbit.
+- `current ⊕ target` is in `C` and names the correction codeword.
 
 ### DEGRADED
-The state is transformation-incompatible or correction is ambiguous. Fallback is required.
-- Admissibility: `TRANSFORMATION_INCOMPATIBLE` or correction is ambiguous
-- Normalization: `NOT_NORMALIZABLE` or no unique correction path
-- Recovery: select a known-good fallback state from the fallback-policy registry
+
+- State is well formed.
+- No same-orbit stable target is available, or a correction attempt failed validation.
+- Fallback policy must decide whether an authorized replacement or containment escalation is available.
 
 ### CONTAINED
-The system has entered containment to prevent error propagation.
-- Entry: DEGRADED where fallback is unavailable, propagation risk detected, or operator request
-- Behavior: restricted operations, awaiting resolution
-- May escalate to SAFE_HALT if containment boundary is breached
+
+- Containment mode has been deliberately entered.
+- Only policy-declared restricted operations are allowed.
+- Entry and resolution attempts are diagnosed.
 
 ### FAILED
-The state is not recoverable through any automated path. Escalation required.
-- Admissibility: `TRANSFORMATION_INCOMPATIBLE` with no fallback available
-- Or: containment has failed to resolve the condition
-- System is still running but in an unrecoverable error state
+
+- Automated correction and fallback are unavailable or exhausted.
+- Normal operations are prohibited.
+- The process may remain running only to preserve diagnostics and await external authority.
 
 ### SAFE_HALT
-The system has deliberately halted in a known-safe terminal state.
-- No further transitions permitted
-- Diagnostic state preserved for post-mortem
-- Distinct from FAILED: SAFE_HALT is an intentional terminal action
 
-## Deterministic class-to-action mapping
-
-| System-State Class | Action Category | Description |
-|---|---|---|
-| `STABLE` | `NO_ACTION` | Normal operation |
-| `UNSTABLE` | `NORMALIZE_STATE` | Restore to valid state via codeword-based normalization |
-| `CORRECTABLE` | `APPLY_CORRECTION` | Apply known codeword correction sequence |
-| `DEGRADED` | `FALLBACK_REQUIRED` | Select known-good state from fallback-policy registry |
-| `CONTAINED` | `CONTAINMENT_REQUIRED` | Restrict operations; await resolution |
-| `FAILED` | `ESCALATION_REQUIRED` | Escalate to external authority |
-| `SAFE_HALT` | `TERMINAL_NO_RECOVERY` | Already halted; no further transitions |
+- Deliberate terminal state.
+- No transition, recovery mutation, fallback, or de-escalation is permitted.
+- Diagnostic chain is frozen and exportable.
 
 ## Pseudocode
 
 ```text
-FUNCTION classify_system_state(diagnostic: StateValidityDiagnostic, context: SystemContext) -> SystemStateClass
-
-    -- Check terminal states first
-    IF context.is_in_safe_halt THEN
-        RETURN SAFE_HALT
+FUNCTION classify_system_state(normalized: NormalizedInput, context: OperationalContext, runtime: RuntimeMode) -> StateAssessment
+    IF normalized.input_status == MALFORMED THEN
+        RETURN blocked_assessment("malformed input has no system-state class")
     END IF
 
-    IF context.is_in_containment THEN
-        RETURN CONTAINED
+    validated_context = validate_operational_context(context)
+    IF validated_context is invalid THEN
+        RETURN blocked_assessment("invalid operational context")
     END IF
 
-    -- Classify from full-state diagnostic
-    IF diagnostic.admissibility_status == VALID AND diagnostic.normalization_status == ALREADY_VALID THEN
-        RETURN STABLE
+    IF runtime.is_in_safe_halt THEN
+        RETURN assessment(class = SAFE_HALT)
     END IF
 
-    IF diagnostic.admissibility_status == TRANSFORMATION_COMPATIBLE THEN
-        IF diagnostic.normalization_status == NORMALIZABLE THEN
-            -- Determine if specific correction is known
-            IF correction_path_is_known(diagnostic) THEN
-                RETURN CORRECTABLE
-            ELSE
-                RETURN UNSTABLE
-            END IF
-        END IF
+    IF runtime.is_in_containment THEN
+        RETURN assessment(class = CONTAINED)
     END IF
 
-    IF diagnostic.admissibility_status == TRANSFORMATION_INCOMPATIBLE THEN
-        IF fallback_is_available(diagnostic) THEN
-            RETURN DEGRADED
-        ELSE
-            RETURN FAILED
-        END IF
+    current = normalized.state
+
+    IF current.state_signature IN validated_context.allowed_stable_states THEN
+        RETURN assessment(class = STABLE)
     END IF
 
-    -- Default for UNCLASSIFIED admissibility
-    RETURN DEGRADED
+    same_orbit_targets = [
+        target FOR target IN validated_context.allowed_stable_states
+        WHERE evaluate_reachability(current, target, C).status == REACHABLE
+    ]
+
+    IF same_orbit_targets is empty THEN
+        RETURN assessment(class = DEGRADED)
+    END IF
+
+    selected = apply_target_policy(current, same_orbit_targets, validated_context)
+
+    IF selected is NONE THEN
+        RETURN assessment(class = UNSTABLE, candidate_targets = same_orbit_targets)
+    END IF
+
+    delta = current.state_signature ⊕ selected.state_signature
+    IF delta ∈ C THEN
+        RETURN assessment(
+            class = CORRECTABLE,
+            selected_target = selected,
+            correction_codeword_id = codeword_id(delta)
+        )
+    END IF
+
+    RETURN assessment(class = DEGRADED)
 END FUNCTION
 ```
 
 ## Invariants
 
-1. **Completeness** — every state maps to exactly one system-state class
-2. **Determinism** — the same diagnostic always produces the same classification
-3. **Monotonic severity** — STABLE < UNSTABLE < CORRECTABLE < DEGRADED < CONTAINED < FAILED < SAFE_HALT
-4. **Terminal finality** — SAFE_HALT is irrevocable
-5. **Full-state semantics** — classification is based on full 9-bit state diagnostics
+1. Classification is total for well-formed states under valid context and runtime mode.
+2. Classes are non-overlapping.
+3. Structural normalization never changes the class by mutating the state.
+4. `CORRECTABLE` always names one same-orbit target and one codeword.
+5. Cross-orbit fallback is never classified as a codeword transition.
+6. `SAFE_HALT` is terminal inside APS semantics.
 
 ## Relation to other specifications
 
-- **state-validity-diagnostics.pseudo.md** — provides the diagnostic that feeds classification
-- **state-admissibility.pseudo.md** — provides admissibility status
-- **recoverability-semantics.pseudo.md** — maps each class to its recovery category
-- **recovery-fallback-semantics.pseudo.md** — implements recovery and fallback actions
-- **containment-safe-failure-semantics.pseudo.md** — implements containment and safe-halt
+- **state-validity-diagnostics.pseudo.md** — provides structural diagnostics.
+- **state-admissibility.pseudo.md** — defines reachability and orbit identity.
+- **recoverability-semantics.pseudo.md** — maps classes to recovery categories.
+- **recovery-fallback-semantics.pseudo.md** — defines correction and fallback behavior.
+- **containment-safe-failure-semantics.pseudo.md** — defines containment and safe halt.

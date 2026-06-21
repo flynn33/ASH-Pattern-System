@@ -1,0 +1,72 @@
+{
+  "$id": "https://github.com/flynn33/ASH-Pattern-System/schemas/1.0/product-manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Versioned APS product-manifest record.",
+  "product_version": "1.0.0-rc.1",
+  "properties": {
+    "canonical_data_version": {
+      "type": "string"
+    },
+    "canonical_repository": {
+      "type": "string"
+    },
+    "conformance_corpus_version": {
+      "type": "string"
+    },
+    "copyright_holder": {
+      "type": "string"
+    },
+    "hashes": {
+      "type": "object"
+    },
+    "license": {
+      "type": "string"
+    },
+    "product_identifier": {
+      "type": "string"
+    },
+    "product_name": {
+      "type": "string"
+    },
+    "release_tag": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "source_commit": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "IN_DEVELOPMENT",
+        "RELEASE_CANDIDATE",
+        "SHIPPABLE",
+        "RELEASED",
+        "MAINTENANCE"
+      ],
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "canonical_data_version",
+    "canonical_repository",
+    "conformance_corpus_version",
+    "copyright_holder",
+    "hashes",
+    "license",
+    "product_identifier",
+    "product_name",
+    "release_tag",
+    "schema_version",
+    "source_commit",
+    "status",
+    "version"
+  ],
+  "title": "APS Product Manifest",
+  "type": "object"
+}

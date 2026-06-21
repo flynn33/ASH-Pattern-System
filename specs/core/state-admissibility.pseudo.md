@@ -1,116 +1,202 @@
-# State Admissibility — canonical specification (Canonical Baseline)
+# State Admissibility — canonical specification (1.0 release candidate)
 
 ## Purpose
 
-This specification defines **admissibility and validity** for full 9-bit states in the ASH Pattern System.
+This specification separates structural state validity from operational health.
 
-Admissibility determines whether a given 9-bit state is structurally valid within the ASH Pattern System and whether it is compatible with the codeword transformation structure.
+An ASH candidate has three distinct evaluation layers:
 
-## Admissibility concept
+1. input well-formedness;
+2. canonical orbit identity and pairwise reachability;
+3. operational assessment under an explicit context.
 
-In the canonical 9-bit model, admissibility is defined in terms of the state's relationship to the **codeword orbit structure**.
+The canonical state space remains `F2^9`. Every well-formed nine-bit value is a realm. No well-formed state is outside the orbit partition.
 
-### Codeword orbits
+## Candidate input status
 
-For any state `x ∈ F2^9`, the **codeword orbit** of `x` is:
+```text
+ENUM InputStatus
+    WELL_FORMED
+    MALFORMED
+END ENUM
+```
+
+`WELL_FORMED` means the candidate is exactly nine binary values in `b0` through `b8` order.
+
+`MALFORMED` means the candidate cannot be represented as an ASH state without losing information. Malformed input is an input-validation failure, not an invalid realm.
+
+## Canonical state record
+
+```text
+TYPE AshState
+    bits            : Vector[9] over F2
+    state_signature : String matching ^[01]{9}$
+    realm_index     : Integer 0..511
+    realm_id        : String matching ^APS-REALM-[0-9]{3}$
+    orbit_id        : String matching ^APS-ORBIT-[0-9]{2}$
+END TYPE
+```
+
+For integer conversion, `b0` is the most significant bit and `b8` is the least significant bit:
+
+```text
+state_index = sum(bi * 2^(8-i)) for i = 0..8
+realm_id = "APS-REALM-" + zero_pad(state_index, 3)
+```
+
+## Orbit identity
+
+For every well-formed state `x`:
 
 ```text
 Orbit(x) = { x ⊕ c : c ∈ C }
 ```
 
-where `C` is the canonical codeword set. All states within the same orbit are reachable from each other via codeword transformations.
+The canonical codeword set `C` is a subgroup. Its orbits partition all 512 states into 32 disjoint orbits of 16 members each.
 
-The orbits partition F2^9 into disjoint equivalence classes. Each orbit represents a family of states that are algebraically connected.
+The canonical orbit representative is the lexicographically smallest state signature in the orbit. Orbit representatives are sorted lexicographically and assigned:
+
+```text
+APS-ORBIT-00 through APS-ORBIT-31
+```
+
+## Pairwise reachability
+
+Reachability is a relation between two well-formed states, not an intrinsic property of one state.
+
+```text
+reachable(source, target) iff (source ⊕ target) ∈ C
+```
+
+Equivalent rule:
+
+```text
+reachable(source, target) iff orbit_id(source) == orbit_id(target)
+```
+
+If reachable, the unique one-step codeword is:
+
+```text
+delta = source ⊕ target
+```
 
 ## Admissibility statuses
 
 ```text
 ENUM AdmissibilityStatus
-    VALID                        -- state is well-formed and transformation-compatible
-    TRANSFORMATION_COMPATIBLE    -- state is reachable via codeword orbit from a known valid state
-    TRANSFORMATION_INCOMPATIBLE  -- state is not reachable via any codeword orbit from known valid states
-    UNCLASSIFIED                 -- admissibility cannot be determined because the input or implementation cannot be classified
+    WELL_FORMED_REALM
+    MALFORMED_INPUT
 END ENUM
 ```
 
-### VALID
+`WELL_FORMED_REALM` means the candidate is a valid element of `F2^9`, has one realm ID, and has one orbit ID.
 
-The state is a well-formed 9-bit vector in F2^9 and is recognized as a structurally valid state in the ASH Pattern System. Valid states are the normal operating states of the system.
+`MALFORMED_INPUT` means parsing failed before a state existed.
 
-### TRANSFORMATION_COMPATIBLE
+## Reachability statuses
 
-The state is reachable from a known valid state via one or more codeword transformations. It is within the codeword orbit structure and can participate in normal transformation operations.
+```text
+ENUM ReachabilityStatus
+    REACHABLE
+    NOT_REACHABLE
+    MALFORMED_INPUT
+END ENUM
+```
 
-### TRANSFORMATION_INCOMPATIBLE
+`NOT_REACHABLE` means two well-formed states belong to different orbits. It does not mean either state is invalid.
 
-The state is a well-formed 9-bit vector but is not reachable from any known valid state via codeword transformations. It lies outside the codeword orbit structure and cannot be reached or departed from using canonical transformations alone.
+## Structural normalization
 
-### UNCLASSIFIED
+Structural normalization only parses and canonicalizes representation:
 
-Admissibility cannot be determined, either because:
-- The state is malformed (not a valid 9-bit F2 vector)
-- Implementation nonconformance prevents classification
+1. parse the candidate;
+2. verify exactly nine binary values;
+3. emit canonical bit-vector, signature, realm, and orbit fields;
+4. preserve every bit.
 
-## Relation to diagnostics and classification
-
-Admissibility status feeds directly into the state-validity diagnostic and system-state classification:
-
-| Admissibility Status | Diagnostic Implication | Classification Guidance |
-|---|---|---|
-| `VALID` | State is healthy | → STABLE (if no other issues) |
-| `TRANSFORMATION_COMPATIBLE` | State is reachable but may need normalization | → STABLE or recovery depending on context |
-| `TRANSFORMATION_INCOMPATIBLE` | State is outside orbit structure | → DEGRADED or FAILED depending on severity |
-| `UNCLASSIFIED` | Cannot determine | → diagnostic notes must explain why |
+Structural normalization never changes a realm, selects an operational target, applies a codeword, or performs fallback.
 
 ## Pseudocode
 
 ```text
-FUNCTION classify_state_admissibility(state[9], codeword_set C) -> AdmissibilityStatus
-    PRECONDITION: length(state) == 9
-    PRECONDITION: all elements are in F2
-
-    IF state is a recognized valid state THEN
-        RETURN VALID
+FUNCTION normalize_state(candidate) -> NormalizedInput
+    IF candidate is not exactly nine binary values THEN
+        RETURN {
+            input_status: MALFORMED,
+            diagnostic_kind: INPUT_VALIDATION,
+            state: NONE
+        }
     END IF
 
-    IF exists c_sequence IN codeword_paths(C) such that
-       apply_codeword_chain(known_valid_state, c_sequence) == state THEN
-        RETURN TRANSFORMATION_COMPATIBLE
-    END IF
+    state_signature = canonical_nine_bit_signature(candidate)
+    state_index = binary_to_integer(state_signature)
+    orbit = compute_orbit_identity(state_signature, C)
 
-    IF implementation_cannot_evaluate_canonical_codeword_set() THEN
-        RETURN UNCLASSIFIED
-    ELSE
-        RETURN TRANSFORMATION_INCOMPATIBLE
-    END IF
+    RETURN {
+        input_status: WELL_FORMED,
+        state: AshState(
+            bits = candidate bits in b0..b8 order,
+            state_signature = state_signature,
+            realm_index = state_index,
+            realm_id = "APS-REALM-" + zero_pad(state_index, 3),
+            orbit_id = orbit.orbit_id
+        )
+    }
 END FUNCTION
 ```
 
-## Relation to recovery semantics
+```text
+FUNCTION classify_state_admissibility(candidate, codeword_set C) -> AdmissibilityStatus
+    normalized = normalize_state(candidate)
 
-- **VALID / TRANSFORMATION_COMPATIBLE** states are candidates for normal operation or normalization
-- **TRANSFORMATION_INCOMPATIBLE** states require fallback or containment — they cannot be corrected via codeword transformations
-- **UNCLASSIFIED** states require diagnostic reporting and may require containment until classification is possible
+    IF normalized.input_status == MALFORMED THEN
+        RETURN MALFORMED_INPUT
+    END IF
 
-## What this specification does NOT define
+    RETURN WELL_FORMED_REALM
+END FUNCTION
+```
 
-This specification does not:
-- Define alternate admissibility models outside the canonical codeword-orbit framing
-- Privilege a reduced sub-vector as the canonical basis for admissibility
-- Assume a linear code structure other than the canonical 16-member set
-- Invent admissibility rules not grounded in the canonical specifications
+```text
+FUNCTION evaluate_reachability(source_candidate, target_candidate, codeword_set C) -> ReachabilityResult
+    source = normalize_state(source_candidate)
+    target = normalize_state(target_candidate)
+
+    IF source.input_status == MALFORMED OR target.input_status == MALFORMED THEN
+        RETURN { status: MALFORMED_INPUT, delta_codeword_id: NONE }
+    END IF
+
+    delta = source.state.state_signature ⊕ target.state.state_signature
+
+    IF delta ∈ C THEN
+        RETURN {
+            status: REACHABLE,
+            delta_signature: delta,
+            codeword_id: codeword_id(delta)
+        }
+    END IF
+
+    RETURN { status: NOT_REACHABLE, delta_signature: delta, codeword_id: NONE }
+END FUNCTION
+```
+
+## Relation to operational health
+
+Operational health is not determined by state membership in `F2^9`. A well-formed state becomes `STABLE`, `UNSTABLE`, `CORRECTABLE`, `DEGRADED`, `CONTAINED`, `FAILED`, or `SAFE_HALT` only through `StateAssessment` under a validated `OperationalContext`.
 
 ## Invariants
 
-1. **Completeness**: every well-formed 9-bit vector in F2^9 maps to exactly one admissibility status under the canonical codeword set
-2. **Determinism**: the same state and codeword set always produce the same admissibility status
-3. **Canonical closure**: admissibility rules are derived from the fixed codeword structure defined by this repository
-4. **Full-state evaluation**: admissibility is evaluated on the full 9-bit state
+1. Every well-formed nine-bit vector maps to one realm ID.
+2. Every well-formed nine-bit vector maps to one orbit ID.
+3. The 32 orbits are disjoint and cover all 512 states.
+4. Pairwise reachability is exact codeword-difference membership.
+5. Structural normalization is realm-preserving.
+6. Malformed input is reported before realm, orbit, or reachability evaluation.
 
 ## Relation to other specifications
 
-- **codeword-set.pseudo.md** — defines the codeword set `C` that determines orbit structure and admissibility
-- **ash-state-space.pseudo.md** — defines the F2^9 state space
-- **state-validity-diagnostics.pseudo.md** — consumes admissibility status to produce diagnostic records
-- **system-state-classification.pseudo.md** — uses admissibility to determine system-state class
-- **recoverability-semantics.pseudo.md** — uses admissibility to determine recovery category
+- **codeword-set.pseudo.md** — defines the codeword set `C`.
+- **ash-state-space.pseudo.md** — defines the `F2^9` state space.
+- **state-validity-diagnostics.pseudo.md** — emits normalized-input and reachability diagnostics.
+- **system-state-classification.pseudo.md** — defines operational assessment under context.
+- **recoverability-semantics.pseudo.md** — maps operational classes to recovery categories.

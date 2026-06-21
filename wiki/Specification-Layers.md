@@ -8,12 +8,14 @@ This page maps the canonical layers so maintainers and downstream implementers c
 flowchart TD
     A[Docs Layer] --> B[Core Specs]
     B --> C[Algorithm Specs]
-    C --> D[Interface Contracts]
+    C --> R[Registries]
+    R --> D[Interface Contracts]
     D --> E[Verification Requirements]
     E --> F[Handoff Templates]
     G[Governance Layer] --> A
     G --> B
     G --> C
+    G --> R
     G --> D
     G --> E
     G --> F
@@ -38,11 +40,12 @@ flowchart TD
 2. `docs/*`
 3. `specs/core/*`
 4. `specs/algorithms/*`
-5. `specs/interfaces/*`
-6. `specs/verification/*`
-7. `handoff-templates/*`
-8. `governance/*`
+5. `specs/registries/*`
+6. `specs/interfaces/*`
+7. `specs/verification/*`
+8. `handoff-templates/*`
+9. `governance/*`
 
 ## Maintenance Rule
 
-When semantics change, update spec layers first, then contracts/verification as needed, then refresh docs/wiki summaries.
+When semantics change, update spec layers first, then the affected contracts and verification surfaces, then refresh docs/wiki summaries.

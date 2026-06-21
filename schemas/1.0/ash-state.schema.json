@@ -1,0 +1,42 @@
+{
+  "$id": "https://github.com/flynn33/ASH-Pattern-System/schemas/1.0/ash-state.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Versioned APS ash-state record.",
+  "product_version": "1.0.0-rc.1",
+  "properties": {
+    "bits": {
+      "items": {
+        "enum": [
+          0,
+          1
+        ],
+        "type": "integer"
+      },
+      "maxItems": 9,
+      "minItems": 9,
+      "type": "array"
+    },
+    "realm_id": {
+      "pattern": "^APS-REALM-[0-9]{3}$",
+      "type": "string"
+    },
+    "realm_index": {
+      "maximum": 511,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "state_signature": {
+      "pattern": "^[01]{9}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "bits",
+    "realm_id",
+    "realm_index",
+    "state_signature"
+  ],
+  "title": "APS Ash State",
+  "type": "object"
+}

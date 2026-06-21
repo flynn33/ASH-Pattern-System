@@ -142,7 +142,7 @@ When `select_fallback_candidate` returns `NONE`:
 1. The system must escalate to `CONTAINMENT_REQUIRED`.
 2. The escalation must be recorded in the diagnostic chain with a `FALLBACK` diagnostic kind.
 3. The diagnostic must include the reason: either "no candidates in registry" or "all candidates failed validation".
-4. The system must not invent, guess, or heuristically select a fallback state outside the registry.
+4. The system must not invent or heuristically select a fallback state outside the registry.
 
 ## Prohibition on heuristic and ad hoc fallback selection
 

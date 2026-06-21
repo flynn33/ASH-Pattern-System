@@ -20,23 +20,26 @@ The `wiki/` directory in the main repository is the source-controlled canonical 
 - `Glossary.md`
 - `Wiki-Maintenance-Playbook.md`
 
+`_Footer.md` is also maintained as a GitHub Wiki special file (rendered on every page) and, like `_Sidebar.md`, is exempt from the top-heading requirement; unlike the pages above, it is not part of the CI-enforced required-page set.
+
 ## Update Triggers
 
 Update wiki pages when any of these change materially:
 
 - `README.md`
-- `docs/*.md`
-- `specs/**/*.md`
-- `governance/*.md`
-- `.github/workflows/*.yml`
-- `.github/scripts/*.py`
+- `docs/`
+- `specs/`
+- `governance/` (recursive — includes `governance/math-change-notes/`)
+- `handoff-templates/`
+- `.github/workflows/`
+- `.github/scripts/`
 
 ## Maintenance Workflow
 
 1. Update canonical source docs/specs first.
 2. Update affected wiki pages in `wiki/`.
 3. Verify internal wiki links resolve.
-4. Ensure `Home.md` and `_Sidebar.md` include all required pages.
+4. Ensure `Home.md` and `_Sidebar.md` link to the nine content pages (Getting-Started through Glossary), not to themselves.
 5. Run `python3 .github/scripts/wiki_maintenance_check.py`.
 
 ## CI Guardrail

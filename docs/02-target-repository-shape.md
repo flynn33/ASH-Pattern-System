@@ -5,6 +5,34 @@
 ```text
 ash-pattern-system/
 ├── README.md
+├── VERSION
+├── product-manifest.json
+├── CHANGELOG.md
+├── PRODUCT-STATUS.md
+├── PUBLIC-SPECIFICATION-API.md
+├── RELEASE-NOTES.md
+├── RELEASE-PROCESS.md
+├── COMPATIBILITY.md
+├── DEPRECATION-POLICY.md
+├── MIGRATION-GUIDE.md
+├── LICENSE.md
+├── NOTICE.md
+├── SECURITY.md
+├── SUPPORT.md
+├── CONTRIBUTING.md
+├── CODE_OF_CONDUCT.md
+├── CITATION.cff
+├── schemas/
+│   └── 1.0/
+├── canonical-data/
+│   └── 1.0/
+├── conformance/
+│   └── 1.0/
+├── examples/
+│   ├── valid/
+│   └── invalid/
+├── tools/
+│   └── product/
 ├── docs/
 │   ├── 00-repository-purpose.md
 │   ├── 01-design-philosophy.md
@@ -56,8 +84,10 @@ ash-pattern-system/
 │   ├── mobile-implementation-handoff-template.md
 │   └── service-implementation-handoff-template.md
 ├── wiki/
+│   ├── README.md
 │   ├── Home.md
 │   ├── _Sidebar.md
+│   ├── _Footer.md
 │   ├── Getting-Started.md
 │   ├── Canonical-Math-Baseline.md
 │   ├── Specification-Layers.md
@@ -67,13 +97,25 @@ ash-pattern-system/
 │   ├── Downstream-Handoff-Guide.md
 │   ├── Wiki-Maintenance-Playbook.md
 │   └── Glossary.md
+├── completion-evidence/
+│   ├── protected-surface-baseline.json
+│   └── governance/
+│       ├── gate-integrity-hardening-request.md
+│       ├── local-verification.md
+│       ├── owner-server-side-steps.md
+│       ├── pinned-actions.md
+│       └── server-ruleset-evidence-2026-06-21.md
 ├── .github/
+│   ├── CODEOWNERS
+│   ├── rulesets/
+│   │   └── main-release-platform-protection.md
 │   ├── workflows/
 │   │   ├── alignment-agent.yml
 │   │   ├── canonical-semantic-integrity-agent.yml
 │   │   ├── math-integrity-agent.yml
 │   │   ├── downstream-conformance-agent.yml
 │   │   ├── no-ai-attribution.yml
+│   │   ├── gate-integrity.yml
 │   │   ├── wiki-maintenance-agent.yml
 │   │   └── docs-maintenance-agent.yml
 │   └── scripts/
@@ -82,6 +124,9 @@ ash-pattern-system/
 │       ├── semantic_integrity_check.py
 │       ├── math_integrity_check.py
 │       ├── downstream_conformance_check.py
+│       ├── no_attribution_check.py
+│       ├── gate_integrity_check.py
+│       ├── gate_integrity_selftest.py
 │       ├── wiki_maintenance_check.py
 │       └── docs_maintenance_check.py
 └── governance/
@@ -89,7 +134,8 @@ ash-pattern-system/
     ├── ai-coding-handoff.md
     ├── github-agents-governance.md
     └── math-change-notes/
-        └── README.md
+        ├── README.md
+        └── 2026-05-02-self-contained-canonical-language.md
 ```
 
 ## Structural rules
@@ -97,6 +143,30 @@ ash-pattern-system/
 ### `docs/`
 
 Contains explanatory and planning documents that describe the repository as a self-contained canonical baseline.
+
+### Root lifecycle files
+
+Contain the product version, manifest, public specification API, release notes, changelog, compatibility policy, migration guidance, license, notice, support, security, contribution, conduct, and citation surfaces for APS as a specification product.
+
+### `schemas/`
+
+Contains versioned JSON Schema entry points for public APS records.
+
+### `canonical-data/`
+
+Contains deterministic versioned codewords, realms, orbits, transitions, fallback policy definitions, rule registry, mathematical properties, and normative artifact index.
+
+### `conformance/`
+
+Contains versioned implementation-neutral vectors and corpus metadata for downstream validation.
+
+### `examples/`
+
+Contains valid and invalid schema examples used by product validation.
+
+### `tools/product/`
+
+Contains standard-library product generation, validation, conformance, and release-archive tooling. This is product support tooling, not a platform implementation tree.
 
 ### `specs/core/`
 
@@ -129,11 +199,15 @@ Contains the version-controlled source for GitHub Wiki pages. Wiki content summa
 
 ### `.github/`
 
-Contains sentinel workflow definitions and governance scripts that enforce repository boundary, semantic integrity, math integrity, attribution policy, and documentation/wiki upkeep.
+Contains sentinel workflow definitions and governance scripts that enforce repository boundary, semantic integrity, math integrity, attribution policy, gate integrity (protected-surface and governance-PR controls), and documentation/wiki upkeep, alongside `CODEOWNERS` and the branch-protection ruleset under `rulesets/`.
 
 ### `governance/`
 
 Contains repository rules, coding-agent handoff rules, and math-change note requirements.
+
+### `completion-evidence/`
+
+Contains the protected-surface baseline and dated governance verification evidence (local verification, owner server-side steps, pinned actions, and recorded ruleset evidence) that support the gate-integrity controls.
 
 ## Exclusions from this repository shape
 
@@ -142,7 +216,6 @@ This repository shape intentionally excludes canonical dependence on:
 - `src/`
 - `include/`
 - `tests/`
-- `examples/`
 - build-system files
 - runtime package manifests
 - platform-specific CI assumptions

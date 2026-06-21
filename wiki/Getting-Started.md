@@ -21,7 +21,7 @@ Use this sequence to understand the repository from canonical intent to downstre
 | What state model is canonical? | Full `F2^9`, 512-state space. |
 | What transformation is canonical? | XOR-by-codeword with `C subset F2^9`. |
 | Where does the math come from? | The canonical specifications and enumerations in this repository. |
-| What proves downstream conformance? | Invariants + category coverage + contract satisfaction + diagnostic completeness. |
+| What proves downstream conformance? | Invariants + category coverage (all five conformance categories) + contract satisfaction + diagnostic completeness, yielding an acceptance judgment of CONFORMANT / CONFORMANT WITH CAVEATS / NON-CONFORMANT. |
 
 ## What To Read In The Repository
 
@@ -29,6 +29,8 @@ Use this sequence to understand the repository from canonical intent to downstre
   - `README.md`
   - `docs/00-repository-purpose.md`
   - `docs/01-design-philosophy.md`
+  - `docs/02-target-repository-shape.md`
+  - `docs/03-design-roadmap.md`
 - Canonical semantics:
   - `specs/core/*.md`
   - `specs/algorithms/*.md`

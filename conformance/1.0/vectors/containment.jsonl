@@ -1,0 +1,2 @@
+{"category":"containment","expected_output":{"mode":"CONTAINED","restricted_operations_only":true},"input":{"risk":"PROPAGATION_BLOCKED"},"product_version":"1.0.0-rc.1","requirements":["containment"],"rule_ids":["ASH-CONTAINMENT-001"],"source_paths":["specs/"],"vector_id":"APS-VEC-CONTAINMENT-ENTER"}
+{"category":"containment","expected_output":{"mode":"FAILED"},"input":{"attempted_operation":"UNDECLARED_WRITE"},"product_version":"1.0.0-rc.1","requirements":["containment"],"rule_ids":["ASH-CONTAINMENT-001"],"source_paths":["specs/"],"vector_id":"APS-VEC-CONTAINMENT-BREACH"}
