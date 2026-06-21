@@ -1,0 +1,5 @@
+{
+  "proof": "reachable(source,target) iff source XOR target is in the canonical codeword set",
+  "reachable_ordered_pair_count": 8192,
+  "version": "1.0"
+}

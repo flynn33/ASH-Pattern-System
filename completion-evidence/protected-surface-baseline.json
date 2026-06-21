@@ -1,0 +1,126 @@
+{
+  "base_commit": "aa917162c915bb5904de3ddec6dbb0a9297300ac",
+  "policy_version": "2.0.0",
+  "protected_files": [
+    {
+      "exists": true,
+      "path": ".github/CODEOWNERS",
+      "sha256": "ad44d094148a385fd2133436ad448667de80c2cf33ef40079f19aff7ab74ad15",
+      "size_bytes": 173
+    },
+    {
+      "exists": true,
+      "path": ".github/scripts/_common.py",
+      "sha256": "3ff4605ae460770ba36c0b7730abfdaa67af0f3e51aaccf8519cf8d15f104bbf",
+      "size_bytes": 4843
+    },
+    {
+      "exists": true,
+      "path": ".github/scripts/alignment_check.py",
+      "sha256": "f7fc63af48ee44a21e89dc6eef41ba5d3df896da233e485ff9c9a60dd033db98",
+      "size_bytes": 6425
+    },
+    {
+      "exists": true,
+      "path": ".github/scripts/docs_maintenance_check.py",
+      "sha256": "a9b38d4e1da47c373079d3fa9b2691407c54577432d5ec03a9b35edf484413df",
+      "size_bytes": 9630
+    },
+    {
+      "exists": true,
+      "path": ".github/scripts/downstream_conformance_check.py",
+      "sha256": "4af49acf904b6a5b4004cb68c34b9a40429b7ed61e36dd45a42d08616df9d93d",
+      "size_bytes": 5530
+    },
+    {
+      "exists": true,
+      "path": ".github/scripts/math_integrity_check.py",
+      "sha256": "07e1dfaaeecddd8886650bafdc578bc8cfcbc528c2a9b848609d332f4a1ca517",
+      "size_bytes": 9010
+    },
+    {
+      "exists": true,
+      "path": ".github/scripts/semantic_integrity_check.py",
+      "sha256": "2216699ec52c5dc9f9aa66bee92d0f820a4afcef49803f7b947e5303fc24df59",
+      "size_bytes": 5700
+    },
+    {
+      "exists": true,
+      "path": ".github/scripts/wiki_maintenance_check.py",
+      "sha256": "59cffdc6a71554a84ae20ebec3601d3d6ea15638082ae1325e8499a7aa2c79dd",
+      "size_bytes": 9276
+    },
+    {
+      "exists": true,
+      "path": ".github/workflows/alignment-agent.yml",
+      "sha256": "1ea6aa1c2337c411ad45c8df97222dc3b6c420a37f6bd7174de6f05a2761eaec",
+      "size_bytes": 993
+    },
+    {
+      "exists": true,
+      "path": ".github/workflows/canonical-semantic-integrity-agent.yml",
+      "sha256": "f9f68645f9fe688163965f1d7a669e31a51d724ac1bfb103d578342d5af7a9d8",
+      "size_bytes": 1060
+    },
+    {
+      "exists": true,
+      "path": ".github/workflows/docs-maintenance-agent.yml",
+      "sha256": "0edc3c0d16cc7071144042b3094b19305f56212913dd644d0b019c64e7095ffe",
+      "size_bytes": 1086
+    },
+    {
+      "exists": true,
+      "path": ".github/workflows/downstream-conformance-agent.yml",
+      "sha256": "82cb88ba2141a5f0d247f22234bba8d94b6700f7d4f5060bf4b7aa0c57e4082e",
+      "size_bytes": 4086
+    },
+    {
+      "exists": true,
+      "path": ".github/workflows/math-integrity-agent.yml",
+      "sha256": "094112061f125af703bcfb4603e7b02fdc89566716c578162ee99130a3c2af1d",
+      "size_bytes": 1480
+    },
+    {
+      "exists": true,
+      "path": ".github/workflows/no-ai-attribution.yml",
+      "sha256": "e8436b840316b47f48e1b57a9ec11c21d82699e5752845c754089aeaad431052",
+      "size_bytes": 879
+    },
+    {
+      "exists": true,
+      "path": ".github/workflows/wiki-maintenance-agent.yml",
+      "sha256": "743cc8d3e7e0feee38677c32f8510631237fbfd83c3e61cbf3af15ef7afc42a2",
+      "size_bytes": 3165
+    },
+    {
+      "exists": true,
+      "path": "governance/ai-coding-handoff.md",
+      "sha256": "7ad7181f32c0e2406e2960998eea4e8210214f0504c7e944031120f693d1ee5a",
+      "size_bytes": 5304
+    },
+    {
+      "exists": true,
+      "path": "governance/github-agents-governance.md",
+      "sha256": "fe64c317735ee28945d0ff74ad95b539416eb9e78cde0c938909c49a301f5a08",
+      "size_bytes": 9032
+    },
+    {
+      "exists": true,
+      "path": "governance/math-change-notes/2026-05-02-self-contained-canonical-language.md",
+      "sha256": "52d70b023e2dcbdc617c4826539b80ecb02c098261bcca8a18b376c74fc28a5c",
+      "size_bytes": 1155
+    },
+    {
+      "exists": true,
+      "path": "governance/math-change-notes/README.md",
+      "sha256": "eae231eff4c95248589b6d0d14c98974d1896749b87c8a155508b5a53e47ebbc",
+      "size_bytes": 1579
+    },
+    {
+      "exists": true,
+      "path": "governance/repository-governance.md",
+      "sha256": "49fc9457c2614af65e6706090673681b2237d03b24aa839cd31be67229662267",
+      "size_bytes": 2993
+    }
+  ]
+}

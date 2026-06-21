@@ -1,185 +1,170 @@
-# State-Validity Diagnostics — canonical specification (Canonical Baseline)
+# State-Validity Diagnostics — canonical specification (1.0 release candidate)
 
 ## Purpose
 
-This specification defines the **canonical diagnostic model** for ASH state validity in the full 9-dimensional canonical baseline.
+This specification defines the diagnostic model for candidate input, structural state validity, orbit identity, pairwise reachability, and operational assessment boundaries.
 
-Every downstream implementation must be able to produce a structured diagnostic record that explains, for any candidate state:
+Diagnostics must distinguish:
 
-- whether it is valid
-- its admissibility status relative to the codeword structure
-- its transformation compatibility
-- what recovery path (if any) is available
-- which specification rules were evaluated
+- malformed input;
+- well-formed ASH realms;
+- orbit identity;
+- pairwise reachability;
+- context-bound operational health.
 
-This record is the foundation for:
+## Diagnostic envelope
 
-- **self-healing behavior** — the system can inspect its own state and determine what to do
-- **self-correcting behavior** — the system can identify correctable errors and apply fixes
-- **safe-failure behavior** — the system can recognize unrecoverable states and fail gracefully
-- **deterministic recovery planning** — recovery decisions are based on structured diagnostics, not heuristics
-- **observability** — external monitors can inspect state health
-
-## Diagnostic record
+Every diagnostic record is emitted inside a versioned envelope:
 
 ```text
-TYPE StateValidityDiagnostic
-    input_state                  : Vector[9] over F2
-    admissibility_status         : AdmissibilityStatus
-    transformation_compatibility : TransformationCompatibility
-    normalization_status         : NormalizationStatus
-    recoverability_relevance     : RecoverabilityRelevance
-    is_valid                     : Boolean
-    orbit_info                   : OrbitInfo or NONE
-    rule_ids                     : List of String
-    notes                        : List of String
+TYPE DiagnosticEnvelope
+    schema_version             : String
+    diagnostic_id              : String
+    diagnostic_kind            : DiagnosticKind
+    severity                   : DiagnosticSeverity
+    stage                      : String
+    disposition                : DiagnosticDisposition
+    subject_reference          : String
+    parent_diagnostic_id       : String or NONE
+    chain_root_diagnostic_id   : String
+    sequence_number            : Integer >= 1
+    rule_ids                   : List of RuleID
+    summary                    : String
+    notes                      : List of String
+    details                    : Object
+    occurrence_metadata        : Object or NONE
 END TYPE
 ```
 
-### Field definitions
+`diagnostic_id` is the SHA-256 digest of the canonical semantic payload. Occurrence metadata such as timestamp, host, process, or transport data is excluded from this identity.
 
-#### `input_state`
-The raw candidate state as received — a full 9-bit vector in F2^9.
-
-#### `admissibility_status`
-The result of classifying the state against the codeword structure, as defined in `state-admissibility.pseudo.md`.
+## Diagnostic kinds
 
 ```text
-ENUM AdmissibilityStatus
-    VALID
-    TRANSFORMATION_COMPATIBLE
-    TRANSFORMATION_INCOMPATIBLE
-    UNCLASSIFIED
+ENUM DiagnosticKind
+    INPUT_VALIDATION
+    STATE_ASSESSMENT
+    CLASSIFICATION
+    TRANSITION
+    TOPOLOGY
+    AXIOM
+    GENERATION_PLAN
+    EMISSION
+    RECOVERY
+    FALLBACK
+    CONTAINMENT
+    SAFE_HALT
+    SCHEMA_VALIDATION
+    CONFORMANCE
 END ENUM
 ```
 
-#### `transformation_compatibility`
-Whether the state can participate in codeword transformations.
+## State validity diagnostic
 
 ```text
-ENUM TransformationCompatibility
-    COMPATIBLE       -- state is within a codeword orbit
-    INCOMPATIBLE     -- state is outside all known codeword orbits
-    UNKNOWN          -- cannot determine because orbit compatibility could not be evaluated
-END ENUM
+TYPE StateValidityDiagnostic
+    input_status            : InputStatus
+    raw_candidate_reference : String
+    state                   : AshState or NONE
+    orbit_id                : String or NONE
+    orbit_representative    : String or NONE
+    admissibility_status    : AdmissibilityStatus
+    reachability            : ReachabilityResult or NONE
+    operational_context_id  : String or NONE
+    state_assessment        : StateAssessment or NONE
+    rule_ids                : List of RuleID
+END TYPE
 ```
 
-#### `normalization_status`
-Whether the state can be or has been normalized within the canonical 9-bit model.
+### `input_status`
 
-```text
-ENUM NormalizationStatus
-    ALREADY_VALID        -- state is valid, no normalization needed
-    NORMALIZABLE         -- state can be restored to a valid state via codeword-based correction
-    NOT_NORMALIZABLE     -- state cannot be restored via codeword operations
-    BLOCKED              -- normalization cannot proceed because required canonical evaluation data is unavailable
-END ENUM
-```
+`WELL_FORMED` or `MALFORMED`.
 
-#### `recoverability_relevance`
-Whether the state's condition is relevant to the recovery/fallback/containment system.
+### `state`
 
-```text
-ENUM RecoverabilityRelevance
-    NO_RECOVERY_NEEDED   -- state is valid
-    RECOVERY_APPLICABLE  -- state is not valid but recovery may be possible
-    FALLBACK_NEEDED      -- state requires fallback selection
-    CONTAINMENT_NEEDED   -- state requires containment
-    NOT_RECOVERABLE      -- no recovery path exists
-END ENUM
-```
+Present only when the candidate is a well-formed nine-bit vector.
 
-#### `is_valid`
-Boolean summary: `TRUE` if `admissibility_status == VALID` and `normalization_status == ALREADY_VALID`.
+### `orbit_id` and `orbit_representative`
 
-#### `orbit_info`
-Optional information about the state's codeword orbit, if computable:
-- which orbit the state belongs to
-- how many states are in that orbit
-- whether the orbit contains known valid states
+Present for every well-formed state. Absent for malformed input.
 
-Set to `NONE` if orbit information is not available or not applicable.
+### `admissibility_status`
 
-#### `rule_ids`
-A list of specification rule identifiers that were evaluated during diagnosis. Must conform to the rule-ID taxonomy defined in `specs/interfaces/rule-id-taxonomy.md`.
+`WELL_FORMED_REALM` for every well-formed state, `MALFORMED_INPUT` otherwise.
 
-#### `notes`
-Human-readable diagnostic strings providing additional context.
+### `reachability`
+
+Present only when the diagnostic evaluates a source/target pair. Reachability is never inferred from a single state.
+
+### `state_assessment`
+
+Present only when a validated `OperationalContext` is supplied. Without context, diagnostics may report structural facts but may not claim operational health.
 
 ## Pseudocode
 
 ```text
-FUNCTION diagnose_state(candidate[9], codeword_set C) -> StateValidityDiagnostic
+FUNCTION diagnose_state(candidate, codeword_set C, operational_context or NONE) -> StateValidityDiagnostic
+    normalized = normalize_state(candidate)
     diagnostic = new StateValidityDiagnostic()
-    diagnostic.input_state = candidate
-    diagnostic.rule_ids = []
-    diagnostic.notes = []
+    diagnostic.rule_ids = ["ASH-INPUT-001", "ASH-STATE-001"]
 
-    -- Step 1: Classify admissibility against codeword structure
-    diagnostic.admissibility_status = classify_state_admissibility(candidate, C)
-
-    -- Step 2: Determine transformation compatibility
-    IF diagnostic.admissibility_status IN [VALID, TRANSFORMATION_COMPATIBLE] THEN
-        diagnostic.transformation_compatibility = COMPATIBLE
-    ELSE IF diagnostic.admissibility_status == TRANSFORMATION_INCOMPATIBLE THEN
-        diagnostic.transformation_compatibility = INCOMPATIBLE
-        diagnostic.notes.append("State is outside codeword orbit structure")
-    ELSE
-        diagnostic.transformation_compatibility = UNKNOWN
-        diagnostic.notes.append("Transformation compatibility cannot be determined")
+    IF normalized.input_status == MALFORMED THEN
+        diagnostic.input_status = MALFORMED
+        diagnostic.raw_candidate_reference = safe_raw_candidate_reference(candidate)
+        diagnostic.state = NONE
+        diagnostic.orbit_id = NONE
+        diagnostic.orbit_representative = NONE
+        diagnostic.admissibility_status = MALFORMED_INPUT
+        diagnostic.state_assessment = NONE
+        RETURN diagnostic
     END IF
 
-    -- Step 3: Determine normalization status
-    IF diagnostic.admissibility_status == VALID THEN
-        diagnostic.normalization_status = ALREADY_VALID
-    ELSE IF diagnostic.admissibility_status == TRANSFORMATION_COMPATIBLE THEN
-        diagnostic.normalization_status = NORMALIZABLE
-    ELSE IF diagnostic.admissibility_status == TRANSFORMATION_INCOMPATIBLE THEN
-        diagnostic.normalization_status = NOT_NORMALIZABLE
-    ELSE
-        diagnostic.normalization_status = BLOCKED
-        diagnostic.notes.append("Normalization blocked: admissibility cannot be determined")
+    diagnostic.input_status = WELL_FORMED
+    diagnostic.state = normalized.state
+    diagnostic.orbit_id = normalized.state.orbit_id
+    diagnostic.orbit_representative = orbit_representative(normalized.state.orbit_id)
+    diagnostic.admissibility_status = WELL_FORMED_REALM
+
+    IF operational_context is NONE THEN
+        diagnostic.operational_context_id = NONE
+        diagnostic.state_assessment = NONE
+        RETURN diagnostic
     END IF
 
-    -- Step 4: Determine recoverability relevance
-    IF diagnostic.normalization_status == ALREADY_VALID THEN
-        diagnostic.recoverability_relevance = NO_RECOVERY_NEEDED
-    ELSE IF diagnostic.normalization_status == NORMALIZABLE THEN
-        diagnostic.recoverability_relevance = RECOVERY_APPLICABLE
-    ELSE IF diagnostic.normalization_status == NOT_NORMALIZABLE THEN
-        diagnostic.recoverability_relevance = NOT_RECOVERABLE
-        diagnostic.notes.append("State is not recoverable via codeword operations")
-    ELSE
-        diagnostic.recoverability_relevance = CONTAINMENT_NEEDED
+    validated_context = validate_operational_context(operational_context)
+    IF validated_context is invalid THEN
+        diagnostic.operational_context_id = NONE
+        diagnostic.state_assessment = blocked_assessment("invalid operational context")
+        RETURN diagnostic
     END IF
 
-    -- Step 5: Compute orbit info if available
-    diagnostic.orbit_info = compute_orbit_info(candidate, C)
-
-    -- Step 6: Summary validity
-    diagnostic.is_valid = (
-        diagnostic.admissibility_status == VALID
-        AND diagnostic.normalization_status == ALREADY_VALID
-    )
-
+    diagnostic.operational_context_id = validated_context.context_id
+    diagnostic.state_assessment = assess_state(normalized.state, validated_context)
     RETURN diagnostic
 END FUNCTION
 ```
 
-## Diagnostic completeness requirement
+```text
+FUNCTION diagnose_reachability(source_candidate, target_candidate, codeword_set C) -> DiagnosticEnvelope
+    result = evaluate_reachability(source_candidate, target_candidate, C)
+    RETURN diagnostic_envelope(
+        diagnostic_kind = TRANSITION,
+        subject_reference = reachability_subject(source_candidate, target_candidate),
+        details = result
+    )
+END FUNCTION
+```
 
-Every downstream implementation must be capable of producing a `StateValidityDiagnostic` for any candidate 9-bit state, even when:
+## Completeness requirement
 
-- Canonical orbit evaluation cannot be completed (use `UNCLASSIFIED` / `BLOCKED`)
-- The candidate state is malformed (report in notes)
-- Orbit information is not computable (use `NONE`)
+Every downstream implementation must emit a diagnostic for any candidate input. The diagnostic may block state assessment when input or context is invalid, but it must not be empty, partial, or silent.
 
-The diagnostic must never be empty, partial, or silently omitted.
+Malformed input must preserve the raw candidate through a safe reference or escaped representation. It must not be coerced into `Vector[9]`.
 
 ## Relation to other specifications
 
-- **ash-state-space.pseudo.md** — defines the F2^9 state space being diagnosed
-- **state-admissibility.pseudo.md** — provides the admissibility classification
-- **codeword-set.pseudo.md** — provides the codeword structure used for classification
-- **system-state-classification.pseudo.md** — consumes diagnostics to classify system state
-- **recoverability-semantics.pseudo.md** — consumes diagnostics to determine recovery category
+- **ash-state-space.pseudo.md** — defines `F2^9` and `AshState`.
+- **state-admissibility.pseudo.md** — defines well-formedness, orbit identity, and pairwise reachability.
+- **codeword-set.pseudo.md** — defines canonical codeword membership.
+- **system-state-classification.pseudo.md** — consumes diagnostics plus operational context.
+- **recoverability-semantics.pseudo.md** — consumes operational classes.

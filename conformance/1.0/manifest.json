@@ -1,0 +1,111 @@
+{
+  "product_version": "1.0.0-rc.1",
+  "vectors": [
+    {
+      "path": "README.md",
+      "sha256": "43b60ac9ac9b7a8011c932db1c054779826a85eb5746e599bf8597cbea8c09d8",
+      "size_bytes": 134
+    },
+    {
+      "path": "invalid/invalid-state-signature.json",
+      "sha256": "593699c70e7f30b57b604760be7650db8d58f86a2c0a1b0bc5590e656a745d6c",
+      "size_bytes": 32
+    },
+    {
+      "path": "invalid/manifest.json",
+      "sha256": "a2b538e86d0986e0c68949bcd58f582af7046bcbceaa0d2a400b2af32135015a",
+      "size_bytes": 377
+    },
+    {
+      "path": "invalid/undeclared-rule-id.json",
+      "sha256": "dbdaede72b17cb18db8fd3ad7d9fadb56ef6d2ac753b54eeafcbc773ae3d417a",
+      "size_bytes": 46
+    },
+    {
+      "path": "reachability-proof.json",
+      "sha256": "c6cba2846a2b8c8821b5931f917a01e8d2755d9621c21854ab5a2fb0f721ee48",
+      "size_bytes": 157
+    },
+    {
+      "path": "vectors/averaging.jsonl",
+      "sha256": "22d87ab0986f545d7ec111fc218daac1121b07b22739c5e3ed414f2215047e61",
+      "size_bytes": 275735
+    },
+    {
+      "path": "vectors/axioms.jsonl",
+      "sha256": "c7bdc1bbd59e5ae8bf5bc9f39726c2c8407102ba7da8f379312dfbd989b9333e",
+      "size_bytes": 793
+    },
+    {
+      "path": "vectors/codewords.jsonl",
+      "sha256": "fa566cb58e416288d2e32398860f9061c4a4355ebc012724670cdbbd3b5d9fd5",
+      "size_bytes": 5909
+    },
+    {
+      "path": "vectors/containment.jsonl",
+      "sha256": "ebc8eccd329741f9e4c2d192632973dc2373d12dea3d2af8c8d8d87fd4010f81",
+      "size_bytes": 580
+    },
+    {
+      "path": "vectors/diagnostics.jsonl",
+      "sha256": "2525abd02d4bf0762e1ae750f47be0e26d6c6038fa2ba7f6a43189f21748e1fe",
+      "size_bytes": 12320
+    },
+    {
+      "path": "vectors/fallback.jsonl",
+      "sha256": "e52093c45253518ab86285e74d439043793a70f26c6379efe428a2458e9016a4",
+      "size_bytes": 947
+    },
+    {
+      "path": "vectors/generation-plans.jsonl",
+      "sha256": "e1a0d075c9436035ad015ea662a56d5869a0305fa25cd9b33f9e3b38ecc12a69",
+      "size_bytes": 943
+    },
+    {
+      "path": "vectors/materialization-boundary.jsonl",
+      "sha256": "83ae0e3841a74e3c38077996f9204ade68ac95ec077414488438dc6e4c5de677",
+      "size_bytes": 653
+    },
+    {
+      "path": "vectors/reachability.jsonl",
+      "sha256": "cefd72b8c9c3cc5fc15be2c9171193b6fbc6085dda5f53db9be3d7908b9f3d91",
+      "size_bytes": 315392
+    },
+    {
+      "path": "vectors/realm-identities.jsonl",
+      "sha256": "ea11dfacf735c93bfe8f980d6b0079784be20c7d727f63446b8d31e5a307ec52",
+      "size_bytes": 193426
+    },
+    {
+      "path": "vectors/recovery.jsonl",
+      "sha256": "fcaafa42a76fe6c39aa5487f81a89e8bd48b6e75a43b2d5170e53108267d2a12",
+      "size_bytes": 910
+    },
+    {
+      "path": "vectors/safe-halt.jsonl",
+      "sha256": "cce68599dd7badc042487e01da6a5756ad6ba2b5483210b64b72b92d007c43b1",
+      "size_bytes": 586
+    },
+    {
+      "path": "vectors/state-assessments.jsonl",
+      "sha256": "2f945e8636816a545d694e81f29616929290b09850864ba81230147da3313f5a",
+      "size_bytes": 2032
+    },
+    {
+      "path": "vectors/states.jsonl",
+      "sha256": "3fea92da75f836084a5e65d65db5d6a1e28c67af294d3945b997f19402935def",
+      "size_bytes": 205202
+    },
+    {
+      "path": "vectors/topology.jsonl",
+      "sha256": "6181da6356e1a50b53c8e18c326682d8bf6b80fd70dc70894c6de839c424ad4f",
+      "size_bytes": 422400
+    },
+    {
+      "path": "vectors/transformations.jsonl",
+      "sha256": "5d7de26dd1a7938f204e30f4e478c9811373ff30f7a3f0d2ff43a2ae454869fc",
+      "size_bytes": 3596288
+    }
+  ],
+  "version": "1.0"
+}

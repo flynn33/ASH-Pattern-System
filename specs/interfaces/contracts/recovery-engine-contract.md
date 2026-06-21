@@ -43,7 +43,7 @@ The `RecoveryEngine` module is the single authority for:
 - Deterministic ordering by `ordering_rank` then `policy_id`
 - Post-selection validation: selected state must classify as STABLE
 - If no valid candidate: escalate to containment
-- Must not invent, guess, or heuristically select fallback states
+- Must not invent or heuristically select fallback states
 
 ### Containment
 - Enter containment when fallback fails, propagation risk detected, or operator requests

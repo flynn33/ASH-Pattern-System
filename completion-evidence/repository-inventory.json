@@ -1,0 +1,523 @@
+{
+  "base_commit": "aa917162c915bb5904de3ddec6dbb0a9297300ac",
+  "branch": "release/aps-1.0.0-completion-clean",
+  "files": [
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/CODEOWNERS",
+      "sha256": "ad44d094148a385fd2133436ad448667de80c2cf33ef40079f19aff7ab74ad15",
+      "size_bytes": 173
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/rulesets/main-release-platform-protection.md",
+      "sha256": "abdac0f6904eb9cf1fa5bd4941b54ac901ab87c5176d1246dd385c72f987b58a",
+      "size_bytes": 1551
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/scripts/_common.py",
+      "sha256": "3ff4605ae460770ba36c0b7730abfdaa67af0f3e51aaccf8519cf8d15f104bbf",
+      "size_bytes": 4843
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/scripts/alignment_check.py",
+      "sha256": "f7fc63af48ee44a21e89dc6eef41ba5d3df896da233e485ff9c9a60dd033db98",
+      "size_bytes": 6425
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/scripts/docs_maintenance_check.py",
+      "sha256": "a9b38d4e1da47c373079d3fa9b2691407c54577432d5ec03a9b35edf484413df",
+      "size_bytes": 9630
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/scripts/downstream_conformance_check.py",
+      "sha256": "4af49acf904b6a5b4004cb68c34b9a40429b7ed61e36dd45a42d08616df9d93d",
+      "size_bytes": 5530
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/scripts/gate_integrity_check.py",
+      "sha256": "b1be96c1c429b2efcfb17125efabc5607309615019d1077095599931b944c2f0",
+      "size_bytes": 10628
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/scripts/gate_integrity_selftest.py",
+      "sha256": "2db6a262b00408d5db6262f3070e47e5b008b0242eb396317e6bde944340a2c7",
+      "size_bytes": 5544
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/scripts/math_integrity_check.py",
+      "sha256": "07e1dfaaeecddd8886650bafdc578bc8cfcbc528c2a9b848609d332f4a1ca517",
+      "size_bytes": 9010
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/scripts/no_attribution_check.py",
+      "sha256": "3e09f537191fe33d9ea96112f7c6fcd41244c8478fb56d2fb2177d63c347a097",
+      "size_bytes": 8148
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/scripts/semantic_integrity_check.py",
+      "sha256": "2216699ec52c5dc9f9aa66bee92d0f820a4afcef49803f7b947e5303fc24df59",
+      "size_bytes": 5700
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/scripts/wiki_maintenance_check.py",
+      "sha256": "59cffdc6a71554a84ae20ebec3601d3d6ea15638082ae1325e8499a7aa2c79dd",
+      "size_bytes": 9276
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/workflows/alignment-agent.yml",
+      "sha256": "1ea6aa1c2337c411ad45c8df97222dc3b6c420a37f6bd7174de6f05a2761eaec",
+      "size_bytes": 993
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/workflows/canonical-semantic-integrity-agent.yml",
+      "sha256": "f9f68645f9fe688163965f1d7a669e31a51d724ac1bfb103d578342d5af7a9d8",
+      "size_bytes": 1060
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/workflows/docs-maintenance-agent.yml",
+      "sha256": "0edc3c0d16cc7071144042b3094b19305f56212913dd644d0b019c64e7095ffe",
+      "size_bytes": 1086
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/workflows/downstream-conformance-agent.yml",
+      "sha256": "82cb88ba2141a5f0d247f22234bba8d94b6700f7d4f5060bf4b7aa0c57e4082e",
+      "size_bytes": 4086
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/workflows/gate-integrity.yml",
+      "sha256": "7a82a7b11c8b43b4583fd04b56a1721c7bfdc5c9a673205edc00fce1faacc9fd",
+      "size_bytes": 1171
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/workflows/math-integrity-agent.yml",
+      "sha256": "094112061f125af703bcfb4603e7b02fdc89566716c578162ee99130a3c2af1d",
+      "size_bytes": 1480
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/workflows/no-ai-attribution.yml",
+      "sha256": "e8436b840316b47f48e1b57a9ec11c21d82699e5752845c754089aeaad431052",
+      "size_bytes": 879
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": ".github/workflows/wiki-maintenance-agent.yml",
+      "sha256": "743cc8d3e7e0feee38677c32f8510631237fbfd83c3e61cbf3af15ef7afc42a2",
+      "size_bytes": 3165
+    },
+    {
+      "category": "OTHER",
+      "path": ".gitignore",
+      "sha256": "6a5aea42d872f3d34f9eadafa45d03101f29173c1f5ba976798bbf8e09bb7de4",
+      "size_bytes": 100
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "README.md",
+      "sha256": "a06499fa0b9557cc97941e0cfaff2530f5e8a4f54bece3505fc11a49bfadb86a",
+      "size_bytes": 3368
+    },
+    {
+      "category": "EVIDENCE",
+      "path": "completion-evidence/governance/gate-integrity-hardening-request.md",
+      "sha256": "83a696204b3b94a5fa0a22dceddbbc1be5c8d137869578d3d66aaf0ff0f129b7",
+      "size_bytes": 3932
+    },
+    {
+      "category": "EVIDENCE",
+      "path": "completion-evidence/governance/local-verification.md",
+      "sha256": "d1ee4cd15d2ab68a77cce63bb1ff6395e7d664574fe9c43d834f2f0d83a4e530",
+      "size_bytes": 2493
+    },
+    {
+      "category": "EVIDENCE",
+      "path": "completion-evidence/governance/owner-server-side-steps.md",
+      "sha256": "1edeb65a7628d7dac7fa5760f52c884ea9fcb6dca6e13e8188fb2e176f12925d",
+      "size_bytes": 1915
+    },
+    {
+      "category": "EVIDENCE",
+      "path": "completion-evidence/governance/pinned-actions.md",
+      "sha256": "9cf9ab93b4206f039a77e82a0787dcb3a8e735aef3cde688cbd7a7e815f750b7",
+      "size_bytes": 628
+    },
+    {
+      "category": "EVIDENCE",
+      "path": "completion-evidence/governance/server-ruleset-evidence-2026-06-21.md",
+      "sha256": "e04a0c8cad40829dbe78f0287bd14c27e92951f3bd3b2dca9b25c7e2f2489d06",
+      "size_bytes": 1595
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "docs/00-repository-purpose.md",
+      "sha256": "7844de46691b11dfabffe4fb05080e8f5120c0691e5df1e53a6223e8b7a79d6a",
+      "size_bytes": 2086
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "docs/01-design-philosophy.md",
+      "sha256": "6d15276d07e471781862ef15c918bdcd60a038c3f37c3b1d8f8ddb26077f6198",
+      "size_bytes": 1766
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "docs/02-target-repository-shape.md",
+      "sha256": "e0c48bac818a905007bede5df9df35ea2c08f852686f289cf412607c83233686",
+      "size_bytes": 5573
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "docs/03-design-roadmap.md",
+      "sha256": "f73681e734ce839cc002cea719a792414fc317d31055630efb6cd3f1ad070aeb",
+      "size_bytes": 2176
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": "governance/ai-coding-handoff.md",
+      "sha256": "7ad7181f32c0e2406e2960998eea4e8210214f0504c7e944031120f693d1ee5a",
+      "size_bytes": 5304
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": "governance/github-agents-governance.md",
+      "sha256": "fe64c317735ee28945d0ff74ad95b539416eb9e78cde0c938909c49a301f5a08",
+      "size_bytes": 9032
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": "governance/math-change-notes/2026-05-02-self-contained-canonical-language.md",
+      "sha256": "52d70b023e2dcbdc617c4826539b80ecb02c098261bcca8a18b376c74fc28a5c",
+      "size_bytes": 1155
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": "governance/math-change-notes/README.md",
+      "sha256": "eae231eff4c95248589b6d0d14c98974d1896749b87c8a155508b5a53e47ebbc",
+      "size_bytes": 1579
+    },
+    {
+      "category": "GOVERNANCE",
+      "path": "governance/repository-governance.md",
+      "sha256": "49fc9457c2614af65e6706090673681b2237d03b24aa839cd31be67229662267",
+      "size_bytes": 2993
+    },
+    {
+      "category": "TEMPLATE",
+      "path": "handoff-templates/README.md",
+      "sha256": "b29d8b5bea9afe973a4004d54bdbe87e79362307e9657c29d5b658e0ee12a010",
+      "size_bytes": 1719
+    },
+    {
+      "category": "TEMPLATE",
+      "path": "handoff-templates/common-downstream-handoff-requirements.md",
+      "sha256": "8b981b51c6b3643a7128dfed1ef05519371bf680db7a932bcffcd60e8e6d80ff",
+      "size_bytes": 5255
+    },
+    {
+      "category": "TEMPLATE",
+      "path": "handoff-templates/desktop-implementation-handoff-template.md",
+      "sha256": "1bad0376c664b72c225534e6eb0ec2b83dbf7c9e49d465a1b192f537bf09ce6c",
+      "size_bytes": 2639
+    },
+    {
+      "category": "TEMPLATE",
+      "path": "handoff-templates/mobile-implementation-handoff-template.md",
+      "sha256": "e75e687cad72a7787ab0160a8261fa605fd85c80fa9e7ec9997bbded63716a64",
+      "size_bytes": 2939
+    },
+    {
+      "category": "TEMPLATE",
+      "path": "handoff-templates/service-implementation-handoff-template.md",
+      "sha256": "7484ba89d88627c012d6a73f10f6e1236f753b4dbcd42cd32b25ef48f50eeb71",
+      "size_bytes": 3177
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/algorithms/averaging-operator-semantics.pseudo.md",
+      "sha256": "c5e2b9a6ca20118bbe887eae5d172ead0b9d46e5adb0fc7a68f5682ae4e10c36",
+      "size_bytes": 3539
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/algorithms/axiom-evaluation.pseudo.md",
+      "sha256": "0f205842840399aaf08932e20cde34761874a3296b260f139dc6a04df0e707ba",
+      "size_bytes": 2071
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/algorithms/branching-semantics.pseudo.md",
+      "sha256": "e8344b2d25b33875986e59e43809af460af25b5e319fa861e2670589083f5c57",
+      "size_bytes": 3908
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/algorithms/codeword-transformation-semantics.pseudo.md",
+      "sha256": "254d698a31f3adb52ae1db10ebb7246b266d0a27e827543d4b727436ed88dc84",
+      "size_bytes": 3556
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/algorithms/containment-safe-failure-semantics.pseudo.md",
+      "sha256": "83f1a19c1a0f375e02f2044c238786514d64b122ab6ab5a8bda6e6fa307c8256",
+      "size_bytes": 11969
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/algorithms/generation-planning.pseudo.md",
+      "sha256": "c712a00daded31b330c83c15852cb42cceb2ff54be73b222dc14ba23e51102a3",
+      "size_bytes": 2600
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/algorithms/recovery-fallback-semantics.pseudo.md",
+      "sha256": "0fb8a0750acae0fb263cd842e186ff35881f77b8e498a8f11f159a5d2db270b7",
+      "size_bytes": 6958
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/algorithms/topology-expansion.pseudo.md",
+      "sha256": "1b6ab5d3d13b678c67f185f2f91a60d0dae7a976dcbb6df2b169efa6d15c9a3d",
+      "size_bytes": 1731
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/algorithms/transition-system.pseudo.md",
+      "sha256": "26c456f60fbb5c847714c4a9a49cf8d11ac48ef0a7d0c127da53bd893dd527c2",
+      "size_bytes": 2765
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/core/ash-state-space.pseudo.md",
+      "sha256": "f97694c962d9257d3f0c2c9ecc2c5401ddc07222796efbaa048cc81f9de6e1d5",
+      "size_bytes": 3813
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/core/codeword-set.pseudo.md",
+      "sha256": "8836c19481b82ce2b4b89fb48911f1b3d37d315e2099af091c69dbaf1d382f0c",
+      "size_bytes": 5867
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/core/realm-identity.pseudo.md",
+      "sha256": "1a712745627a0e7e350c8b1cd2626ed61df0d2f25fe8b606949094519097ac51",
+      "size_bytes": 1880
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/core/recoverability-semantics.pseudo.md",
+      "sha256": "cd520d8a9d65c70878dfafe29db8dbee5dcbcbe1e9d2a6b24ef6a6b2e5cf11fd",
+      "size_bytes": 4735
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/core/state-admissibility.pseudo.md",
+      "sha256": "5d9231331849a6359a8d8e537d0434ee78787bb14efe5da03f60e68ba3c1978e",
+      "size_bytes": 5275
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/core/state-validity-diagnostics.pseudo.md",
+      "sha256": "20d3f3cac028b916524a21bb1fb91afe5bb118eee549c376720ce6049d50a74e",
+      "size_bytes": 7419
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/core/system-state-classification.pseudo.md",
+      "sha256": "806ee1e731d6bddec9326150eb645af90b90d08b3256c81436fa272acf7238ff",
+      "size_bytes": 5586
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/interfaces/contracts/artifact-emitter-contract.md",
+      "sha256": "cca1c794405f2d85c80f5de2e1efd6a8f1bc395985a39ebf7ebc6daf64b53243",
+      "size_bytes": 3369
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/interfaces/contracts/axiom-evaluator-contract.md",
+      "sha256": "dc2edf80d2ded0b89b31df15416e24c13139988ab6fd38adaa6195921a692faf",
+      "size_bytes": 2543
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/interfaces/contracts/diagnostics-module-contract.md",
+      "sha256": "88b8d682fa826f128787e6154151c68b32d677239e17ddf4344a084461554a37",
+      "size_bytes": 4321
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/interfaces/contracts/generation-planner-contract.md",
+      "sha256": "108dae3b968a346412ef8f6b9e774e417ac3b51fd76ef91501e3cd6b9f0c0064",
+      "size_bytes": 3822
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/interfaces/contracts/realm-encoder-contract.md",
+      "sha256": "b3fa0deb71ae136c712f402f2b8159b7448ef8756a884369931ab7098bc83fbb",
+      "size_bytes": 2244
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/interfaces/contracts/recovery-engine-contract.md",
+      "sha256": "27ffacc6218812b280ed236bf9052ee825e903498365d735bf57ee9cb338955b",
+      "size_bytes": 4514
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/interfaces/contracts/state-model-contract.md",
+      "sha256": "02193e701bf4e565ca92dbcea05b7c7420cc0926e0d0c90e9d4bedd163972ab8",
+      "size_bytes": 4019
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/interfaces/contracts/topology-generator-contract.md",
+      "sha256": "a408b335ecacff01e38113bcd6cc6089142e40219d521e7081e87406fac11147",
+      "size_bytes": 2410
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/interfaces/contracts/transition-registry-contract.md",
+      "sha256": "f123b02c3390253cba5f50a04e9c69e9c20771c6dc7cff5bcdc7a3c85aa6471f",
+      "size_bytes": 2545
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/interfaces/diagnostic-schema.md",
+      "sha256": "825de7cfdd8598e940dbbcea73cdd78d2db1ba43df9beaee5e51ebdc0d92f8c7",
+      "size_bytes": 6757
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/interfaces/rule-id-taxonomy.md",
+      "sha256": "f5ccaf3063dfe3df749f42dbe4659449a1874a6074e1d8d28ab4cad4a462f892",
+      "size_bytes": 5748
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/interfaces/semantic-contracts.md",
+      "sha256": "c2b965d3155443d45421542056b1fb2934df00a0d858542aaf26c4bacf4c97d3",
+      "size_bytes": 3633
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/registries/fallback-policy-registry.md",
+      "sha256": "b108d6c4127da9ea375899e97c34048ded4ea3a7cb624ef24f18bfda5f8deaaa",
+      "size_bytes": 8422
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/verification/conformance-categories.md",
+      "sha256": "979f287e3521a750997814d1bc3a85893433ce885cde6669c919511656799bf2",
+      "size_bytes": 3594
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/verification/implementation-acceptance.md",
+      "sha256": "db42cd27a2f5700066e50b446d0d9ae627baea25f443f43717b68236bf60953c",
+      "size_bytes": 3601
+    },
+    {
+      "category": "NORMATIVE",
+      "path": "specs/verification/invariant-spec.md",
+      "sha256": "2b7dbd52b539810b3f957ed23bcbcd7fffd068b3f01ea43f24b51a0e8f98866b",
+      "size_bytes": 8528
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "wiki/Canonical-Math-Baseline.md",
+      "sha256": "a5c1e4512a128120c06b4e5c47d8178bc9f5bd4a9eea4066be1c3f645d7cfb71",
+      "size_bytes": 1527
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "wiki/Contracts-and-Verification.md",
+      "sha256": "ccb492fc679169b2ef161f6a1fa8258cecd57317eb29723913bd4371cd45bbe5",
+      "size_bytes": 1912
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "wiki/Downstream-Handoff-Guide.md",
+      "sha256": "0616b99783d519a56ad523ef3bb8df3728bd558e7f83f5e9abf442c93fd93830",
+      "size_bytes": 1176
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "wiki/Getting-Started.md",
+      "sha256": "51c64cdfead997f5e2bdc8a6ad6f8141ee2c03f6e3a75aa3013d6440f22af799",
+      "size_bytes": 1730
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "wiki/Glossary.md",
+      "sha256": "7734bced2c7db2310b36f95d81cfe3b302355ffce3c6939518cc189a7d7e24a7",
+      "size_bytes": 1238
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "wiki/Governance-and-Agents.md",
+      "sha256": "bfa1c59f44552119a3faaa4d770be0968e21fc765c7c0c49e9a7d60894a9b263",
+      "size_bytes": 1738
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "wiki/Home.md",
+      "sha256": "a7de9a2433ee082d4867f407ab04bd5b00e45a44aad12b4ff76f93207b6dde4c",
+      "size_bytes": 3039
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "wiki/README.md",
+      "sha256": "8b9896222786f53ab758cdaef27563d9934e3ceb909c72e404f01c73f1fb2430",
+      "size_bytes": 309
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "wiki/Recovery-and-Safety-Semantics.md",
+      "sha256": "81073c03c6bbb6b8f4bda7508ec12d4c17265c8a0851c776519d0d7bde8932f1",
+      "size_bytes": 1882
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "wiki/Specification-Layers.md",
+      "sha256": "7c75ddada615f06fc65881a91dd824a2257cfebd368ec8c78e446a66fc856478",
+      "size_bytes": 1701
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "wiki/Wiki-Maintenance-Playbook.md",
+      "sha256": "f615a6e1685587635a2ca37560ce3793a9dafac7f314f05fb5fdcc61ea78780b",
+      "size_bytes": 1362
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "wiki/_Footer.md",
+      "sha256": "01fb73ed2415c58aff53cf7bdde6b21f3e5a9241f6e0e4c3c7c3cbddcfce49da",
+      "size_bytes": 194
+    },
+    {
+      "category": "INFORMATIVE",
+      "path": "wiki/_Sidebar.md",
+      "sha256": "ee5784f1606df1b641d42fae43f2762c9658191f5bc2b09ea63b78ed3eab5c89",
+      "size_bytes": 488
+    }
+  ],
+  "tracked_file_count": 86
+}

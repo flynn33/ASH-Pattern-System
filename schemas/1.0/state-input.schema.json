@@ -1,0 +1,31 @@
+{
+  "$id": "https://github.com/flynn33/ASH-Pattern-System/schemas/1.0/state-input.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Versioned APS state-input record.",
+  "product_version": "1.0.0-rc.1",
+  "properties": {
+    "data": {
+      "type": "object"
+    },
+    "id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "product_version": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "product_version",
+    "id",
+    "data"
+  ],
+  "title": "APS State Input",
+  "type": "object"
+}

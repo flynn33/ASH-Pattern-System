@@ -8,7 +8,7 @@ The `ArtifactEmitter` module materializes an abstract generation plan for a spec
 
 The `ArtifactEmitter` module is the single authority for:
 
-- materializing a generation plan into target-specific artifacts (files, modules, services, etc.)
+- materializing a generation plan into target-specific artifacts such as files, modules, and services
 - preserving the semantic meaning of the plan during materialization
 - producing emission diagnostics
 
@@ -19,7 +19,7 @@ The `ArtifactEmitter` module is the single authority for:
 
 ## Required outputs
 
-- Materialized artifacts (files, modules, services, etc.)
+- Materialized artifacts such as files, modules, and services
 - Emission diagnostics
 
 ## Required behaviors
@@ -36,7 +36,7 @@ The `ArtifactEmitter` module is the single authority for:
 
 ### No invention of missing semantics
 - If the plan does not define a behavior, the emitter must not invent one
-- If the plan is incomplete or ambiguous, the emitter must fail with a diagnostic rather than guess
+- If the plan is incomplete or ambiguous, the emitter must fail with a diagnostic rather than invent behavior
 - The emitter must not substitute local conventions, defaults, or assumptions for plan-defined semantics
 
 ### Explicit receipt of plan

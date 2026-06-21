@@ -18,10 +18,11 @@ The ASH Pattern System is a platform-agnostic framework for:
 This repository defines:
 
 - the canonical ASH state space as `F2^9` with 512 states
-- the canonical codeword set `C ⊂ F2^9` as a fixed 16-member `[9, 4, 4]` code
+- the canonical codeword set `C ⊂ F2^9` as a fixed 16-member `[9, 4, 4]` doubly-even code with 32 orbits
 - canonical XOR-by-codeword transitions, averaging, branching, topology expansion, and realm identity
 - canonical admissibility, diagnostics, classification, recoverability, fallback, containment, and safe-failure semantics
 - canonical contracts, diagnostic schema, taxonomy, and verification requirements
+- versioned schemas, canonical data, examples, and conformance corpus artifacts for downstream validation
 - governance, GitHub agents, wiki material, and handoff templates that reinforce the same canonical baseline
 
 This repository does not define:
@@ -33,6 +34,15 @@ This repository does not define:
 
 ## Repository map
 
+- `VERSION` — current product version
+- `product-manifest.json` — machine-readable product manifest
+- `CHANGELOG.md` — release history for the canonical specification baseline
+- `PRODUCT-STATUS.md` — current objective release-candidate status
+- `PUBLIC-SPECIFICATION-API.md` — public APS compatibility surface
+- `schemas/` — versioned JSON Schema entry points
+- `canonical-data/` — versioned codewords, realms, orbits, transitions, policies, rule registry, and artifact index
+- `conformance/` — versioned implementation-neutral conformance corpus
+- `examples/` — valid and invalid schema examples
 - `docs/00-repository-purpose.md` — repository role and boundaries
 - `docs/01-design-philosophy.md` — governing design principles
 - `docs/02-target-repository-shape.md` — canonical repository structure
@@ -43,12 +53,12 @@ This repository does not define:
 - `specs/interfaces/` — contracts, diagnostic schema, and rule-ID taxonomy
 - `specs/verification/` — invariants, conformance categories, and acceptance requirements
 - `handoff-templates/` — downstream delivery templates and conformance evidence requirements
+- `tools/product/` — standard-library product generation, validation, conformance, and archive tooling
 - `wiki/` — GitHub Wiki source pages aligned to canonical repository content
-- `governance/repository-governance.md` — repository rules for current canonical content
-- `governance/ai-coding-handoff.md` — coding-agent instructions for downstream implementation work
-- `governance/github-agents-governance.md` — GitHub agent policy and enforcement boundaries
+- `governance/` — repository rules, protected handoff/governance policy, and math-change notes
 - `.github/workflows/` — repository agent workflows
 - `.github/scripts/` — repository agent scripts
+- `completion-evidence/` — temporary completion evidence, protected-surface baseline, and verification reports
 
 ## Intended use
 

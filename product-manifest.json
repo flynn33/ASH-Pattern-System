@@ -1,0 +1,15 @@
+{
+  "canonical_data_version": "1.0",
+  "canonical_repository": "https://github.com/flynn33/ASH-Pattern-System",
+  "conformance_corpus_version": "1.0",
+  "copyright_holder": "James Daley",
+  "hashes": {},
+  "license": "LicenseRef-ASH-Pattern-System-Personal-Academic",
+  "product_identifier": "aps",
+  "product_name": "ASH Pattern System",
+  "release_tag": "v1.0.0-rc.1",
+  "schema_version": "1.0",
+  "source_commit": "aa917162c915bb5904de3ddec6dbb0a9297300ac",
+  "status": "RELEASE_CANDIDATE",
+  "version": "1.0.0-rc.1"
+}

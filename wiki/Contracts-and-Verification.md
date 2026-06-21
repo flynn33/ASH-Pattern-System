@@ -16,6 +16,11 @@ Downstream implementations are conformant only when module contracts and verific
 | Diagnostics | `specs/interfaces/contracts/diagnostics-module-contract.md` |
 | RecoveryEngine | `specs/interfaces/contracts/recovery-engine-contract.md` |
 
+Module notes:
+
+- `RealmEncoder` produces realm identities. A realm is the stable semantic encoding of an ASH state; there is exactly one realm per F2^9 vertex (512 realms). See `specs/core/realm-identity.pseudo.md`.
+- `TopologyGenerator` generates deterministic ternary topology from the ASH state model.
+
 ## Materialization Boundary (Locked)
 
 - `GenerationPlanner`: computes abstract plan, no side effects.
@@ -39,6 +44,8 @@ Only these are valid:
 - `CONFORMANT`
 - `CONFORMANT WITH CAVEATS`
 - `NON-CONFORMANT`
+
+`PARTIAL` is not a valid acceptance judgment — there is no partial conformance.
 
 ## Conformance Gate Summary
 

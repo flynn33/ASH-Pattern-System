@@ -90,8 +90,11 @@ END FUNCTION
 
 Validity and admissibility for the canonical 9-bit model are defined by:
 
-- **Codeword-orbit membership** — whether a state is reachable from known valid states via codeword transformations
-- **Admissibility classification** — VALID, TRANSFORMATION_COMPATIBLE, TRANSFORMATION_INCOMPATIBLE, or UNCLASSIFIED
+- **Input well-formedness** — whether a candidate can be represented as exactly nine binary coordinates
+- **Realm identity** — the deterministic `APS-REALM-000` through `APS-REALM-511` mapping
+- **Orbit identity** — the deterministic `APS-ORBIT-00` through `APS-ORBIT-31` partition
+- **Pairwise reachability** — whether `source ⊕ target` is a member of the canonical codeword set
+- **Operational assessment** — context-bound classification under a validated operational policy
 
 See `specs/core/state-admissibility.pseudo.md` for the full admissibility specification.
 See `specs/core/codeword-set.pseudo.md` for the canonical codeword structure.
@@ -99,9 +102,9 @@ See `specs/core/codeword-set.pseudo.md` for the canonical codeword structure.
 ## Required invariants
 
 1. The state space is F2^9 — all states are 9-bit binary vectors
-2. Normalization is deterministic — the same candidate state always produces the same result
+2. Structural normalization is deterministic and realm-preserving — the same candidate state always produces the same state or the same input-validation failure
 3. Codeword transformations are deterministic — the same state and codeword always produce the same result
-4. State validity can be explained diagnostically
+4. Every well-formed state has one realm ID and one orbit ID
 5. All 9 coordinates are part of the algebraic structure — no coordinate is excluded from the foundational model
 
 ## Related specifications

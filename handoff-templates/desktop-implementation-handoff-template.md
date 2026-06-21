@@ -37,7 +37,7 @@ Document how diagnostics will be surfaced in the desktop context:
 ### 5. Materialization-boundary expectations
 Document how the planner/emitter boundary is respected:
 - Where planning occurs in the desktop application lifecycle
-- Where materialization occurs (file emission, UI rendering, etc.)
+- Where materialization occurs, including file emission and UI rendering
 - How the boundary is enforced architecturally
 
 ### 6. Packaging / build / deployment decisions

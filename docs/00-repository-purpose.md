@@ -30,6 +30,8 @@ That means the repository must make the following explicit:
 - how a generation plan is produced before side effects occur
 - what downstream implementations must preserve
 
+The canonical definitions for these points live under [`specs/core/`](../specs/core) and [`specs/algorithms/`](../specs/algorithms). In particular, the system-state classes above are specified in [`system-state-classification.pseudo.md`](../specs/core/system-state-classification.pseudo.md), and full-9-bit normalization and validity in [`ash-state-space.pseudo.md`](../specs/core/ash-state-space.pseudo.md) and [`state-admissibility.pseudo.md`](../specs/core/state-admissibility.pseudo.md).
+
 ## What this repository is not for
 
 This repository is not a place to settle language-specific engineering decisions.

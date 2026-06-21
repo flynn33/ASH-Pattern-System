@@ -1,0 +1,9 @@
+{
+  "examples": [
+    {
+      "path": "ash-state-too-short.json",
+      "reason": "state_signature must contain exactly nine binary characters",
+      "schema": "schemas/1.0/ash-state.schema.json"
+    }
+  ]
+}

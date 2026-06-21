@@ -35,7 +35,7 @@ flowchart LR
 | If you need to... | Open this page |
 |---|---|
 | Onboard quickly and read in the right order | [Getting Started](Getting-Started) |
-| Understand the canonical 9D math baseline | [Canonical Math Baseline](Canonical-Math-Baseline) |
+| Understand the canonical 9-bit / `F2^9` math baseline | [Canonical Math Baseline](Canonical-Math-Baseline) |
 | Navigate all specs by layer | [Specification Layers](Specification-Layers) |
 | Understand recovery, fallback, containment, and safe halt | [Recovery and Safety Semantics](Recovery-and-Safety-Semantics) |
 | Implement against contracts and prove conformance | [Contracts and Verification](Contracts-and-Verification) |
@@ -47,7 +47,7 @@ flowchart LR
 ## Canonical Guardrails
 
 1. Main is canonical semantics, not implementation code.
-2. Full 9-bit state space (`F2^9`) is canonical.
+2. Full 9-bit state space (`F2^9`, i.e. 9-dimensional over F2) is canonical.
 3. Canonical transition is XOR-by-codeword (`x' = x XOR c`).
 4. Branching is first-class.
 5. Diagnostics are mandatory across detection, recovery, escalation, and terminal halt.

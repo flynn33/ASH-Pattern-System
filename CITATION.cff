@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this specification, cite it as below."
+title: "ASH Pattern System"
+authors:
+  - family-names: "Daley"
+    given-names: "James"
+version: "1.0.0-rc.1"
+repository-code: "https://github.com/flynn33/ASH-Pattern-System"
+license: "LicenseRef-ASH-Pattern-System-Personal-Academic"

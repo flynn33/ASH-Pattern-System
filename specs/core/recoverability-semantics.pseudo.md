@@ -1,99 +1,99 @@
-# Recoverability Semantics — canonical specification (Canonical Baseline)
+# Recoverability Semantics — canonical specification (1.0 release candidate)
 
 ## Purpose
 
-This specification defines the **recoverability layer** of the ASH Pattern System.
+This specification defines the deterministic mapping from each operational system-state class to the allowed recovery category.
 
-Recoverability determines the deterministic mapping from each system-state class to the **allowed recovery category**. It answers: given the current system-state classification, what category of recovery action is permitted, required, or forbidden?
+Structural normalization is not a recovery category. It occurs before operational classification and preserves realm identity.
 
 ## Recovery categories
 
 ```text
 ENUM RecoveryCategory
     NO_ACTION
-    NORMALIZE_STATE
+    TARGET_RESOLUTION_REQUIRED
     APPLY_CORRECTION
     FALLBACK_REQUIRED
-    CONTAINMENT_REQUIRED
-    ESCALATION_REQUIRED
+    CONTAINMENT_ACTIVE
+    EXTERNAL_ESCALATION_REQUIRED
     TERMINAL_NO_RECOVERY
 END ENUM
 ```
 
 ### NO_ACTION
-- **Applies to**: `STABLE`
-- **Meaning**: The system is healthy. No recovery action is needed.
 
-### NORMALIZE_STATE
+- **Applies to**: `STABLE`
+- **Meaning**: The state is allowed by the active context. No recovery action is needed.
+
+### TARGET_RESOLUTION_REQUIRED
+
 - **Applies to**: `UNSTABLE`
-- **Meaning**: The state is transformation-compatible but not in a recognized valid configuration. Recovery consists of restoring the state to a valid configuration using the codeword structure.
-- **Preconditions**: State is `TRANSFORMATION_COMPATIBLE`. A normalization path exists.
-- **Blocked when**: a normalization path cannot be computed from the canonical definitions.
+- **Meaning**: Same-orbit stable candidates exist, but policy cannot select exactly one target. No mutation is allowed until policy or context resolves the ambiguity.
 
 ### APPLY_CORRECTION
+
 - **Applies to**: `CORRECTABLE`
-- **Meaning**: The state can be corrected to a valid state through a known codeword correction sequence.
-- **Preconditions**: A specific correction path is known. The correction produces a `VALID` state.
-- **Postconditions**: After correction, the state must classify as `STABLE`.
+- **Meaning**: Apply the single codeword `current ⊕ target` to reach the selected same-orbit stable target.
 
 ### FALLBACK_REQUIRED
+
 - **Applies to**: `DEGRADED`
-- **Meaning**: The state is transformation-incompatible or correction is ambiguous. Select a known-good fallback state from the fallback-policy registry.
-- **Blocked when**: No fallback-policy registry is available, or registry contains no candidates. Escalate to containment.
+- **Meaning**: No same-orbit correction is currently available. A validated fallback policy instance must select an authorized replacement or escalate to containment.
 
-### CONTAINMENT_REQUIRED
+### CONTAINMENT_ACTIVE
+
 - **Applies to**: `CONTAINED`
-- **Meaning**: Restrict operations to prevent error propagation. Await external resolution.
-- **Escalation**: If containment boundary is breached, escalate to `SAFE_HALT`.
+- **Meaning**: Restricted operations are active while diagnostics and external resolution proceed.
 
-### ESCALATION_REQUIRED
+### EXTERNAL_ESCALATION_REQUIRED
+
 - **Applies to**: `FAILED`
-- **Meaning**: No automated recovery path exists. Escalate to external authority.
+- **Meaning**: Automated correction and fallback are unavailable or exhausted. External authority is required.
 
 ### TERMINAL_NO_RECOVERY
+
 - **Applies to**: `SAFE_HALT`
-- **Meaning**: The system has already halted. No further transitions or recovery actions.
+- **Meaning**: The process is in a terminal no-mutation state.
 
 ## Deterministic mapping
 
 ```text
 FUNCTION classify_recoverability(state_class: SystemStateClass) -> RecoveryCategory
     SWITCH state_class
-        CASE STABLE:                RETURN NO_ACTION
-        CASE UNSTABLE:              RETURN NORMALIZE_STATE
-        CASE CORRECTABLE:           RETURN APPLY_CORRECTION
-        CASE DEGRADED:              RETURN FALLBACK_REQUIRED
-        CASE CONTAINED:             RETURN CONTAINMENT_REQUIRED
-        CASE FAILED:                RETURN ESCALATION_REQUIRED
-        CASE SAFE_HALT:             RETURN TERMINAL_NO_RECOVERY
+        CASE STABLE:      RETURN NO_ACTION
+        CASE UNSTABLE:    RETURN TARGET_RESOLUTION_REQUIRED
+        CASE CORRECTABLE: RETURN APPLY_CORRECTION
+        CASE DEGRADED:    RETURN FALLBACK_REQUIRED
+        CASE CONTAINED:   RETURN CONTAINMENT_ACTIVE
+        CASE FAILED:      RETURN EXTERNAL_ESCALATION_REQUIRED
+        CASE SAFE_HALT:   RETURN TERMINAL_NO_RECOVERY
     END SWITCH
 END FUNCTION
 ```
 
 ## Blocked recovery conditions
 
-| Recovery Category | Blocked When | Fallback Behavior |
+| Recovery Category | Blocked When | Escalation |
 |---|---|---|
-| `NORMALIZE_STATE` | Normalization path not computable | Normalization is `BLOCKED`; escalate to containment |
-| `APPLY_CORRECTION` | Correction path not computable | Escalate to `FALLBACK_REQUIRED` |
-| `FALLBACK_REQUIRED` | No registry or no candidates | Escalate to `CONTAINMENT_REQUIRED` |
-| `CONTAINMENT_REQUIRED` | Containment boundary breached | Escalate to `TERMINAL_NO_RECOVERY` |
-| `ESCALATION_REQUIRED` | No external authority reachable | Escalate to `TERMINAL_NO_RECOVERY` |
+| `TARGET_RESOLUTION_REQUIRED` | Policy still cannot select one target | remain `UNSTABLE` or enter `DEGRADED` if context invalidates candidates |
+| `APPLY_CORRECTION` | Target mismatch, codeword mismatch, or post-check failure | `FALLBACK_REQUIRED` |
+| `FALLBACK_REQUIRED` | No valid policy instance or no valid candidate | containment escalation |
+| `CONTAINMENT_ACTIVE` | Containment boundary breached | `TERMINAL_NO_RECOVERY` |
+| `EXTERNAL_ESCALATION_REQUIRED` | External authority unavailable | `TERMINAL_NO_RECOVERY` |
 
 ## Invariants
 
-1. **Determinism** — the same system-state class always maps to the same recovery category
-2. **Completeness** — every system-state class has a defined recovery category
-3. **Monotonic escalation** — blocked recovery always escalates to a more severe category
-4. **No silent recovery** — every recovery action must produce a diagnostic record
-5. **Finality** — `TERMINAL_NO_RECOVERY` is the completed terminal state
-6. **Full-state semantics** — recovery categories are expressed in full 9-bit state terms
+1. Every system-state class maps to exactly one recovery category.
+2. Blocked recovery never silently succeeds.
+3. Correction and fallback are distinct actions.
+4. Cross-orbit replacement is fallback, not canonical codeword motion.
+5. Escalation is monotonic unless an external authority records a policy-permitted resolution.
+6. `TERMINAL_NO_RECOVERY` is final inside APS semantics.
 
 ## Relation to other specifications
 
-- **system-state-classification.pseudo.md** — provides the system-state class that maps to a recovery category
-- **recovery-fallback-semantics.pseudo.md** — implements the algorithmic details of correction, fallback, and escalation
-- **containment-safe-failure-semantics.pseudo.md** — implements containment and safe-halt behavior
-- **state-validity-diagnostics.pseudo.md** — provides diagnostics that inform classification and recovery
-- **codeword-set.pseudo.md** — provides the codeword structure used for normalization and correction
-- **state-admissibility.pseudo.md** — provides admissibility classification
+- **system-state-classification.pseudo.md** — provides the operational class.
+- **recovery-fallback-semantics.pseudo.md** — implements correction and fallback.
+- **containment-safe-failure-semantics.pseudo.md** — implements containment and safe halt behavior.
+- **state-validity-diagnostics.pseudo.md** — provides diagnostic inputs.
+- **codeword-set.pseudo.md** — defines the codeword structure used for correction.
