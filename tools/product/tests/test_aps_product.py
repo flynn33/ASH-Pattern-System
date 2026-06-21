@@ -245,6 +245,39 @@ class ProductOutputTests(unittest.TestCase):
                 archived_manifest = json.loads(archive.read("product-manifest.json"))
             self.assertEqual(release_commit, archived_manifest["source_commit"])
 
+    def test_release_readiness_rejects_root_manifest_release_mismatch(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir) / "source"
+            output = root / "release"
+            release_commit = "3" * 40
+            stale_commit = "4" * 40
+            root.mkdir()
+            aps_product.build_product_tree(root, source_commit=stale_commit)
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(Path("tools/product/build_release_archive.py")),
+                    "--root",
+                    str(root),
+                    "--output",
+                    str(output),
+                    "--source-commit",
+                    release_commit,
+                    "--verify",
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+
+            self.assertEqual(0, result.returncode, result.stdout)
+            errors = aps_product.validate_release_outputs(root, release_commit)
+            self.assertTrue(
+                any("root product-manifest.json source_commit does not match release-manifest.json" in error for error in errors),
+                errors,
+            )
+
     def test_required_command_entrypoints_support_self_test(self):
         commands = [
             "generate_canonical_data.py",
