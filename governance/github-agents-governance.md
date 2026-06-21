@@ -21,12 +21,13 @@ The canonical ASH Pattern System repository may contain:
 - pseudocode files (`.pseudo.md`)
 - GitHub Actions workflow YAML under `.github/workflows/`
 - small governance and sentinel Python scripts under `.github/scripts/`
+- product support tooling under `tools/product/`
 
-The canonical repository may not contain platform, product, build, or runtime implementation code outside the governance-agent allowlist.
+The canonical repository may not contain platform, build, or runtime implementation code outside the governance and product-tooling allowlists.
 
 ## Agents
 
-Seven agents/workflows are defined. Six guard the canonical repository directly on `push` and `pull_request`; one is a reusable workflow for downstream implementation repositories.
+Eight agents/workflows are defined. Seven guard the canonical repository directly; one is a reusable workflow for downstream implementation repositories.
 
 ### 1. Alignment Agent
 
@@ -135,6 +136,7 @@ The agent validates the six canonical downstream conformance artifacts defined i
 ### 5. No AI Attribution Agent
 
 **Workflow:** `.github/workflows/no-ai-attribution.yml`
+**Script:** `.github/scripts/no_attribution_check.py`
 **Behavior:** blocking.
 **Triggers:** every `push` and `pull_request` on any branch.
 
@@ -143,12 +145,31 @@ Checks:
 - AI-attribution markers in commit messages
 - AI-associated author or committer identities
 - AI-attribution markers in changed file content
+- prohibited attribution tokens in branch and tag names
+- prohibited attribution tokens in non-grandfathered changed paths
 
-### 6. Wiki Maintenance Agent
+### 6. Gate Integrity Agent
+
+**Workflow:** `.github/workflows/gate-integrity.yml`
+**Script:** `.github/scripts/gate_integrity_check.py`
+**Self-test:** `.github/scripts/gate_integrity_selftest.py`
+**Behavior:** blocking.
+**Triggers:** `pull_request_target` for opened, reopened, synchronize, ready-for-review, label, and unlabel events.
+
+Checks:
+
+- product pull requests do not add, edit, delete, or rename protected governance paths
+- historical protected-path touches inside a pull-request branch are detected even if later reverted
+- governance pull requests are isolated to the governance allowlist
+- governance pull requests use a `governance/` branch and the `governance-change` label
+- owner approval is present on the current head commit
+- API, pagination, payload, or policy errors fail closed
+
+### 7. Wiki Maintenance Agent
 
 **Workflow:** `.github/workflows/wiki-maintenance-agent.yml`
 **Script:** `.github/scripts/wiki_maintenance_check.py`
-**Behavior:** controlled by workflow `REPORT_ONLY` mode.
+**Behavior:** blocking on hard violations; drift notices remain warnings.
 **Triggers:** every `push` and `pull_request` on any branch.
 
 Checks:
@@ -159,11 +180,11 @@ Checks:
 - drift signal when canonical docs/specs/governance/agent surfaces change without a wiki update
 - optional GitHub Wiki sync on `push` to `main`
 
-### 7. Docs Maintenance Agent
+### 8. Docs Maintenance Agent
 
 **Workflow:** `.github/workflows/docs-maintenance-agent.yml`
 **Script:** `.github/scripts/docs_maintenance_check.py`
-**Behavior:** controlled by workflow `REPORT_ONLY` mode.
+**Behavior:** blocking on hard violations; drift notices remain warnings.
 **Triggers:** every `push` and `pull_request` on any branch.
 
 Checks:
@@ -176,9 +197,9 @@ Checks:
 
 ## Rollout state
 
-Agent blocking behavior is controlled by the `REPORT_ONLY` environment variable in each workflow.
+Critical sentinel workflows run blocking in protected-branch operation. `REPORT_ONLY` is retained only as a local diagnostic switch inside the Python helpers.
 
 - `REPORT_ONLY="1"` prints full findings but exits successfully
 - `REPORT_ONLY="0"` makes the workflow blocking
 
-Promotion to blocking should happen only after the repository is clean against the current canonical baseline and the corresponding rules are tuned to avoid false positives.
+Protected branch rulesets must require the blocking sentinel checks, Gate Integrity, CODEOWNER review, latest-push approval, and no bypass actors before product completion branches are created.

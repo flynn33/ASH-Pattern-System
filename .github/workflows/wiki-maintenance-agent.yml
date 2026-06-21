@@ -7,7 +7,6 @@ name: Wiki Maintenance Agent
 #   - drift signal when canonical docs/specs/governance changed without wiki updates
 #   - automatic sync from wiki/ to <repo>.wiki.git on push to main
 #
-# Report-only on initial landing; promotion to blocking is a follow-up commit.
 # See governance/github-agents-governance.md for policy.
 
 on:
@@ -17,10 +16,10 @@ on:
     branches: ["**"]
 
 permissions:
-  contents: write
+  contents: read
 
 env:
-  REPORT_ONLY: "1"
+  REPORT_ONLY: "0"
 
 jobs:
   wiki-maintenance:
@@ -28,12 +27,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: "3.11"
 
@@ -45,11 +45,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: wiki-maintenance
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Detect wiki changes
         id: detect

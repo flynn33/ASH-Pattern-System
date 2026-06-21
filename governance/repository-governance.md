@@ -41,6 +41,7 @@ This repository may contain:
 - Markdown specifications and governance
 - pseudocode specifications
 - GitHub workflows and small governance scripts that enforce canonical integrity
+- product support tooling under `tools/product/` for generation, validation, conformance, evidence, and release packaging
 - wiki source pages and downstream handoff templates aligned to the canonical baseline
 - small supporting text or JSON artifacts that clarify canonical semantics
 

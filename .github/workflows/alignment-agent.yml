@@ -5,11 +5,6 @@ name: Alignment Agent
 #   - build / package / platform-tree files anywhere in the repo
 #   - hierarchy-inversion language treating a downstream repo as canonical authority
 #
-# This workflow runs in report-only mode on initial landing (REPORT_ONLY: "1").
-# The Python script honors REPORT_ONLY and always exits 0 while still printing
-# the full violation report and GitHub annotations. Promotion to blocking is a
-# follow-up commit that flips REPORT_ONLY to "0" after the first clean run.
-#
 # See governance/github-agents-governance.md for full policy.
 
 on:
@@ -19,7 +14,10 @@ on:
     branches: ["**"]
 
 env:
-  REPORT_ONLY: "1"
+  REPORT_ONLY: "0"
+
+permissions:
+  contents: read
 
 jobs:
   alignment:
@@ -27,12 +25,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: "3.11"
 

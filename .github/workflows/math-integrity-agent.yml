@@ -21,7 +21,10 @@ on:
     branches: ["**"]
 
 env:
-  REPORT_ONLY: "1"
+  REPORT_ONLY: "0"
+
+permissions:
+  contents: read
 
 jobs:
   math-integrity:
@@ -29,12 +32,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: "3.11"
 

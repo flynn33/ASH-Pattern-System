@@ -42,9 +42,10 @@ IMPL_EXTENSIONS = {
     ".nim", ".zig", ".v", ".sol",
 }
 
-# Exact-path allowlist. .github/scripts/** is allowed via a prefix check below;
-# anything else must be listed here explicitly.
-ALLOWED_IMPL_PREFIXES = (".github/scripts/",)
+# Exact-path allowlist. Product support tooling is permitted only under
+# tools/product/ so completion tooling can be reviewed without admitting
+# platform/runtime source trees into the canonical repository.
+ALLOWED_IMPL_PREFIXES = (".github/scripts/", "tools/product/")
 ALLOWED_IMPL_EXACT: set[str] = set()
 
 # -------------------------------------------------------------------

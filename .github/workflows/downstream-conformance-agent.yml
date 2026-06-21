@@ -9,7 +9,7 @@ name: Downstream Conformance Agent
 #
 #   jobs:
 #     conformance:
-#       uses: flynn33/ASH-Pattern-System/.github/workflows/downstream-conformance-agent.yml@main
+#       uses: flynn33/ASH-Pattern-System/.github/workflows/downstream-conformance-agent.yml@<protected-sha>
 #       with:
 #         conformance-root: conformance/
 #         # ... override individual artifact paths if needed
@@ -73,6 +73,8 @@ jobs:
   downstream-conformance:
     name: Downstream conformance check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       CONFORMANCE_ROOT: ${{ inputs.conformance-root }}
       MODULE_MAPPING_PATH: ${{ inputs.module-mapping-path }}
@@ -84,19 +86,22 @@ jobs:
       REQUIRE_ALL: ${{ inputs.require-all }}
     steps:
       - name: Checkout calling repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: "3.11"
 
       - name: Fetch downstream conformance check script
-        uses: actions/checkout@v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
-          repository: flynn33/ASH-Pattern-System
-          ref: main
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
           path: .ash-canonical
+          persist-credentials: false
           sparse-checkout: |
             .github/scripts
 
