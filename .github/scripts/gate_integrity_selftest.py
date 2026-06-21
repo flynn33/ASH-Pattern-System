@@ -70,6 +70,17 @@ def assert_workflow_hardening() -> None:
 
 def main() -> int:
     case("legitimate product file", [item("README.md")], True)
+    case(
+        "product math-change note addition",
+        [item("specs/core/state-admissibility.pseudo.md"), item("governance/math-change-notes/2026-06-21-product-semantic-closure.md", "added")],
+        True,
+    )
+    case("product math-change note readme edit", [item("governance/math-change-notes/README.md")], False)
+    case(
+        "product existing math-change note edit",
+        [item("governance/math-change-notes/2026-05-02-self-contained-canonical-language.md")],
+        False,
+    )
     case("whole workflow bypass", [item(".github/workflows/alignment-agent.yml")], False)
     case("pattern-line exemption", [item(".github/scripts/gate_integrity_check.py")], False)
     case("changed-file skip for checker", [item(".github/scripts/gate_integrity_selftest.py")], False)
