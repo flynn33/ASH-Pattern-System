@@ -1,7 +1,7 @@
 {
   "archive_name": "ash-pattern-system-1.0.0-rc.1.zip",
-  "archive_sha256": "e75d67fe9127f3fdf432a18136cbf1dededcfcf6e35eaf826a93972f9c9777a0",
-  "archive_size_bytes": 5718068,
+  "archive_sha256": "fee0485dddc250b8f11dc05b516b64de6fad243cd1b3646c9ecde947816ba6ab",
+  "archive_size_bytes": 5739267,
   "canonical_data_version": "1.0",
   "conformance_corpus_version": "1.0",
   "files": [
@@ -37,13 +37,13 @@
     },
     {
       "path": ".github/scripts/gate_integrity_check.py",
-      "sha256": "b1be96c1c429b2efcfb17125efabc5607309615019d1077095599931b944c2f0",
-      "size_bytes": 10628
+      "sha256": "c66186dadbb830c48ce02a0929fb0addb95b4cd9c06eae6180155147a4d27f69",
+      "size_bytes": 11114
     },
     {
       "path": ".github/scripts/gate_integrity_selftest.py",
-      "sha256": "2db6a262b00408d5db6262f3070e47e5b008b0242eb396317e6bde944340a2c7",
-      "size_bytes": 5544
+      "sha256": "add9f6bb5158b3f7e8396e448b58a7c4f090fa778c4c303974ad3200e8ca0d0f",
+      "size_bytes": 6048
     },
     {
       "path": ".github/scripts/math_integrity_check.py",
@@ -182,8 +182,8 @@
     },
     {
       "path": "RELEASE-PROCESS.md",
-      "sha256": "c3eaf8b8bfdf8e8db14fbc71204703e4209b0d575c80044a9f90763ad5f0f9b3",
-      "size_bytes": 230
+      "sha256": "f292b2a0fac0e8c1cbf9f5185566c8aa797119d53b19938577167ee270387565",
+      "size_bytes": 479
     },
     {
       "path": "SECURITY.md",
@@ -217,8 +217,8 @@
     },
     {
       "path": "canonical-data/1.0/normative-artifact-index.json",
-      "sha256": "e9e9295ee5c29f403f4cb5d2114dc80f8ca57e0a7903ffb7658ce26bc582776b",
-      "size_bytes": 21461
+      "sha256": "ee361c7ea14bee845c057a7d430438a9f90d78dd2e245bb904f399f65b1dfdbf",
+      "size_bytes": 21564
     },
     {
       "path": "canonical-data/1.0/orbits.json",
@@ -447,7 +447,7 @@
     },
     {
       "path": "product-manifest.json",
-      "sha256": "aae32e8897cd28b1e4409025955477ecc5f96a4aa0286669026871308eb00320",
+      "sha256": "5945922849a248392fb722ad5c2e2731c254a28553c34165bfc52931cbd0eaf2",
       "size_bytes": 522
     },
     {
@@ -547,8 +547,8 @@
     },
     {
       "path": "schemas/1.0/product-manifest.schema.json",
-      "sha256": "36e45690a354dd490c4eb58a241601edd30fc5e8240827e5bb8c26454f6b2fc5",
-      "size_bytes": 1510
+      "sha256": "524ed2dacfb790b9087769b6048b6eb72f470c2de0fef00bbedbe20c1ee4dc4f",
+      "size_bytes": 1545
     },
     {
       "path": "schemas/1.0/reachability-result.schema.json",
@@ -787,8 +787,8 @@
     },
     {
       "path": "tools/product/aps_product.py",
-      "sha256": "f49ce51ef9888b0304be540e55c4a14d576163b22eed0ef328732a6db4b83acc",
-      "size_bytes": 48715
+      "sha256": "4e1c60eeff04964c10f792d14037a95abd89f332df36a045d248b00f79984c7f",
+      "size_bytes": 62541
     },
     {
       "path": "tools/product/build_release_archive.py",
@@ -797,8 +797,8 @@
     },
     {
       "path": "tools/product/cli.py",
-      "sha256": "2ce24297a718c290a11c4964ae5a6e50a3c1a606166f1bbfda5b4497f7c3aedc",
-      "size_bytes": 9141
+      "sha256": "57af7fbaffda8114e6bcf84c5cf7056e19999a7b80f151a2ffc7ac020f51f84b",
+      "size_bytes": 10116
     },
     {
       "path": "tools/product/generate_canonical_data.py",
@@ -811,9 +811,14 @@
       "size_bytes": 212
     },
     {
+      "path": "tools/product/release_readiness.py",
+      "sha256": "3774983fa4f5e7a0f19b0c5f034100affba0fd8bd52aae6fc45beb3209d4b952",
+      "size_bytes": 202
+    },
+    {
       "path": "tools/product/tests/test_aps_product.py",
-      "sha256": "73da539e565f0a83fff547d3a334a794746d33fb7a4ce9183869e08bc06a6b3a",
-      "size_bytes": 8065
+      "sha256": "52afcd91beca4ad0f087e08b8545b2177f555e3fb14e4a9e4fb2d20ea6596f95",
+      "size_bytes": 12738
     },
     {
       "path": "tools/product/validate_rule_registry.py",
@@ -872,8 +877,8 @@
     },
     {
       "path": "wiki/Governance-and-Agents.md",
-      "sha256": "aaf72d7cf5d4b55e1dcb3e7880bf46fbd224d1686d4cc864562ad7d000c7045a",
-      "size_bytes": 2280
+      "sha256": "792349bfec0ad31d404563ba547f0775a5eefb93956a2afee5e773d739727206",
+      "size_bytes": 2282
     },
     {
       "path": "wiki/Home.md",
@@ -911,7 +916,7 @@
       "size_bytes": 488
     }
   ],
-  "included_file_count": 181,
+  "included_file_count": 182,
   "license": "LicenseRef-ASH-Pattern-System-Personal-Academic",
   "product_identifier": "aps",
   "product_name": "ASH Pattern System",
@@ -922,7 +927,7 @@
   },
   "release_tag": "v1.0.0-rc.1",
   "schema_version": "1.0",
-  "source_commit": "aa917162c915bb5904de3ddec6dbb0a9297300ac",
+  "source_commit": "09d07b511924cd0d2906f039b56bddb37dd23c2e",
   "status": "RELEASE_CANDIDATE",
   "version": "1.0.0-rc.1"
 }
