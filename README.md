@@ -67,3 +67,10 @@ An implementation agent should use this repository as the semantic authority for
 If an implementation disagrees with this repository, the specification here wins. If repository wording drifts internally, the repository must be corrected to match its canonical baseline.
 
 The repository remains in maintenance mode as a canonical baseline: future edits should preserve internal mathematical consistency and improve clarity, enforcement, and downstream conformance.
+
+## License
+
+Copyright 2026 James Daley
+
+This project is licensed under the Apache License, Version 2.0.
+See the [LICENSE](LICENSE) file for the full terms.
