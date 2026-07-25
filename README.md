@@ -68,6 +68,12 @@ If an implementation disagrees with this repository, the specification here wins
 
 The repository remains in maintenance mode as a canonical baseline: future edits should preserve internal mathematical consistency and improve clarity, enforcement, and downstream conformance.
 
+## Contributing
+
+This project is open source under Apache License, Version 2.0. You are welcome to use, modify, and redistribute the code under that license.
+
+Outside contributions to this repository are not accepted. Pull requests and collaboration requests will not be reviewed or merged. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## License
 
 Copyright 2026 James Daley
