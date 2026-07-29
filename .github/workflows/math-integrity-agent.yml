@@ -1,0 +1,46 @@
+name: Math Integrity Agent
+
+# Sentinel workflow. Protects the locked 9D canonical baseline math.
+#
+# On any change to a math-critical path (see .github/scripts/math_integrity_check.py
+# and governance/github-agents-governance.md for the list), this agent requires:
+#   - a math-change note under governance/math-change-notes/ with the three
+#     required headings ("## What changed", "## Why", "## Baseline preservation statement")
+#   - a human-review label on the PR (math-reviewed, human-reviewed, or baseline-approved)
+#     when the event is pull_request and the PR payload is available
+#   - no non-canonical math-language in the post-change content
+#   - continued presence of 9D baseline markers in the narrow baseline-marker
+#     subset of math-critical files
+#
+# See governance/github-agents-governance.md for full policy.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  REPORT_ONLY: "0"
+
+permissions:
+  contents: read
+
+jobs:
+  math-integrity:
+    name: Math integrity check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.11"
+
+      - name: Run math integrity check
+        run: python3 .github/scripts/math_integrity_check.py
