@@ -1,0 +1,102 @@
+name: Wiki Maintenance Agent
+
+# Sentinel workflow. Maintains wiki quality and freshness by checking:
+#   - required wiki pages and headings
+#   - navigation integrity (Home and _Sidebar)
+#   - internal wiki-link validity
+#   - drift signal when canonical docs/specs/governance changed without wiki updates
+#   - automatic sync from wiki/ to <repo>.wiki.git on push to main
+#
+# See governance/github-agents-governance.md for policy.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  REPORT_ONLY: "0"
+
+jobs:
+  wiki-maintenance:
+    name: Wiki maintenance check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.11"
+
+      - name: Run wiki maintenance check
+        run: python3 .github/scripts/wiki_maintenance_check.py
+
+  wiki-sync:
+    name: Wiki sync
+    runs-on: ubuntu-latest
+    needs: wiki-maintenance
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run wiki sync check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          if [ "${{ github.event_name }}" != "push" ] || [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            echo "Wiki sync check ran. Publishing is only permitted on push to main."
+            exit 0
+          fi
+
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            CHANGED="$(git show --name-only --format= "${{ github.sha }}" | sed -n '/^wiki\//p')"
+          else
+            CHANGED="$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" | sed -n '/^wiki\//p')"
+          fi
+
+          if [ -z "$CHANGED" ]; then
+            echo "Wiki sync check ran. No wiki changes to publish."
+            exit 0
+          fi
+
+          printf '%s\n' "$CHANGED"
+
+          TMP_DIR="$(mktemp -d)"
+          WIKI_DIR="$TMP_DIR/wiki-repo"
+
+          if ! git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.wiki.git" "$WIKI_DIR"; then
+            echo "::error::Could not clone ${REPO}.wiki.git for required wiki sync."
+            exit 1
+          fi
+
+          # Preserve destination .git metadata while mirroring wiki pages.
+          rsync -a --delete --exclude '.git' wiki/ "$WIKI_DIR/"
+
+          cd "$WIKI_DIR"
+          if git diff --quiet; then
+            echo "Wiki sync check ran. No wiki changes to publish."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Sync wiki from main repository"
+          git push
