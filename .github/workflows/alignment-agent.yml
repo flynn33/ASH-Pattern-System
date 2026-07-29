@@ -1,0 +1,39 @@
+name: Alignment Agent
+
+# Sentinel workflow. Detects canonical-repo boundary drift:
+#   - implementation code outside the small .github/scripts/ allowlist
+#   - build / package / platform-tree files anywhere in the repo
+#   - hierarchy-inversion language treating a downstream repo as canonical authority
+#
+# See governance/github-agents-governance.md for full policy.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  REPORT_ONLY: "0"
+
+permissions:
+  contents: read
+
+jobs:
+  alignment:
+    name: Alignment check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.11"
+
+      - name: Run alignment check
+        run: python3 .github/scripts/alignment_check.py
