@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import re
+import json
 import sys
 from pathlib import Path
 
@@ -38,34 +39,70 @@ def case(name: str, records: list[dict], ok: bool, *, labels=None, branch="relea
         raise AssertionError(f"{name}: expected ok={ok}, got ok={actual}")
 
 
-def assert_workflow_hardening() -> None:
-    workflow_dir = ROOT / ".github" / "workflows"
+def assert_workflow_hardening(root: Path = ROOT) -> None:
+    workflow_dir = root / ".github" / "workflows"
+    activation = json.loads((root / "governance" / "workflow-activation.json").read_text(encoding="utf-8"))
+    if not isinstance(activation, dict) or set(activation) != {"schema_version", "active_workflows", "retired_workflows"}:
+        raise AssertionError("invalid workflow activation contract")
+    if activation["schema_version"] != "1.0":
+        raise AssertionError("unsupported workflow activation schema")
+    active = activation["active_workflows"]
+    retired = activation["retired_workflows"]
+    if not isinstance(active, list) or not isinstance(retired, list):
+        raise AssertionError("workflow activation lists are required")
+    valid_name = re.compile(r"^[a-z0-9-]+\.ya?ml$")
+    if any(not isinstance(name, str) or not valid_name.fullmatch(name) for name in active):
+        raise AssertionError("invalid active workflow name")
+    if len(set(active)) != len(active) or "no-ai-attribution.yml" not in active:
+        raise AssertionError("active inventory must uniquely retain the restored attribution workflow")
+    retired_names = []
+    for record in retired:
+        if not isinstance(record, dict) or set(record) != {"workflow", "script", "retirement_commit"}:
+            raise AssertionError("invalid retired workflow record")
+        name, script, commit = record["workflow"], record["script"], record["retirement_commit"]
+        if not isinstance(name, str) or not valid_name.fullmatch(name):
+            raise AssertionError("invalid retired workflow name")
+        if not isinstance(script, str) or not re.fullmatch(r"\.github/scripts/[a-z_]+\.py", script) or not (root / script).is_file():
+            raise AssertionError("retired workflow must retain its local policy script")
+        if not isinstance(commit, str) or not re.fullmatch(r"[0-9a-f]{40}", commit):
+            raise AssertionError("retirement must identify an exact source commit")
+        retired_names.append(name)
+    if len(set(retired_names)) != len(retired_names) or set(active) & set(retired_names):
+        raise AssertionError("workflow activation states overlap or repeat")
+    actual = {path.name for path in workflow_dir.iterdir() if path.is_file() and path.suffix.lower() in (".yml", ".yaml")}
+    if actual != set(active):
+        raise AssertionError("active workflow inventory mismatch: missing=" + str(sorted(set(active) - actual)) + "; extra=" + str(sorted(actual - set(active))))
     mutable_uses = []
-    for path in sorted(workflow_dir.glob("*.yml")):
+    for path in sorted(workflow_dir / name for name in active):
         text = path.read_text(encoding="utf-8")
         for line_no, line in enumerate(text.splitlines(), start=1):
             stripped = line.strip()
-            if not stripped.startswith("uses:"):
+            if not re.match(r"(?:-\s*)?uses:", stripped):
                 continue
             if not re.search(r"@[0-9a-f]{40}\s*$", stripped):
-                mutable_uses.append(f"{path.relative_to(ROOT)}:{line_no}: {stripped}")
+                mutable_uses.append(f"{path.relative_to(root)}:{line_no}: {stripped}")
         if "continue-on-error" in text:
-            raise AssertionError(f"{path.relative_to(ROOT)} contains continue-on-error")
+            raise AssertionError(f"{path.relative_to(root)} contains continue-on-error")
+        if re.search(r"REPORT_ONLY\s*:\s*[\"']?1\b", text):
+            raise AssertionError(f"{path.relative_to(root)} enables report-only mode")
 
     if mutable_uses:
         raise AssertionError("mutable action reference(s): " + "; ".join(mutable_uses))
 
-    gate_text = (workflow_dir / "gate-integrity.yml").read_text(encoding="utf-8")
-    required = [
+    # Owner-retired workflows do not run. If this workflow is reactivated by a
+    # protected governance change, the original trusted-base contract applies.
+    if "gate-integrity.yml" in active:
+        gate_text = (workflow_dir / "gate-integrity.yml").read_text(encoding="utf-8")
+        required = [
         "pull_request_target:",
         "contents: read",
         "pull-requests: read",
         "github.event.pull_request.base.sha",
         "gate_integrity_check.py",
-    ]
-    for token in required:
-        if token not in gate_text:
-            raise AssertionError(f"gate-integrity.yml missing required token: {token}")
+        ]
+        for token in required:
+            if token not in gate_text:
+                raise AssertionError(f"gate-integrity.yml missing required token: {token}")
 
 
 def main() -> int:

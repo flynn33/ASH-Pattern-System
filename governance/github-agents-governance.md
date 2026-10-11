@@ -27,7 +27,7 @@ The canonical repository may not contain platform, build, or runtime implementat
 
 ## Agents
 
-Eight agents/workflows are defined. Seven guard the canonical repository directly; one is a reusable workflow for downstream implementation repositories.
+Eight sentinel roles are defined. Hosted activation is recorded in `governance/workflow-activation.json`: only `no-ai-attribution.yml` is active. The owner intentionally retired the other seven workflows in August 2026 to stop runner spend and subsequently restored the attribution workflow at `7bb68bf3377b18c74d4b0ace6a561371e446bbee`. Their policy scripts remain available for blocking local execution. The workflow/trigger descriptions below define their retained contracts if reactivated; they do not assert that retired jobs currently run.
 
 ### 1. Alignment Agent
 
@@ -197,9 +197,8 @@ Checks:
 
 ## Rollout state
 
-Critical sentinel workflows run blocking in protected-branch operation. `REPORT_ONLY` is retained only as a local diagnostic switch inside the Python helpers.
+### Current activation and local enforcement
 
-- `REPORT_ONLY="1"` prints full findings but exits successfully
-- `REPORT_ONLY="0"` makes the workflow blocking
+`workflow-activation.json` is a protected governance surface. It declares the exact active hosted inventory and records each intentional retirement commit and retained local script. The Gate Integrity self-test must reject missing or undeclared active workflows, duplicate or overlapping activation states, absent retained scripts, mutable action references, failure-continuation settings, and report-only activation. It preserves every protected-surface policy case. If Gate Integrity is reactivated, its trusted-base pull_request_target contract remains mandatory.
 
-Protected branch rulesets must require the blocking sentinel checks, Gate Integrity, CODEOWNER review, latest-push approval, and no bypass actors before product completion branches are created.
+Run the retained alignment, semantic, math, docs, downstream, wiki, and Gate Integrity policy checks locally with blocking behavior (`REPORT_ONLY=0`). `REPORT_ONLY=1` remains a diagnostic-only switch and does not satisfy a gate. Workflow retirement changes hosted scheduling; it does not relax canonical requirements or protected-surface policy. Changes to activation or checker logic remain isolated governance changes under the existing branch, label, and review policy. Owner-authorized administrative bypass is recorded separately from substantive verification and must not conceal a failed policy or product check.

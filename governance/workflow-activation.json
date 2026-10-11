@@ -1,0 +1,13 @@
+{
+  "active_workflows": ["no-ai-attribution.yml"],
+  "retired_workflows": [
+    {"workflow": "alignment-agent.yml", "script": ".github/scripts/alignment_check.py", "retirement_commit": "2dde2ace2fabda44a6df5a3dd896d38d9e03da48"},
+    {"workflow": "canonical-semantic-integrity-agent.yml", "script": ".github/scripts/semantic_integrity_check.py", "retirement_commit": "df32d9c0c924c08232db6aff2c944ca512fccef8"},
+    {"workflow": "docs-maintenance-agent.yml", "script": ".github/scripts/docs_maintenance_check.py", "retirement_commit": "8971e9226067f9f12f350fbf56cb9f3caa837beb"},
+    {"workflow": "downstream-conformance-agent.yml", "script": ".github/scripts/downstream_conformance_check.py", "retirement_commit": "3df4bd60c20b27818b47ac640a2d25b47b1f2d88"},
+    {"workflow": "gate-integrity.yml", "script": ".github/scripts/gate_integrity_check.py", "retirement_commit": "e52a123fe42f1cd9e6e2466c03a5ff4864ad9bae"},
+    {"workflow": "math-integrity-agent.yml", "script": ".github/scripts/math_integrity_check.py", "retirement_commit": "95861d178e7ceb9beba41d7df63182f79bad98f9"},
+    {"workflow": "wiki-maintenance-agent.yml", "script": ".github/scripts/wiki_maintenance_check.py", "retirement_commit": "596d4058f756e1a77b61d6dbf49c7ebafa215a03"}
+  ],
+  "schema_version": "1.0"
+}
