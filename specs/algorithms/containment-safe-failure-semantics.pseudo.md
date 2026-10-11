@@ -39,7 +39,7 @@ FUNCTION enter_containment(diagnostic: StateValidityDiagnostic, trigger: Contain
     record.restricted_operations = determine_safe_operation_subset(diagnostic)
     record.containment_time = current_timestamp()
     record.awaiting_resolution = TRUE
-    record.rule_ids = ["CONTAINMENT-TRIGGER-" + trigger.id]
+    record.rule_ids = ["ASH-CONTAINMENT-001"]
     record.notes = ["Containment entered: " + trigger.reason]
 
     RETURN record
@@ -65,6 +65,14 @@ Containment is resolved by:
 3. **Escalation to safe halt** — if the containment boundary is breached (the error propagates despite containment), the system must escalate to `SAFE_HALT`
 
 Containment must never silently resolve. Resolution must be recorded in the diagnostic chain.
+
+### Denied attempt and confirmed breach
+
+An unauthorized operation attempt is not sufficient evidence of a breach. If containment prevents the operation and no error crosses the boundary, the system remains `CONTAINED`, records a `CONTAINMENT` management diagnostic with `BLOCKED` disposition, preserves restrictions, and awaits resolution. It must not classify that successful prevention as `FAILED` or halt merely because the attempt occurred.
+
+A confirmed breach requires the precondition `system_state_class = CONTAINED` and observed error propagation despite restrictions. Record the breach and its evidence, then enter `SAFE_HALT` before returning the operation result. A transient failure observation may appear in the preserved chain; the completed breach operation returns terminal `SAFE_HALT`, not `FAILED`. Preserve all prior diagnostics and the breach/halt records, freeze the resulting chain, and permit no future transition, recovery, fallback, containment re-entry, or diagnostic mutation. Repeated calls after halt return the original frozen snapshot without appending records.
+
+The corpus declares these preconditions explicitly in separate `BREACH` and `BLOCKED-ATTEMPT` vectors. It does not infer propagation from an operation name.
 
 ## Safe failure
 
@@ -110,7 +118,7 @@ FUNCTION enter_safe_halt(diagnostic: StateValidityDiagnostic, trigger: SafeHaltT
     record.system_state_class = SAFE_HALT
     record.halt_time = current_timestamp()
     record.is_terminal = TRUE
-    record.rule_ids = ["SAFE-HALT-TRIGGER-" + trigger.id]
+    record.rule_ids = ["ASH-HALT-001"]
     record.notes = ["Safe halt entered: " + trigger.reason]
     record.full_diagnostic_chain = collect_full_diagnostic_chain(diagnostic)
 
@@ -194,8 +202,8 @@ Containment and safe failure are the most critical states for observability:
 
 Containment and safe-halt diagnostics conform to the shared diagnostic envelope defined in `specs/interfaces/diagnostic-schema.md`:
 
-- Containment diagnostics use `diagnostic_kind` = `CONTAINMENT`, `stage` = `ESCALATION`
-- Safe-halt diagnostics use `diagnostic_kind` = `SAFE_HALT`, `stage` = `TERMINAL`
+- Containment diagnostics use `diagnostic_kind` = `CONTAINMENT`, `stage` = `CONTAIN` or retained `ESCALATION`; same-phase management records remain contained
+- Safe-halt diagnostics use `diagnostic_kind` = `SAFE_HALT`, `stage` = `HALT` or retained `TERMINAL`
 - `rule_ids` must conform to the `ASH-CONTAINMENT` and `ASH-HALT` families in `specs/interfaces/rule-id-taxonomy.md`
 
 ### Diagnostic chaining
@@ -216,3 +224,7 @@ Containment and safe-halt diagnostics conform to the shared diagnostic envelope 
 - **codeword-set.pseudo.md** — provides the codeword structure that determines recoverability
 - **diagnostic-schema.md** — defines the shared diagnostic envelope this specification conforms to
 - **rule-id-taxonomy.md** — defines the canonical rule-ID pattern for the `rule_ids` field
+
+## Serialized safety records
+
+The `containment-record` and `safe-halt-record` schemas use the same versioned transport wrapper as the diagnostic schema. Their `data` contains `trigger`, the complete `original_diagnostic` record, the action `diagnostic` record, `system_state_class`, and `full_diagnostic_chain` from root through action. Containment additionally records `restricted_operations`, `containment_time`, `awaiting_resolution`, and `resolution` (`PENDING`, `OPERATOR_DIRECTED`, `POLICY_DIRECTED`, or `SAFE_HALT`). Safe halt additionally records `halt_time`, `is_terminal = true`, and `frozen = true`. Times are nonempty timestamp strings outside the semantic diagnostic payload. The wrapper ID equals the action diagnostic ID; original/action records equal the chain root/tail. These projections retain the minimum content above without a local diagnostic structure or dependence on runtime pointers.

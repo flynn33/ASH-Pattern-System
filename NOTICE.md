@@ -2,4 +2,4 @@
 
 ASH Pattern System. Copyright (c) 2026 James Daley. All rights reserved.
 
-Commercial licensing requires separate written permission.
+Licensed under the Apache License, Version 2.0. See LICENSE for the applicable terms.

@@ -96,7 +96,7 @@ def verify_conformance_corpus(argv: list[str]) -> int:
         print("Conformance manifest is missing.")
         return 1
     data = json.loads(manifest.read_text(encoding="utf-8"))
-    errors = []
+    errors = aps_product.validate_conformance_semantics(args.root)
     for entry in data.get("vectors", []):
         path = manifest.parent / entry["path"]
         if not path.is_file():
@@ -174,7 +174,7 @@ def build_release_archive(argv: list[str]) -> int:
     if args.self_test:
         return self_test("build-release-archive")
     staging = args.output / "staging"
-    second = args.output / "ash-pattern-system-1.0.0-rc.1.second.zip"
+    second = args.output / f"ash-pattern-system-{aps_product.PRODUCT_VERSION}.second.zip"
     source_commit = args.source_commit or current_commit(args.root)
     if not aps_product.HEX_SHA_RE.fullmatch(source_commit):
         print("source commit must be a full lowercase commit SHA")
@@ -182,7 +182,7 @@ def build_release_archive(argv: list[str]) -> int:
     try:
         aps_product.copy_release_inputs(args.root, staging)
         aps_product.stamp_product_manifest(staging, source_commit)
-        archive = args.output / "ash-pattern-system-1.0.0-rc.1.zip"
+        archive = args.output / f"ash-pattern-system-{aps_product.PRODUCT_VERSION}.zip"
         result = aps_product.build_release_archive(staging, archive)
         manifest = aps_product.release_manifest(staging, result, source_commit=source_commit)
         manifest_path = args.output / "release-manifest.json"

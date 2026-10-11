@@ -1,0 +1,221 @@
+{
+  "data": {
+    "diagnostic": {
+      "chain_root_diagnostic_id": "APS-DIAG-29BDF38D1F32F89D98D60837",
+      "details": {
+        "boundary_breached": true,
+        "frozen": true,
+        "is_terminal": true,
+        "propagation_observed": true,
+        "trigger": "CONTAINMENT_BREACH"
+      },
+      "diagnostic_id": "APS-DIAG-579D4805AB46410A4777E5EA",
+      "diagnostic_kind": "SAFE_HALT",
+      "disposition": "TERMINAL",
+      "notes": [
+        "Error propagation was observed despite containment restrictions; the breach requires safe halt and the complete diagnostic chain is now frozen."
+      ],
+      "occurrence_metadata": null,
+      "parent_diagnostic_id": "APS-DIAG-96BA57CB6263F3F0C682EE43",
+      "rule_ids": [
+        "ASH-HALT-001"
+      ],
+      "schema_version": "1.0",
+      "sequence_number": 6,
+      "severity": "CRITICAL",
+      "stage": "HALT",
+      "subject_reference": "APS-CHAIN-MODERN-SAFETY",
+      "summary": "Confirmed containment breach caused terminal halt"
+    },
+    "frozen": true,
+    "full_diagnostic_chain": [
+      {
+        "chain_root_diagnostic_id": "APS-DIAG-29BDF38D1F32F89D98D60837",
+        "details": {
+          "candidate": "000011110",
+          "input_status": "WELL_FORMED"
+        },
+        "diagnostic_id": "APS-DIAG-29BDF38D1F32F89D98D60837",
+        "diagnostic_kind": "INPUT_VALIDATION",
+        "disposition": "RECORDED",
+        "notes": [
+          "The candidate has exactly nine binary coordinates and was preserved without coercion."
+        ],
+        "occurrence_metadata": null,
+        "parent_diagnostic_id": null,
+        "rule_ids": [
+          "ASH-DIAGNOSTIC-001"
+        ],
+        "schema_version": "1.0",
+        "sequence_number": 1,
+        "severity": "INFO",
+        "stage": "PARSE",
+        "subject_reference": "APS-CHAIN-MODERN-SAFETY",
+        "summary": "Candidate parsing succeeded"
+      },
+      {
+        "chain_root_diagnostic_id": "APS-DIAG-29BDF38D1F32F89D98D60837",
+        "details": {
+          "candidate": "000011110",
+          "codeword_id": "APS-CW-01",
+          "state_class": "CORRECTABLE",
+          "target": "000000000"
+        },
+        "diagnostic_id": "APS-DIAG-251268B2DD1C32A0A94657A5",
+        "diagnostic_kind": "STATE_ASSESSMENT",
+        "disposition": "RECORDED",
+        "notes": [
+          "The validated context permits target 000000000; candidate 000011110 reaches it by canonical codeword APS-CW-01."
+        ],
+        "occurrence_metadata": null,
+        "parent_diagnostic_id": "APS-DIAG-29BDF38D1F32F89D98D60837",
+        "rule_ids": [
+          "ASH-DIAGNOSTIC-001"
+        ],
+        "schema_version": "1.0",
+        "sequence_number": 2,
+        "severity": "WARNING",
+        "stage": "ASSESS",
+        "subject_reference": "APS-CHAIN-MODERN-SAFETY",
+        "summary": "Candidate has a declared correction path"
+      },
+      {
+        "chain_root_diagnostic_id": "APS-DIAG-29BDF38D1F32F89D98D60837",
+        "details": {
+          "candidate": "000011110",
+          "codeword_id": "APS-CW-01",
+          "state_class": "CORRECTABLE",
+          "target": "000000000"
+        },
+        "diagnostic_id": "APS-DIAG-377A837F4B04CC4534D4E29B",
+        "diagnostic_kind": "CLASSIFICATION",
+        "disposition": "RECORDED",
+        "notes": [
+          "The validated context permits target 000000000; candidate 000011110 reaches it by canonical codeword APS-CW-01."
+        ],
+        "occurrence_metadata": null,
+        "parent_diagnostic_id": "APS-DIAG-251268B2DD1C32A0A94657A5",
+        "rule_ids": [
+          "ASH-DIAGNOSTIC-001"
+        ],
+        "schema_version": "1.0",
+        "sequence_number": 3,
+        "severity": "WARNING",
+        "stage": "CLASSIFY",
+        "subject_reference": "APS-CHAIN-MODERN-SAFETY",
+        "summary": "Candidate has a declared correction path"
+      },
+      {
+        "chain_root_diagnostic_id": "APS-DIAG-29BDF38D1F32F89D98D60837",
+        "details": {
+          "candidate": "000011110",
+          "correction_succeeded": false,
+          "post_assessment": "CORRECTABLE",
+          "target": "000000000"
+        },
+        "diagnostic_id": "APS-DIAG-325482C097E6FD85D1D38ADE",
+        "diagnostic_kind": "RECOVERY",
+        "disposition": "RECORDED",
+        "notes": [
+          "The correction attempt did not produce the declared stable target; the observed candidate remains correctable and requires escalation."
+        ],
+        "occurrence_metadata": null,
+        "parent_diagnostic_id": "APS-DIAG-377A837F4B04CC4534D4E29B",
+        "rule_ids": [
+          "ASH-DIAGNOSTIC-001"
+        ],
+        "schema_version": "1.0",
+        "sequence_number": 4,
+        "severity": "ERROR",
+        "stage": "RECOVER",
+        "subject_reference": "APS-CHAIN-MODERN-SAFETY",
+        "summary": "Correction failed post-recovery validation"
+      },
+      {
+        "chain_root_diagnostic_id": "APS-DIAG-29BDF38D1F32F89D98D60837",
+        "details": {
+          "awaiting_resolution": true,
+          "restricted_operations": [
+            "INSPECT_DIAGNOSTICS"
+          ],
+          "trigger": "RECOVERY_VALIDATION_FAILURE"
+        },
+        "diagnostic_id": "APS-DIAG-96BA57CB6263F3F0C682EE43",
+        "diagnostic_kind": "CONTAINMENT",
+        "disposition": "RECORDED",
+        "notes": [
+          "Recovery validation failed; only diagnostic inspection is permitted while containment awaits an explicit resolution."
+        ],
+        "occurrence_metadata": null,
+        "parent_diagnostic_id": "APS-DIAG-325482C097E6FD85D1D38ADE",
+        "rule_ids": [
+          "ASH-CONTAINMENT-001"
+        ],
+        "schema_version": "1.0",
+        "sequence_number": 5,
+        "severity": "ERROR",
+        "stage": "CONTAIN",
+        "subject_reference": "APS-CHAIN-MODERN-SAFETY",
+        "summary": "Containment entered after recovery validation failure"
+      },
+      {
+        "chain_root_diagnostic_id": "APS-DIAG-29BDF38D1F32F89D98D60837",
+        "details": {
+          "boundary_breached": true,
+          "frozen": true,
+          "is_terminal": true,
+          "propagation_observed": true,
+          "trigger": "CONTAINMENT_BREACH"
+        },
+        "diagnostic_id": "APS-DIAG-579D4805AB46410A4777E5EA",
+        "diagnostic_kind": "SAFE_HALT",
+        "disposition": "TERMINAL",
+        "notes": [
+          "Error propagation was observed despite containment restrictions; the breach requires safe halt and the complete diagnostic chain is now frozen."
+        ],
+        "occurrence_metadata": null,
+        "parent_diagnostic_id": "APS-DIAG-96BA57CB6263F3F0C682EE43",
+        "rule_ids": [
+          "ASH-HALT-001"
+        ],
+        "schema_version": "1.0",
+        "sequence_number": 6,
+        "severity": "CRITICAL",
+        "stage": "HALT",
+        "subject_reference": "APS-CHAIN-MODERN-SAFETY",
+        "summary": "Confirmed containment breach caused terminal halt"
+      }
+    ],
+    "halt_time": "2026-10-11T00:00:01Z",
+    "is_terminal": true,
+    "original_diagnostic": {
+      "chain_root_diagnostic_id": "APS-DIAG-29BDF38D1F32F89D98D60837",
+      "details": {
+        "candidate": "000011110",
+        "input_status": "WELL_FORMED"
+      },
+      "diagnostic_id": "APS-DIAG-29BDF38D1F32F89D98D60837",
+      "diagnostic_kind": "INPUT_VALIDATION",
+      "disposition": "RECORDED",
+      "notes": [
+        "The candidate has exactly nine binary coordinates and was preserved without coercion."
+      ],
+      "occurrence_metadata": null,
+      "parent_diagnostic_id": null,
+      "rule_ids": [
+        "ASH-DIAGNOSTIC-001"
+      ],
+      "schema_version": "1.0",
+      "sequence_number": 1,
+      "severity": "INFO",
+      "stage": "PARSE",
+      "subject_reference": "APS-CHAIN-MODERN-SAFETY",
+      "summary": "Candidate parsing succeeded"
+    },
+    "system_state_class": "SAFE_HALT",
+    "trigger": "CONTAINMENT_BREACH"
+  },
+  "id": "APS-DIAG-579D4805AB46410A4777E5EA",
+  "product_version": "1.0.0-rc.2",
+  "schema_version": "1.0"
+}

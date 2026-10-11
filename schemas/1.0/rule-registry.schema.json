@@ -3,7 +3,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "Versioned APS rule-registry record.",
-  "product_version": "1.0.0-rc.1",
+  "product_version": "1.0.0-rc.2",
   "properties": {
     "data": {
       "type": "object"

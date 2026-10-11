@@ -19,10 +19,13 @@ from itertools import product
 from pathlib import Path
 from typing import Any
 
+from tools.product import diagnostic_contract
+
 
 PRODUCT_NAME = "ASH Pattern System"
 PRODUCT_IDENTIFIER = "aps"
-PRODUCT_VERSION = "1.0.0-rc.1"
+PRODUCT_LICENSE = "Apache-2.0"
+PRODUCT_VERSION = "1.0.0-rc.2"
 SCHEMA_VERSION = "1.0"
 CANONICAL_DATA_VERSION = "1.0"
 CONFORMANCE_VERSION = "1.0"
@@ -147,6 +150,7 @@ REQUIRED_CONFORMANCE_VECTOR_FILES = (
     "containment.jsonl",
     "safe-halt.jsonl",
     "diagnostics.jsonl",
+    "diagnostic-chains.jsonl",
     "axioms.jsonl",
     "generation-plans.jsonl",
     "materialization-boundary.jsonl",
@@ -224,7 +228,7 @@ def semantic_digest(value: Any) -> str:
 
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
 
 
 def write_jsonl(path: Path, values: list[dict[str, Any]]) -> None:
@@ -475,7 +479,40 @@ def schema_for(name: str) -> dict[str, Any]:
         },
         "required": ["schema_version", "product_version", "id", "data"],
     }
-    if name == "ash-state":
+    if name == "diagnostic-envelope":
+        object_schema["properties"]["data"] = diagnostic_contract.record_schema()
+    elif name in ("containment-record", "safe-halt-record"):
+        diagnostic = diagnostic_contract.record_schema()
+        properties = {
+            "trigger": {"type": "string", "minLength": 1},
+            "original_diagnostic": diagnostic,
+            "diagnostic": diagnostic,
+            "system_state_class": {"type": "string", "const": "CONTAINED" if name == "containment-record" else "SAFE_HALT"},
+            "full_diagnostic_chain": {"type": "array", "minItems": 1, "items": diagnostic},
+        }
+        if name == "containment-record":
+            properties["trigger"]["enum"] = ["FALLBACK_FAILURE", "PROPAGATION_RISK", "OPERATOR_REQUEST", "RECOVERY_VALIDATION_FAILURE"]
+            properties["diagnostic"] = json.loads(canonical_json(diagnostic))
+            properties["diagnostic"]["properties"]["diagnostic_kind"] = {"const": "CONTAINMENT"}
+            properties["diagnostic"]["properties"]["stage"] = {"enum": ["CONTAIN", "ESCALATION"]}
+            properties.update({
+                "restricted_operations": {"type": "array", "items": {"type": "string", "minLength": 1}},
+                "containment_time": {"type": "string", "minLength": 1},
+                "awaiting_resolution": {"type": "boolean"},
+                "resolution": {"type": "string", "enum": ["PENDING", "OPERATOR_DIRECTED", "POLICY_DIRECTED", "SAFE_HALT"]},
+            })
+        else:
+            properties["trigger"]["enum"] = ["ESCALATION_FROM_FAILED", "CONTAINMENT_BREACH", "OPERATOR_HALT_REQUEST", "POLICY_HALT_REQUEST", "UNRESOLVABLE_BLOCKED_RECOVERY"]
+            properties["diagnostic"] = json.loads(canonical_json(diagnostic))
+            properties["diagnostic"]["properties"]["diagnostic_kind"] = {"const": "SAFE_HALT"}
+            properties["diagnostic"]["properties"]["stage"] = {"enum": ["HALT", "TERMINAL"]}
+            properties["diagnostic"]["properties"]["disposition"] = {"const": "TERMINAL"}
+            properties.update({"halt_time": {"type": "string", "minLength": 1},
+                               "is_terminal": {"type": "boolean", "const": True},
+                               "frozen": {"type": "boolean", "const": True}})
+        object_schema["properties"]["data"] = {"type": "object", "additionalProperties": False,
+                                                "properties": properties, "required": list(properties)}
+    elif name == "ash-state":
         object_schema["properties"] = {
             "bits": {"type": "array", "items": {"type": "integer", "enum": [0, 1]}, "minItems": 9, "maxItems": 9},
             "realm_id": {"type": "string", "pattern": "^APS-REALM-[0-9]{3}$"},
@@ -503,6 +540,26 @@ def schema_for(name: str) -> dict[str, Any]:
     return object_schema
 
 
+def validate_diagnostic_projection(instance: Any, schema_name: str = "diagnostic-envelope") -> list[str]:
+    errors = validate_instance(instance, schema_for(schema_name), "diagnostic projection")
+    if errors:
+        return errors
+    data = instance["data"]
+    if schema_name == "diagnostic-envelope":
+        errors.extend(diagnostic_contract.record_errors(data))
+        if instance["id"] != data["diagnostic_id"]:
+            errors.append("diagnostic projection: wrapper ID differs from inner diagnostic ID")
+    else:
+        errors.extend(diagnostic_contract.chain_errors(data["full_diagnostic_chain"]))
+        if data["diagnostic"] != data["full_diagnostic_chain"][-1]:
+            errors.append("diagnostic projection: action diagnostic is not the chain tail")
+        if data["original_diagnostic"] != data["full_diagnostic_chain"][0]:
+            errors.append("diagnostic projection: original diagnostic is not the chain root")
+        if instance["id"] != data["diagnostic"]["diagnostic_id"]:
+            errors.append("diagnostic projection: wrapper ID differs from action diagnostic ID")
+    return errors
+
+
 def build_schemas(root: Path) -> None:
     for name in SCHEMA_ENTRY_POINTS:
         write_json(root / "schemas" / SCHEMA_VERSION / f"{name}.schema.json", schema_for(name))
@@ -515,7 +572,7 @@ def build_canonical_data(root: Path) -> dict[str, Any]:
         write_json(output / f"{name}.json", data[name])
     write_json(output / "rule-registry.json", rule_registry())
     paths = [
-        str(path.relative_to(root))
+        path.relative_to(root).as_posix()
         for path in root.rglob("*")
         if path.is_file() and ".git" not in path.parts
         and "__pycache__" not in path.parts
@@ -523,6 +580,108 @@ def build_canonical_data(root: Path) -> dict[str, Any]:
     ]
     write_json(output / "normative-artifact-index.json", normative_artifact_index(paths))
     return data
+
+
+def diagnostic_chain_vectors() -> list[dict[str, Any]]:
+    vectors = []
+    observations = {
+        0: ("Candidate parsing succeeded", "The candidate has exactly nine binary coordinates and was preserved without coercion.", {"candidate": "000011110", "input_status": "WELL_FORMED"}),
+        1: ("Candidate has a declared correction path", "The validated context permits target 000000000; candidate 000011110 reaches it by canonical codeword APS-CW-01.", {"candidate": "000011110", "target": "000000000", "state_class": "CORRECTABLE", "codeword_id": "APS-CW-01"}),
+        2: ("Correction failed post-recovery validation", "The correction attempt did not produce the declared stable target; the observed candidate remains correctable and requires escalation.", {"candidate": "000011110", "target": "000000000", "post_assessment": "CORRECTABLE", "correction_succeeded": False}),
+        3: ("Containment entered after recovery validation failure", "Recovery validation failed; only diagnostic inspection is permitted while containment awaits an explicit resolution.", {"trigger": "RECOVERY_VALIDATION_FAILURE", "restricted_operations": ["INSPECT_DIAGNOSTICS"], "awaiting_resolution": True}),
+        4: ("Confirmed containment breach caused terminal halt", "Error propagation was observed despite containment restrictions; the breach requires safe halt and the complete diagnostic chain is now frozen.", {"trigger": "CONTAINMENT_BREACH", "boundary_breached": True, "propagation_observed": True, "is_terminal": True, "frozen": True}),
+        "PLAN": ("Declared correction plan recorded", "The plan references the declared correction transition APS-TRANSITION-CW-01; recording the plan does not mutate the candidate.", {"transition_id": "APS-TRANSITION-CW-01", "candidate_mutated": False}),
+        "VALIDATE": ("Post-recovery validation requires containment", "The observed candidate remains outside the configured stable set after the correction attempt; containment is required.", {"candidate": "000011110", "allowed_stable_states": ["000000000"], "post_assessment": "CORRECTABLE"}),
+    }
+    sequences = [
+        ("MODERN-SAFETY", [("INPUT_VALIDATION", "PARSE"), ("STATE_ASSESSMENT", "ASSESS"),
+                            ("CLASSIFICATION", "CLASSIFY"), ("RECOVERY", "RECOVER"),
+                            ("CONTAINMENT", "CONTAIN"), ("SAFE_HALT", "HALT")]),
+        ("LEGACY-SAFETY", [("STATE_VALIDITY", "DETECTION"), ("CLASSIFICATION", "CLASSIFICATION"),
+                            ("RECOVERY", "RECOVERY"), ("CONTAINMENT", "ESCALATION"),
+                            ("SAFE_HALT", "TERMINAL")]),
+        ("BLOCKED-CONTAINMENT-ATTEMPT", [("STATE_ASSESSMENT", "ASSESS"), ("RECOVERY", "RECOVER"),
+                            ("CONTAINMENT", "CONTAIN"), ("CONTAINMENT", "CONTAIN")]),
+        ("OPERATION-PHASE-CARRY", [("CLASSIFICATION", "CLASSIFY"), ("GENERATION_PLAN", "PLAN"),
+                            ("RECOVERY", "RECOVER"), ("SCHEMA_VALIDATION", "VALIDATE"),
+                            ("CONTAINMENT", "CONTAIN"), ("SAFE_HALT", "HALT")]),
+    ]
+    for case, sequence in sequences:
+        records = []
+        payloads = []
+        for index, (kind, stage) in enumerate(sequence, 1):
+            blocked = case == "BLOCKED-CONTAINMENT-ATTEMPT" and index == len(sequence)
+            phase = diagnostic_contract.SAFETY_PHASES.get(stage)
+            summary, note, details = observations[phase if phase is not None else stage]
+            payload = {
+                "diagnostic_kind": kind, "severity": "CRITICAL" if phase == 4 else "ERROR" if phase in (2, 3) or stage == "VALIDATE" else "INFO" if phase == 0 else "WARNING",
+                "stage": stage, "disposition": "TERMINAL" if kind == "SAFE_HALT" else "BLOCKED" if blocked else "RECORDED",
+                "subject_reference": f"APS-CHAIN-{case}", "rule_ids": ["ASH-HALT-001" if kind == "SAFE_HALT" else "ASH-CONTAINMENT-001" if kind == "CONTAINMENT" else "ASH-DIAGNOSTIC-001"],
+                "summary": "Unauthorized operation prevented within containment" if blocked else summary,
+                "notes": ["The denied write did not cross the containment boundary; restricted mode remains active." if blocked else note],
+                "details": {"attempted_operation": "UNDECLARED_WRITE", "boundary_breached": False, "attempt_prevented": True, "propagation_observed": False} if blocked else details,
+            }
+            payloads.append(payload)
+            records.append(diagnostic_contract.make_record(payload, records[-1] if records else None))
+        vectors.append({"vector_id": f"APS-VEC-DIAGNOSTIC-CHAIN-{case}", "category": "diagnostic_chains",
+                        "product_version": PRODUCT_VERSION, "input": {"payloads": payloads, "occurrence_metadata": None},
+                        "expected_output": {"records": records, "chain_valid": True},
+                        "requirements": ["All diagnostic fields, semantic identities, and causal safety phases are validated"],
+                        "rule_ids": ["ASH-DIAGNOSTIC-001"], "source_paths": ["specs/interfaces/diagnostic-schema.md"]})
+    semantic = {"diagnostic_kind": "STATE_ASSESSMENT", "severity": "INFO", "stage": "ASSESS", "disposition": "RECORDED",
+                "subject_reference": "APS-OCCURRENCE-SUBJECT", "rule_ids": ["ASH-STATE-001"], "summary": "Structural state observed",
+                "notes": ["The candidate is a well-formed nine-bit realm; no operational context was supplied."], "details": {"candidate": "000000000"}}
+    occurrences = [None, {"timestamp": "2026-10-11T00:00:00Z", "host": "host-a", "process": 42},
+                   {"timestamp": "2026-10-11T00:00:01Z", "host": "host-b", "transport": {"sequence": 3}}]
+    vectors.append({"vector_id": "APS-VEC-DIAGNOSTIC-CHAIN-OCCURRENCE-VARIATION", "category": "diagnostic_chains",
+                    "product_version": PRODUCT_VERSION, "input": {"payload": semantic, "occurrences": occurrences},
+                    "expected_output": {"records": [diagnostic_contract.make_record(semantic, occurrence_metadata=item) for item in occurrences], "identity_unchanged": True},
+                    "requirements": ["Occurrence metadata does not change semantic identity"], "rule_ids": ["ASH-DIAGNOSTIC-001"],
+                    "source_paths": ["specs/interfaces/diagnostic-schema.md"]})
+    return vectors
+
+
+def validate_conformance_semantics(root: Path) -> list[str]:
+    errors = []
+    base = root / "conformance" / CONFORMANCE_VERSION / "vectors"
+    for name in ("diagnostics.jsonl", "diagnostic-chains.jsonl", "containment.jsonl", "safe-halt.jsonl"):
+        path = base / name
+        if not path.is_file():
+            errors.append(f"{path}: missing semantic vectors")
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                vector = json.loads(line)
+                inputs, expected = vector["input"], vector["expected_output"]
+                failures = []
+                if name == "diagnostics.jsonl":
+                    failures.extend(validate_instance(expected, diagnostic_contract.record_schema(), "expected_output"))
+                    failures.extend(diagnostic_contract.chain_errors([expected]))
+                    actual = diagnostic_contract.make_record(inputs, occurrence_metadata=inputs["occurrence_metadata"])
+                elif name == "diagnostic-chains.jsonl":
+                    records = []
+                    if "payloads" in inputs:
+                        for payload in inputs["payloads"]:
+                            records.append(diagnostic_contract.make_record(payload, records[-1] if records else None, inputs["occurrence_metadata"]))
+                        failures.extend(diagnostic_contract.chain_errors(expected["records"]))
+                        actual = {"records": records, "chain_valid": True}
+                    else:
+                        records = [diagnostic_contract.make_record(inputs["payload"], occurrence_metadata=item) for item in inputs["occurrences"]]
+                        for record in expected["records"]:
+                            failures.extend(diagnostic_contract.chain_errors([record]))
+                        actual = {"records": records, "identity_unchanged": len({record["diagnostic_id"] for record in records}) == 1}
+                    for record in expected["records"]:
+                        failures.extend(validate_instance(record, diagnostic_contract.record_schema(), "expected_output.records"))
+                elif name == "containment.jsonl" or "initial_mode" in inputs:
+                    actual = diagnostic_contract.containment_outcome(inputs)
+                else:
+                    actual = {"terminal": True, "transitions_allowed": False}
+                if actual != expected:
+                    failures.append("declared expected output differs from the specified operation")
+                errors.extend(f"{vector['vector_id']}: {failure}" for failure in failures)
+            except (ValueError, KeyError, TypeError) as exc:
+                errors.append(f"{path}: invalid semantic vector: {exc}")
+    return errors
 
 
 def build_conformance_corpus(root: Path, data: dict[str, Any]) -> None:
@@ -693,12 +852,13 @@ def build_conformance_corpus(root: Path, data: dict[str, Any]) -> None:
             ("CONTAINMENT-ESCALATION", {"policy_id": "FALLBACK-STATE-999"}, {"replacement_kind": "CONTAINMENT_ESCALATION"}, ["ASH-FALLBACK-001", "ASH-CONTAINMENT-001"]),
         ],
         "containment.jsonl": [
-            ("ENTER", {"risk": "PROPAGATION_BLOCKED"}, {"mode": "CONTAINED", "restricted_operations_only": True}, ["ASH-CONTAINMENT-001"]),
-            ("BREACH", {"attempted_operation": "UNDECLARED_WRITE"}, {"mode": "FAILED"}, ["ASH-CONTAINMENT-001"]),
+            ("ENTER", {"initial_mode": "DEGRADED", "risk": "PROPAGATION_BLOCKED"}, {}, ["ASH-CONTAINMENT-001"]),
+            ("BREACH", {"initial_mode": "CONTAINED", "attempted_operation": "UNDECLARED_WRITE", "boundary_breached": True, "attempt_prevented": False, "propagation_observed": True}, {}, ["ASH-CONTAINMENT-001", "ASH-HALT-001"]),
+            ("BLOCKED-ATTEMPT", {"initial_mode": "CONTAINED", "attempted_operation": "UNDECLARED_WRITE", "boundary_breached": False, "attempt_prevented": True, "propagation_observed": False}, {}, ["ASH-CONTAINMENT-001"]),
         ],
         "safe-halt.jsonl": [
             ("ENTER", {"state_class": "SAFE_HALT"}, {"terminal": True, "transitions_allowed": False}, ["ASH-HALT-001"]),
-            ("MUTATION-AFTER-HALT", {"attempted_transition": "APS-TRANSITION-CW-01"}, {"expected_failure": "TERMINAL_NO_RECOVERY"}, ["ASH-HALT-001"]),
+            ("MUTATION-AFTER-HALT", {"initial_mode": "SAFE_HALT", "attempted_transition": "APS-TRANSITION-CW-01"}, {}, ["ASH-HALT-001"]),
         ],
         "axioms.jsonl": [
             ("PASS", {"evidence": "profile_threshold_met"}, {"axiom_result": "PASS"}, ["ASH-AXIOM-001"]),
@@ -721,17 +881,33 @@ def build_conformance_corpus(root: Path, data: dict[str, Any]) -> None:
             [
                 {
                     "category": filename.removesuffix(".jsonl").replace("-", "_"),
-                    "expected_output": expected,
+                    "expected_output": diagnostic_contract.containment_outcome(input_value) if filename == "containment.jsonl" or (filename == "safe-halt.jsonl" and case_id == "MUTATION-AFTER-HALT") else expected,
                     "input": input_value,
                     "product_version": PRODUCT_VERSION,
                     "requirements": [filename.removesuffix(".jsonl").replace("-", " ")],
                     "rule_ids": rule_ids,
-                    "source_paths": ["specs/"],
+                    "source_paths": ["specs/algorithms/containment-safe-failure-semantics.pseudo.md"] if filename in ("containment.jsonl", "safe-halt.jsonl") else ["specs/"],
                     "vector_id": f"APS-VEC-{filename.removesuffix('.jsonl').upper()}-{case_id}",
                 }
                 for case_id, input_value, expected, rule_ids in rows
             ],
         )
+    explanations = {
+        "INPUT_VALIDATION": ("Candidate parsing blocked because the signature has four bits; nine bits are required.", {"candidate": "0101", "required_bit_count": 9}),
+        "STATE_ASSESSMENT": ("The nine-bit candidate is structurally valid; operational health requires a supplied context.", {"candidate": "000000000", "operational_context_supplied": False}),
+        "CLASSIFICATION": ("The candidate matches the context's declared stable state.", {"candidate": "000000000", "state_class": "STABLE"}),
+        "TRANSITION": ("The requested target is in a different orbit; no canonical codeword reaches it.", {"source": "000000000", "target": "000000001", "reachable": False}),
+        "TOPOLOGY": ("Expansion was blocked because the requested depth exceeds the declared resource bound.", {"requested_depth": 7, "maximum_depth": 6}),
+        "AXIOM": ("The axiom result is indeterminate because the required measurement is absent.", {"result": "INDETERMINATE", "measurement_supplied": False}),
+        "GENERATION_PLAN": ("Plan construction was blocked because the profile reference is unknown.", {"profile_id": "unknown"}),
+        "EMISSION": ("Emission was refused because the plan is incomplete.", {"plan_complete": False}),
+        "RECOVERY": ("The declared correction was applied and the target was reassessed as stable.", {"delta": "000011110", "target": "000000000", "post_assessment": "STABLE"}),
+        "FALLBACK": ("The declared known-good candidate was reassessed as stable before replacement.", {"policy_id": "FALLBACK-STATE-001", "post_assessment": "STABLE"}),
+        "CONTAINMENT": ("Containment restricted operations to diagnostic inspection while awaiting resolution.", {"trigger": "FALLBACK_FAILURE", "restricted_operations": ["INSPECT_DIAGNOSTICS"], "awaiting_resolution": True}),
+        "SAFE_HALT": ("A confirmed containment breach caused terminal halt; diagnostics are frozen and transitions are forbidden.", {"trigger": "CONTAINMENT_BREACH", "is_terminal": True, "frozen": True}),
+        "SCHEMA_VALIDATION": ("Schema validation blocked the record because a required subject reference is absent.", {"missing_field": "subject_reference"}),
+        "CONFORMANCE": ("Conformance failed because the observed output differs from the authoritative expected output.", {"field": "mode", "expected": "SAFE_HALT", "observed": "FAILED"}),
+    }
     diagnostics = []
     for index, (kind, severity, stage, disposition, rule_ids) in enumerate(
         [
@@ -760,20 +936,14 @@ def build_conformance_corpus(root: Path, data: dict[str, Any]) -> None:
             "stage": stage,
             "subject_reference": f"APS-DIAG-SUBJECT-{index:02d}",
             "summary": f"{kind} diagnostic vector",
+            "notes": [explanations[kind][0]],
+            "details": explanations[kind][1],
         }
-        diagnostic_id = semantic_digest(payload)
         diagnostics.append(
             {
                 "category": "diagnostics",
-                "expected_output": {
-                    **payload,
-                    "chain_root_diagnostic_id": diagnostic_id,
-                    "diagnostic_id": diagnostic_id,
-                    "notes": [],
-                    "parent_diagnostic_id": None,
-                    "sequence_number": 1,
-                },
-                "input": payload,
+                "expected_output": diagnostic_contract.make_record(payload),
+                "input": {**payload, "occurrence_metadata": None},
                 "product_version": PRODUCT_VERSION,
                 "requirements": ["Diagnostic envelope is deterministic and schema-bound"],
                 "rule_ids": rule_ids,
@@ -782,6 +952,7 @@ def build_conformance_corpus(root: Path, data: dict[str, Any]) -> None:
             }
         )
     write_jsonl(vectors / "diagnostics.jsonl", diagnostics)
+    write_jsonl(vectors / "diagnostic-chains.jsonl", diagnostic_chain_vectors())
     write_json(
         invalid / "manifest.json",
         {
@@ -812,8 +983,10 @@ def build_conformance_corpus(root: Path, data: dict[str, Any]) -> None:
     )
     (base / "README.md").write_text(
         "# APS 1.0 Conformance Corpus\n\n"
-        "This directory contains deterministic implementation-neutral vectors for APS 1.0 release qualification.\n",
-        encoding="utf-8",
+        "This directory contains deterministic implementation-neutral vectors for APS 1.0 release qualification.\n\n"
+        "Compare every declared expected field. Diagnostic expected_output is the complete inner record; the versioned schema transport wraps it as data and repeats its diagnostic_id as id. Required notes explain conditions, details hold semantic facts, and occurrence_metadata may be null. diagnostic-chains.jsonl additionally qualifies modern/legacy safety chains, containment management, operation-phase carry, and occurrence-invariant identity.\n\n"
+        "Containment vectors declare initial mode and actual boundary/prevention/propagation evidence. A confirmed breach completes at frozen terminal SAFE_HALT; a prevented unauthorized attempt stays CONTAINED. After halt, calls return the preserved frozen snapshot without appending diagnostics.\n",
+        encoding="utf-8", newline="\n",
     )
     files = [path for path in base.rglob("*") if path.is_file()]
     manifest = {
@@ -821,7 +994,7 @@ def build_conformance_corpus(root: Path, data: dict[str, Any]) -> None:
         "version": CONFORMANCE_VERSION,
         "vectors": [
             {
-                "path": str(path.relative_to(base)),
+                "path": path.relative_to(base).as_posix(),
                 "sha256": sha256_file(path),
                 "size_bytes": path.stat().st_size,
             }
@@ -833,7 +1006,7 @@ def build_conformance_corpus(root: Path, data: dict[str, Any]) -> None:
     sums = []
     for entry in manifest["vectors"]:
         sums.append(f"{entry['sha256']}  {entry['path']}")
-    (base / "SHA256SUMS").write_text("\n".join(sums) + "\n", encoding="utf-8")
+    (base / "SHA256SUMS").write_text("\n".join(sums) + "\n", encoding="utf-8", newline="\n")
 
 
 def product_manifest(source_commit: str) -> dict[str, Any]:
@@ -843,10 +1016,10 @@ def product_manifest(source_commit: str) -> dict[str, Any]:
         "conformance_corpus_version": CONFORMANCE_VERSION,
         "copyright_holder": "James Daley",
         "hashes": {},
-        "license": "LicenseRef-ASH-Pattern-System-Personal-Academic",
+        "license": PRODUCT_LICENSE,
         "product_identifier": PRODUCT_IDENTIFIER,
         "product_name": PRODUCT_NAME,
-        "release_tag": "v1.0.0-rc.1",
+        "release_tag": f"v{PRODUCT_VERSION}",
         "schema_version": SCHEMA_VERSION,
         "source_commit": source_commit,
         "status": "RELEASE_CANDIDATE",
@@ -857,27 +1030,27 @@ def product_manifest(source_commit: str) -> dict[str, Any]:
 def build_root_documents(root: Path, source_commit: str) -> None:
     documents = {
         "VERSION": PRODUCT_VERSION + "\n",
-        "LICENSE.md": "# ASH Pattern System Personal and Academic Use License\n\nCopyright (c) 2026 James Daley. All rights reserved.\n\n## 1. Scope\n\nThis license applies to the ASH Pattern System specifications, schemas, canonical data, conformance materials, documentation, governance tools, and related repository contents (the \"Materials\").\n\n## 2. Personal non-commercial use\n\nSubject to this license, an individual may use, study, reproduce, and modify the Materials solely for that individual's personal, non-commercial purposes.\n\n## 3. Academic use\n\nSubject to this license, accredited educational institutions, educators, students, and researchers may use, study, reproduce, and modify the Materials for non-commercial teaching, scholarship, and academic research.\n\n## 4. Conditions\n\nAny permitted copy or permitted redistribution must retain this license and all copyright and notice files, identify modifications clearly, avoid implying endorsement by the copyright holder, and avoid commercial use without a separate written commercial license.\n\n## 5. Commercial use\n\nCommercial use is not granted by this license. Any commercial use, commercial deployment, paid distribution, commercial integration, or use primarily intended for commercial advantage requires a separate written license from the copyright holder.\n\n## 6. No trademark license\n\nNo right to use any name, logo, mark, or product identity as a trademark is granted except as necessary for accurate identification.\n\n## 7. No patent grant\n\nNo patent license is granted except to the extent explicitly stated in a separate written agreement.\n\n## 8. Disclaimer of warranty\n\nTHE MATERIALS ARE PROVIDED \"AS IS,\" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT, TO THE MAXIMUM EXTENT PERMITTED BY LAW.\n\n## 9. Limitation of liability\n\nTO THE MAXIMUM EXTENT PERMITTED BY LAW, THE COPYRIGHT HOLDER SHALL NOT BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM OR RELATED TO THE MATERIALS OR THEIR USE.\n\n## 10. Termination\n\nRights granted under this license terminate automatically upon material breach. Continued possession or use after termination is unauthorized unless the breach is cured with written permission from the copyright holder.\n\n## 11. Commercial licensing\n\nCommercial licensing inquiries must use the owner-confirmed contact or process documented in `SUPPORT.md`.\n",
+        "LICENSE": (Path(__file__).resolve().parents[2] / "LICENSE").read_text(encoding="utf-8"),
         "PUBLIC-SPECIFICATION-API.md": "# Public Specification API\n\nAPS 1.0 defines state, codeword, orbit, realm, transition, topology, diagnostic, recovery, fallback, generation, schema, canonical data, and conformance surfaces as its public specification API.\n",
-        "CHANGELOG.md": "# Changelog\n\n## 1.0.0-rc.1\n\n### Added\n\n- Release-candidate schemas, canonical data, conformance vectors, and lifecycle evidence for APS 1.0.\n",
-        "RELEASE-NOTES.md": "# APS 1.0.0-rc.1 Release Notes\n\nThis release candidate converts APS into a versioned specification product with machine-readable data and conformance evidence.\n",
-        "COMPATIBILITY.md": "# Compatibility Policy\n\nAPS follows Semantic Versioning. Changes to public identifiers, required fields, canonical JSON, or conformance interpretation require a major version unless explicitly backward compatible.\n",
+        "CHANGELOG.md": (Path(__file__).resolve().parents[2] / "CHANGELOG.md").read_text(encoding="utf-8"),
+        "RELEASE-NOTES.md": (Path(__file__).resolve().parents[2] / "RELEASE-NOTES.md").read_text(encoding="utf-8"),
+        "COMPATIBILITY.md": (Path(__file__).resolve().parents[2] / "COMPATIBILITY.md").read_text(encoding="utf-8"),
         "DEPRECATION-POLICY.md": "# Deprecation Policy\n\nDeprecated APS identifiers remain documented for at least one minor release unless a security issue requires earlier removal.\n",
-        "MIGRATION-GUIDE.md": "# Migration Guide\n\nDownstream implementations should bind to versioned schemas, canonical data, and conformance corpus paths for each APS release.\n",
-        "RELEASE-PROCESS.md": "# Release Process\n\nFrom a clean checkout, run `python3 tools/product/verify_canonical_data.py`, `python3 tools/product/verify_conformance_corpus.py`, `python3 tools/product/build_release_archive.py --source-commit <release-source-commit> --verify`, `python3 tools/product/verify_release_archive.py --archive release/ash-pattern-system-1.0.0-rc.1.zip`, and `python3 tools/product/release_readiness.py --strict --offline --source-commit <release-source-commit>` before publishing.\n",
+        "MIGRATION-GUIDE.md": (Path(__file__).resolve().parents[2] / "MIGRATION-GUIDE.md").read_text(encoding="utf-8"),
+        "RELEASE-PROCESS.md": (Path(__file__).resolve().parents[2] / "RELEASE-PROCESS.md").read_text(encoding="utf-8"),
         "PRODUCT-STATUS.md": "# Product Status\n\nStatus: `RELEASE_CANDIDATE`\n\nFinal release requires all technical gates plus owner-approved license and publication approval.\n",
         "NORMATIVE-ARTIFACT-INDEX.md": "# Normative Artifact Index\n\nThe machine-readable index lives at `canonical-data/1.0/normative-artifact-index.json`.\n",
-        "NOTICE.md": "# Notice\n\nASH Pattern System. Copyright (c) 2026 James Daley. All rights reserved.\n\nCommercial licensing requires separate written permission.\n",
+        "NOTICE.md": (Path(__file__).resolve().parents[2] / "NOTICE.md").read_text(encoding="utf-8"),
         "SECURITY.md": "# Security Policy\n\nReport vulnerabilities through the repository private security advisory mechanism or an owner-confirmed private contact before public disclosure.\n",
         "SUPPORT.md": "# Support Policy\n\nSupported requests include specification defects, conformance questions, security reports, and commercial licensing inquiries. Downstream implementation defects belong to their implementation repository.\n",
         "CONTRIBUTING.md": "# Contributing\n\nContributions must preserve canonical APS semantics, include verification evidence, respect compatibility policy, and avoid platform implementation code in this canonical repository.\n",
         "CODE_OF_CONDUCT.md": "# Code of Conduct\n\nParticipation requires professional, respectful collaboration. Report conduct issues through an owner-confirmed repository contact.\n",
-        "CITATION.cff": "cff-version: 1.2.0\nmessage: \"If you use this specification, cite it as below.\"\ntitle: \"ASH Pattern System\"\nauthors:\n  - family-names: \"Daley\"\n    given-names: \"James\"\nversion: \"1.0.0-rc.1\"\nrepository-code: \"https://github.com/flynn33/ASH-Pattern-System\"\nlicense: \"LicenseRef-ASH-Pattern-System-Personal-Academic\"\n",
+        "CITATION.cff": "cff-version: 1.2.0\nmessage: \"If you use this specification, cite it as below.\"\ntitle: \"ASH Pattern System\"\nauthors:\n  - family-names: \"Daley\"\n    given-names: \"James\"\nversion: \"1.0.0-rc.2\"\nrepository-code: \"https://github.com/flynn33/ASH-Pattern-System\"\nlicense: \"Apache-2.0\"\n",
     }
     for relative, text in documents.items():
         path = root / relative
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
+        path.write_text(text, encoding="utf-8", newline="\n")
     write_json(root / "product-manifest.json", product_manifest(source_commit))
 
 
@@ -891,6 +1064,27 @@ def build_examples(root: Path) -> None:
     invalid = {"state_signature": "00000000"}
     write_json(root / "examples/valid/ash-state-minimal.json", valid)
     write_json(root / "examples/invalid/ash-state-too-short.json", invalid)
+    chain = diagnostic_chain_vectors()[0]["expected_output"]["records"]
+    for name, record in (("diagnostic-root", chain[0]), ("diagnostic-child", chain[1])):
+        write_json(root / f"examples/valid/{name}.json", diagnostic_contract.wrapper(record, PRODUCT_VERSION))
+    occurrence = diagnostic_chain_vectors()[-1]["expected_output"]["records"][1]
+    write_json(root / "examples/valid/diagnostic-occurrence.json", diagnostic_contract.wrapper(occurrence, PRODUCT_VERSION))
+    containment = {"trigger": "FALLBACK_FAILURE", "original_diagnostic": chain[0], "diagnostic": chain[4],
+                   "system_state_class": "CONTAINED", "full_diagnostic_chain": chain[:5],
+                   "restricted_operations": ["INSPECT_DIAGNOSTICS"], "containment_time": "2026-10-11T00:00:00Z",
+                   "awaiting_resolution": True, "resolution": "PENDING"}
+    halt = {"trigger": "CONTAINMENT_BREACH", "original_diagnostic": chain[0], "diagnostic": chain[-1],
+            "system_state_class": "SAFE_HALT", "full_diagnostic_chain": chain,
+            "halt_time": "2026-10-11T00:00:01Z", "is_terminal": True, "frozen": True}
+    for name, data in (("containment-record", containment), ("safe-halt-record", halt)):
+        write_json(root / f"examples/valid/{name}.json", {"schema_version": SCHEMA_VERSION,
+                   "product_version": PRODUCT_VERSION, "id": data["diagnostic"]["diagnostic_id"], "data": data})
+    empty_notes = json.loads(canonical_json(chain[0]))
+    empty_notes["notes"] = []
+    write_json(root / "examples/invalid/diagnostic-empty-notes.json", diagnostic_contract.wrapper(empty_notes, PRODUCT_VERSION))
+    missing_details = json.loads(canonical_json(chain[0]))
+    del missing_details["details"]
+    write_json(root / "examples/invalid/diagnostic-missing-details.json", diagnostic_contract.wrapper(missing_details, PRODUCT_VERSION))
     write_json(
         root / "examples/invalid/manifest.json",
         {
@@ -899,7 +1093,9 @@ def build_examples(root: Path) -> None:
                     "path": "ash-state-too-short.json",
                     "reason": "state_signature must contain exactly nine binary characters",
                     "schema": "schemas/1.0/ash-state.schema.json",
-                }
+                },
+                {"path": "diagnostic-empty-notes.json", "reason": "Diagnostic notes must explain the condition", "schema": "schemas/1.0/diagnostic-envelope.schema.json"},
+                {"path": "diagnostic-missing-details.json", "reason": "Diagnostic details are required even when empty", "schema": "schemas/1.0/diagnostic-envelope.schema.json"},
             ]
         },
     )
@@ -971,6 +1167,7 @@ def verify_product_tree(root: Path) -> dict[str, Any]:
         invalid_manifest = root / "conformance" / CONFORMANCE_VERSION / "invalid" / "manifest.json"
         if not invalid_manifest.is_file():
             errors.append("missing invalid conformance manifest")
+    errors.extend(validate_conformance_semantics(root))
     return {"errors": errors}
 
 
@@ -995,6 +1192,8 @@ def json_type_matches(value: Any, expected: str) -> bool:
 def validate_instance(instance: Any, schema: dict[str, Any], location: str) -> list[str]:
     errors: list[str] = []
     expected_type = schema.get("type")
+    if isinstance(expected_type, list) and not any(json_type_matches(instance, value) for value in expected_type):
+        return [f"{location}: expected one of {expected_type}"]
     if isinstance(expected_type, str) and not json_type_matches(instance, expected_type):
         errors.append(f"{location}: expected {expected_type}")
         return errors
@@ -1086,6 +1285,11 @@ def validate_schema_surfaces(root: Path) -> list[str]:
 
     valid_examples = {
         root / "examples" / "valid" / "ash-state-minimal.json": "ash-state",
+        root / "examples" / "valid" / "diagnostic-root.json": "diagnostic-envelope",
+        root / "examples" / "valid" / "diagnostic-child.json": "diagnostic-envelope",
+        root / "examples" / "valid" / "diagnostic-occurrence.json": "diagnostic-envelope",
+        root / "examples" / "valid" / "containment-record.json": "containment-record",
+        root / "examples" / "valid" / "safe-halt-record.json": "safe-halt-record",
     }
     for path, schema_name in valid_examples.items():
         instance = load_json_file(path, errors)
@@ -1093,6 +1297,10 @@ def validate_schema_surfaces(root: Path) -> list[str]:
             continue
         for error in validate_instance(instance, schemas[schema_name], path.relative_to(root).as_posix()):
             errors.append(error)
+        if schema_name == "diagnostic-envelope":
+            errors.extend(validate_diagnostic_projection(instance, schema_name))
+        elif schema_name in ("containment-record", "safe-halt-record"):
+            errors.extend(validate_diagnostic_projection(instance, schema_name))
 
     invalid_manifest_path = root / "examples" / "invalid" / "manifest.json"
     invalid_manifest = load_json_file(invalid_manifest_path, errors)
@@ -1180,7 +1388,7 @@ def validate_release_outputs(root: Path, expected_source_commit: str | None = No
     root_manifest_path = root / "product-manifest.json"
     manifest_path = release_dir / "release-manifest.json"
     sums_path = release_dir / "SHA256SUMS"
-    archive_path = release_dir / "ash-pattern-system-1.0.0-rc.1.zip"
+    archive_path = release_dir / f"ash-pattern-system-{PRODUCT_VERSION}.zip"
 
     root_product_manifest = load_json_file(root_manifest_path, errors)
     manifest = load_json_file(manifest_path, errors)
@@ -1221,7 +1429,7 @@ def validate_release_outputs(root: Path, expected_source_commit: str | None = No
     else:
         sums = sums_path.read_text(encoding="utf-8").splitlines()
         expected = {
-            "ash-pattern-system-1.0.0-rc.1.zip": sha256_file(archive_path) if archive_path.is_file() else None,
+            f"ash-pattern-system-{PRODUCT_VERSION}.zip": sha256_file(archive_path) if archive_path.is_file() else None,
             "release-manifest.json": sha256_file(manifest_path) if manifest_path.is_file() else None,
         }
         for name, value in expected.items():
@@ -1315,7 +1523,7 @@ def release_manifest(staging_root: Path, archive_result: dict[str, Any], *, sour
         "conformance_corpus_version": CONFORMANCE_VERSION,
         "files": files,
         "included_file_count": len(files),
-        "license": "LicenseRef-ASH-Pattern-System-Personal-Academic",
+        "license": PRODUCT_LICENSE,
         "product_identifier": PRODUCT_IDENTIFIER,
         "product_name": PRODUCT_NAME,
         "release_gate_results": {
@@ -1323,7 +1531,7 @@ def release_manifest(staging_root: Path, archive_result: dict[str, Any], *, sour
             "canonical_data": "PASS",
             "conformance_corpus": "PASS",
         },
-        "release_tag": "v1.0.0-rc.1",
+        "release_tag": f"v{PRODUCT_VERSION}",
         "schema_version": SCHEMA_VERSION,
         "source_commit": source_commit,
         "status": "RELEASE_CANDIDATE",

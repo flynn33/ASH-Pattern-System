@@ -36,7 +36,7 @@ TYPE DiagnosticEnvelope
 END TYPE
 ```
 
-`diagnostic_id` is the SHA-256 digest of the canonical semantic payload. Occurrence metadata such as timestamp, host, process, or transport data is excluded from this identity.
+`diagnostic_id` uses the nine-field semantic payload, canonical JSON encoding, and `APS-DIAG-` digest format defined in `specs/interfaces/diagnostic-schema.md`. Meaningful notes and details are semantic and required; occurrence metadata such as timestamp, host, process, or transport data is excluded. This shared contract also defines the modern and retained legacy vocabulary, explicit safety-phase mapping, and transport projection. A validator must recompute identity and validate complete causal chains.
 
 ## Diagnostic kinds
 

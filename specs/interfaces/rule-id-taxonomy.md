@@ -34,6 +34,10 @@ Example: `ASH-STATE-VALIDITY-001`
 | `ASH-CONTAINMENT` | Containment triggers, containment behavior | `containment-safe-failure-semantics.pseudo.md` |
 | `ASH-HALT` | Safe halt triggers, terminal state semantics | `containment-safe-failure-semantics.pseudo.md` |
 
+## 1.0 registered baseline vocabulary
+
+The versioned `canonical-data/1.0/rule-registry.json` declares the short baseline form `{FAMILY}-{NUMBER}` (for example `ASH-STATE-001`). The absent category means the registered baseline requirement; it is not a missing field. Existing long-form IDs remain accepted and retain their original meanings. New diagnostics may use either a declared long-form source rule or a short rule present in the registry. The 1.0 registered families are `ASH-INPUT`, `ASH-STATE`, `ASH-CODEWORD`, `ASH-ORBIT`, `ASH-REALM`, `ASH-TRANSITION`, `ASH-TOPOLOGY`, `ASH-AXIOM`, `ASH-CLASSIFICATION`, `ASH-RECOVERY`, `ASH-FALLBACK`, `ASH-CONTAINMENT`, `ASH-HALT`, `ASH-GENERATION`, `ASH-EMISSION`, `ASH-DIAGNOSTIC`, `ASH-CONFORMANCE`, `ASH-RELEASE`, and `ASH-SECURITY`. The earlier `ASH-ADMISSIBILITY` family remains valid for declared source rules. Unknown families are invalid. Numbering, stability, source traceability, and evaluation-order requirements apply to both forms.
+
 ## Numbering rules
 
 1. Numbers are 3-digit zero-padded: `001`, `002`, ..., `999`.

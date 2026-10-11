@@ -3,9 +3,148 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "Versioned APS diagnostic-envelope record.",
-  "product_version": "1.0.0-rc.1",
+  "product_version": "1.0.0-rc.2",
   "properties": {
     "data": {
+      "additionalProperties": false,
+      "properties": {
+        "chain_root_diagnostic_id": {
+          "pattern": "^APS-DIAG-[0-9A-F]{24}$",
+          "type": "string"
+        },
+        "details": {
+          "type": "object"
+        },
+        "diagnostic_id": {
+          "pattern": "^APS-DIAG-[0-9A-F]{24}$",
+          "type": "string"
+        },
+        "diagnostic_kind": {
+          "enum": [
+            "INPUT_VALIDATION",
+            "STATE_ASSESSMENT",
+            "CLASSIFICATION",
+            "TRANSITION",
+            "TOPOLOGY",
+            "AXIOM",
+            "GENERATION_PLAN",
+            "EMISSION",
+            "RECOVERY",
+            "FALLBACK",
+            "CONTAINMENT",
+            "SAFE_HALT",
+            "SCHEMA_VALIDATION",
+            "CONFORMANCE",
+            "STATE_VALIDITY"
+          ],
+          "type": "string"
+        },
+        "disposition": {
+          "enum": [
+            "RECORDED",
+            "RESOLVED",
+            "PENDING",
+            "BLOCKED",
+            "ESCALATED",
+            "TERMINAL"
+          ],
+          "type": "string"
+        },
+        "notes": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "occurrence_metadata": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "parent_diagnostic_id": {
+          "pattern": "^APS-DIAG-[0-9A-F]{24}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rule_ids": {
+          "items": {
+            "pattern": "^ASH-(?:INPUT|STATE|CODEWORD|ORBIT|REALM|TRANSITION|TOPOLOGY|AXIOM|CLASSIFICATION|RECOVERY|FALLBACK|CONTAINMENT|HALT|GENERATION|EMISSION|DIAGNOSTIC|CONFORMANCE|RELEASE|SECURITY|ADMISSIBILITY)(?:-[A-Z]+)*-[0-9]{3}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "type": "string"
+        },
+        "sequence_number": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "severity": {
+          "enum": [
+            "INFO",
+            "WARNING",
+            "ERROR",
+            "CRITICAL"
+          ],
+          "type": "string"
+        },
+        "stage": {
+          "enum": [
+            "DETECTION",
+            "PARSE",
+            "CLASSIFICATION",
+            "ASSESS",
+            "CLASSIFY",
+            "RECOVERY",
+            "RECOVER",
+            "FALLBACK",
+            "ESCALATION",
+            "CONTAIN",
+            "TERMINAL",
+            "HALT",
+            "TRANSFORM",
+            "PLAN",
+            "EVALUATE",
+            "EMIT",
+            "VALIDATE",
+            "VERIFY"
+          ],
+          "type": "string"
+        },
+        "subject_reference": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "summary": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "diagnostic_id",
+        "diagnostic_kind",
+        "severity",
+        "stage",
+        "disposition",
+        "subject_reference",
+        "parent_diagnostic_id",
+        "chain_root_diagnostic_id",
+        "sequence_number",
+        "rule_ids",
+        "summary",
+        "notes",
+        "details",
+        "occurrence_metadata"
+      ],
       "type": "object"
     },
     "id": {

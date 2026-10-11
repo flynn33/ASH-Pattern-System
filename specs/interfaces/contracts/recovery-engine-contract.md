@@ -49,12 +49,13 @@ The `RecoveryEngine` module is the single authority for:
 - Enter containment when fallback fails, propagation risk detected, or operator requests
 - Restrict operations to safe subset
 - Preserve diagnostic state
-- Escalate to safe halt if containment boundary is breached
+- Escalate to terminal safe halt for a confirmed containment breach; preserve and freeze the full chain before returning
+- A successfully prevented unauthorized attempt remains contained, emits a blocked management record, and retains restrictions
 
 ### Safe halt
 - Enter safe halt when directed by escalation, containment breach, or operator request
 - No further transitions permitted — terminal state
-- Preserve full diagnostic chain for post-mortem
+- Preserve full diagnostic chain for post-mortem and freeze it; subsequent calls return the original snapshot without appending or mutating diagnostics
 
 ### Monotonic escalation
 - Recovery failure → fallback → containment → safe halt

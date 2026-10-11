@@ -6,6 +6,30 @@
     },
     {
       "classification": "GOVERNANCE",
+      "path": ".github/FUNDING.yaml"
+    },
+    {
+      "classification": "GOVERNANCE",
+      "path": ".github/FUNDING.yml"
+    },
+    {
+      "classification": "GOVERNANCE",
+      "path": ".github/ISSUE_TEMPLATE/bug_report.md"
+    },
+    {
+      "classification": "GOVERNANCE",
+      "path": ".github/ISSUE_TEMPLATE/config.yml"
+    },
+    {
+      "classification": "GOVERNANCE",
+      "path": ".github/ISSUE_TEMPLATE/feature_request.md"
+    },
+    {
+      "classification": "GOVERNANCE",
+      "path": ".github/PULL_REQUEST_TEMPLATE.md"
+    },
+    {
+      "classification": "GOVERNANCE",
       "path": ".github/rulesets/main-release-platform-protection.md"
     },
     {
@@ -46,39 +70,15 @@
     },
     {
       "classification": "GOVERNANCE",
+      "path": ".github/scripts/test_gate_workflow_activation.py"
+    },
+    {
+      "classification": "GOVERNANCE",
       "path": ".github/scripts/wiki_maintenance_check.py"
     },
     {
       "classification": "GOVERNANCE",
-      "path": ".github/workflows/alignment-agent.yml"
-    },
-    {
-      "classification": "GOVERNANCE",
-      "path": ".github/workflows/canonical-semantic-integrity-agent.yml"
-    },
-    {
-      "classification": "GOVERNANCE",
-      "path": ".github/workflows/docs-maintenance-agent.yml"
-    },
-    {
-      "classification": "GOVERNANCE",
-      "path": ".github/workflows/downstream-conformance-agent.yml"
-    },
-    {
-      "classification": "GOVERNANCE",
-      "path": ".github/workflows/gate-integrity.yml"
-    },
-    {
-      "classification": "GOVERNANCE",
-      "path": ".github/workflows/math-integrity-agent.yml"
-    },
-    {
-      "classification": "GOVERNANCE",
       "path": ".github/workflows/no-ai-attribution.yml"
-    },
-    {
-      "classification": "GOVERNANCE",
-      "path": ".github/workflows/wiki-maintenance-agent.yml"
     },
     {
       "classification": "INFORMATIVE",
@@ -110,7 +110,7 @@
     },
     {
       "classification": "INFORMATIVE",
-      "path": "LICENSE.md"
+      "path": "LICENSE"
     },
     {
       "classification": "INFORMATIVE",
@@ -314,6 +314,10 @@
     },
     {
       "classification": "CONFORMANCE",
+      "path": "conformance/1.0/vectors/diagnostic-chains.jsonl"
+    },
+    {
+      "classification": "CONFORMANCE",
       "path": "conformance/1.0/vectors/diagnostics.jsonl"
     },
     {
@@ -406,11 +410,39 @@
     },
     {
       "classification": "INFORMATIVE",
+      "path": "examples/invalid/diagnostic-empty-notes.json"
+    },
+    {
+      "classification": "INFORMATIVE",
+      "path": "examples/invalid/diagnostic-missing-details.json"
+    },
+    {
+      "classification": "INFORMATIVE",
       "path": "examples/invalid/manifest.json"
     },
     {
       "classification": "INFORMATIVE",
       "path": "examples/valid/ash-state-minimal.json"
+    },
+    {
+      "classification": "INFORMATIVE",
+      "path": "examples/valid/containment-record.json"
+    },
+    {
+      "classification": "INFORMATIVE",
+      "path": "examples/valid/diagnostic-child.json"
+    },
+    {
+      "classification": "INFORMATIVE",
+      "path": "examples/valid/diagnostic-occurrence.json"
+    },
+    {
+      "classification": "INFORMATIVE",
+      "path": "examples/valid/diagnostic-root.json"
+    },
+    {
+      "classification": "INFORMATIVE",
+      "path": "examples/valid/safe-halt-record.json"
     },
     {
       "classification": "GOVERNANCE",
@@ -430,11 +462,19 @@
     },
     {
       "classification": "GOVERNANCE",
+      "path": "governance/math-change-notes/2026-10-11-diagnostic-containment-consistency.md"
+    },
+    {
+      "classification": "GOVERNANCE",
       "path": "governance/math-change-notes/README.md"
     },
     {
       "classification": "GOVERNANCE",
       "path": "governance/repository-governance.md"
+    },
+    {
+      "classification": "GOVERNANCE",
+      "path": "governance/workflow-activation.json"
     },
     {
       "classification": "TEMPLATE",
@@ -742,6 +782,10 @@
     },
     {
       "classification": "INFORMATIVE",
+      "path": "tools/product/diagnostic_contract.py"
+    },
+    {
+      "classification": "INFORMATIVE",
       "path": "tools/product/generate_canonical_data.py"
     },
     {
@@ -755,6 +799,10 @@
     {
       "classification": "INFORMATIVE",
       "path": "tools/product/tests/test_aps_product.py"
+    },
+    {
+      "classification": "INFORMATIVE",
+      "path": "tools/product/tests/test_diagnostic_containment.py"
     },
     {
       "classification": "INFORMATIVE",

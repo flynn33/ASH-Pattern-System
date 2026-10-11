@@ -1,0 +1,31 @@
+{
+  "data": {
+    "chain_root_diagnostic_id": "APS-DIAG-29BDF38D1F32F89D98D60837",
+    "details": {
+      "candidate": "000011110",
+      "codeword_id": "APS-CW-01",
+      "state_class": "CORRECTABLE",
+      "target": "000000000"
+    },
+    "diagnostic_id": "APS-DIAG-251268B2DD1C32A0A94657A5",
+    "diagnostic_kind": "STATE_ASSESSMENT",
+    "disposition": "RECORDED",
+    "notes": [
+      "The validated context permits target 000000000; candidate 000011110 reaches it by canonical codeword APS-CW-01."
+    ],
+    "occurrence_metadata": null,
+    "parent_diagnostic_id": "APS-DIAG-29BDF38D1F32F89D98D60837",
+    "rule_ids": [
+      "ASH-DIAGNOSTIC-001"
+    ],
+    "schema_version": "1.0",
+    "sequence_number": 2,
+    "severity": "WARNING",
+    "stage": "ASSESS",
+    "subject_reference": "APS-CHAIN-MODERN-SAFETY",
+    "summary": "Candidate has a declared correction path"
+  },
+  "id": "APS-DIAG-251268B2DD1C32A0A94657A5",
+  "product_version": "1.0.0-rc.2",
+  "schema_version": "1.0"
+}

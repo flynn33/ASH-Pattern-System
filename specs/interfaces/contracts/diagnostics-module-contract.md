@@ -27,12 +27,15 @@ The `Diagnostics` module is the single authority for:
 
 ### Schema conformance
 - All diagnostic records must conform to the `DiagnosticEnvelope` defined in `specs/interfaces/diagnostic-schema.md`
-- Required fields: `diagnostic_kind`, `severity`, `stage`, `disposition`, `subject_reference`, `parent_diagnostic_reference`, `chain_root_reference`, `rule_ids`, `summary`, `notes`
+- Required serialized fields: `schema_version`, `diagnostic_id`, `diagnostic_kind`, `severity`, `stage`, `disposition`, `subject_reference`, `parent_diagnostic_id`, `chain_root_diagnostic_id`, `sequence_number`, `rule_ids`, `summary`, nonempty meaningful `notes`, `details`, and `occurrence_metadata`
+- Recompute the nine-field semantic identity; reject arbitrary IDs or IDs stale after any semantic field changes
+- Validate the transport wrapper and every inner field; `details = {}` and `occurrence_metadata = null` are valid populated fields
+- Validate the explicit safety phases and carried operation phase defined in `diagnostic-schema.md`; enum ordinals are not escalation order
 - No diagnostic record may be emitted without these fields populated
 
 ### Rule-ID taxonomy conformance
 - All `rule_ids` in diagnostic records must conform to the canonical pattern defined in `specs/interfaces/rule-id-taxonomy.md`
-- Pattern: `{FAMILY}-{CATEGORY}-{NUMBER}` (e.g., `ASH-STATE-VALIDITY-001`)
+- Patterns: registered baseline `{FAMILY}-{NUMBER}` and retained `{FAMILY}-{CATEGORY}-{NUMBER}` (e.g., `ASH-STATE-001`, `ASH-STATE-VALIDITY-001`), as defined in the taxonomy
 - Rule-free diagnostics are prohibited
 
 ### Diagnostic chain exposure
