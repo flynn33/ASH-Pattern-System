@@ -4,6 +4,8 @@
 
 This contract layer is authoritative for module-level implementation behavior within the current 9D foundation.
 
+For the 1.0 release-candidate series, apply the explicit [normative reconciliation](../../PUBLIC-SPECIFICATION-API.md#100-rc3-normative-reconciliation). It names superseded generic clauses and their controlling current core/algorithm/data contracts. This is a bounded compatibility decision, not permission to ignore unaffected module requirements or choose an alternate model.
+
 **Codeword-set closure**: The codeword set `C ⊂ F2^9` is fully closed as a [9, 4, 4] doubly-even linear code with 16 members, defined in `specs/core/codeword-set.pseudo.md`. Implementations must use exactly the specified codeword set and must not invent or extend codewords.
 
 ## Umbrella contract document

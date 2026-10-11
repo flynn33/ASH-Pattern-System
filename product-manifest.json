@@ -7,9 +7,9 @@
   "license": "Apache-2.0",
   "product_identifier": "aps",
   "product_name": "ASH Pattern System",
-  "release_tag": "v1.0.0-rc.2",
+  "release_tag": "v1.0.0-rc.3",
   "schema_version": "1.0",
   "source_commit": "639e0cfe8b1c276e03cd3351e04311fc845936d1",
   "status": "RELEASE_CANDIDATE",
-  "version": "1.0.0-rc.2"
+  "version": "1.0.0-rc.3"
 }

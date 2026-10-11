@@ -192,6 +192,6 @@
     "trigger": "FALLBACK_FAILURE"
   },
   "id": "APS-DIAG-96BA57CB6263F3F0C682EE43",
-  "product_version": "1.0.0-rc.2",
+  "product_version": "1.0.0-rc.3",
   "schema_version": "1.0"
 }

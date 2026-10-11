@@ -4,6 +4,6 @@ title: "ASH Pattern System"
 authors:
   - family-names: "Daley"
     given-names: "James"
-version: "1.0.0-rc.2"
+version: "1.0.0-rc.3"
 repository-code: "https://github.com/flynn33/ASH-Pattern-System"
 license: "Apache-2.0"

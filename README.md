@@ -64,6 +64,8 @@ This repository does not define:
 
 An implementation agent should use this repository as the semantic authority for ASH Pattern System behavior.
 
+Current specification candidate: **1.0.0-rc.3**. Read the [explicit normative reconciliation](PUBLIC-SPECIFICATION-API.md#100-rc3-normative-reconciliation) before applying older module, invariant, topology-expansion, or registry prose. It identifies exactly which conflicting clauses are superseded by the existing context-bound and structural model; unaffected requirements remain binding. Diagnostic schemas reject blank explanation fields while semantic validation checks identity, chain integrity, and meaning.
+
 If an implementation disagrees with this repository, the specification here wins. If repository wording drifts internally, the repository must be corrected to match its canonical baseline.
 
 The repository remains in maintenance mode as a canonical baseline: future edits should preserve internal mathematical consistency and improve clarity, enforcement, and downstream conformance.

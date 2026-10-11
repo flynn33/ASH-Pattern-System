@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0-rc.3
+
+### Corrected
+
+- Machine schemas reject whitespace-only diagnostic explanations and multiline summaries, matching already-required semantic constraints.
+- Record explicit normative precedence for older conflicting state, recovery, realm, topology, fallback, and taxonomy reference clauses. Preserve the existing core/algorithm/data behavior and locked mathematics rather than changing the operational model to fit stale prose.
+- Preserve the reviewed public specification API during regeneration. Retain prior source commits, diagnostic IDs, and release evidence unchanged.
+
 ## 1.0.0-rc.2
 
 ### Corrected

@@ -1,6 +1,11 @@
 {
-  "product_version": "1.0.0-rc.2",
+  "product_version": "1.0.0-rc.3",
   "vectors": [
+    {
+      "path": "README.md",
+      "sha256": "ec3ea31e311fd077efe8c787d947e0343e40ba188975bc05ba6adb998c3632f0",
+      "size_bytes": 865
+    },
     {
       "path": "invalid/invalid-state-signature.json",
       "sha256": "593699c70e7f30b57b604760be7650db8d58f86a2c0a1b0bc5590e656a745d6c",
@@ -22,93 +27,88 @@
       "size_bytes": 157
     },
     {
-      "path": "README.md",
-      "sha256": "ec3ea31e311fd077efe8c787d947e0343e40ba188975bc05ba6adb998c3632f0",
-      "size_bytes": 865
-    },
-    {
       "path": "vectors/averaging.jsonl",
-      "sha256": "9d612dc389e92e62457d24f342e4fca68c6b8649f5dea837b3688a1538ff5ad1",
+      "sha256": "4cfa0476f6b246d4e977c25fd7d2deb1ed3662c3084b4fe0faf8a26b45e3eb5d",
       "size_bytes": 275735
     },
     {
       "path": "vectors/axioms.jsonl",
-      "sha256": "20b78aa62c4a2c5b85e2ad4c63d2b4e7e6d9559749c77eea85e6d020b3c95324",
+      "sha256": "fdbd0d34cbbd11195e473a7b5131df6d1c63f3a53cb42bedad79db0873ee6ee0",
       "size_bytes": 793
     },
     {
       "path": "vectors/codewords.jsonl",
-      "sha256": "ed0033d1cfbc0b97de15b83075f39d23afc21a5c15e7d816ff3e83539e883398",
+      "sha256": "a1360d6d8d1f3bbced6379f0094e816428f66ee7c4c3f9210eaa7be38e389781",
       "size_bytes": 5909
     },
     {
       "path": "vectors/containment.jsonl",
-      "sha256": "12319f47ad5ddac95ad9ce2849bd9f5dbbeb081b3b42e76ba51b468abbe284cd",
+      "sha256": "3963c87e559267f74aab826af60beff3a38976f107baa58f8b9a5c8b20bf71e6",
       "size_bytes": 1717
     },
     {
       "path": "vectors/diagnostic-chains.jsonl",
-      "sha256": "e88e64103f2cd627475d0f67c357c7d000691b3e1644964bb1abc921b3292fc9",
+      "sha256": "498e8d88d535985ee11bfcef4dd7f6b1017cbc167d969b7de939b3b06dde1741",
       "size_bytes": 29624
     },
     {
       "path": "vectors/diagnostics.jsonl",
-      "sha256": "8560becb5dff8ce3a7db39c8faee84fb1f65c5da37efb349cedd09b1aec31256",
+      "sha256": "66f14244354e0ef052f90ece5f9f80ec613d9efa804fa3ca2c15a714efd58376",
       "size_bytes": 17668
     },
     {
       "path": "vectors/fallback.jsonl",
-      "sha256": "757dcdc4e1885776328cd9559b1e3b63f8384f6285782f2fe54cd47346b28608",
+      "sha256": "fb7155d61d9563ca15830f024034f0c81a9bfbc2df61b7d6cdd1314a4f091318",
       "size_bytes": 947
     },
     {
       "path": "vectors/generation-plans.jsonl",
-      "sha256": "b950a39e97cc34cd6065121b08342655ace9e6ba1a0d525c2d04001918994d43",
+      "sha256": "3a864dbb9cd898ab06f6b6af675cc3e99de52599f93151cfe581be6b6949015a",
       "size_bytes": 943
     },
     {
       "path": "vectors/materialization-boundary.jsonl",
-      "sha256": "d7b99a9199baaa60ae7294c7ee8a7a2e2b12e5546c888c1146ab38bf71b8cdd9",
+      "sha256": "1f3e56be2587f17edd7893235191aa748c1d7ed7ff42b9ea8102b76fb424701b",
       "size_bytes": 653
     },
     {
       "path": "vectors/reachability.jsonl",
-      "sha256": "f2c638446e67b2b71e409f34ffe27a74701d79beabbb093caeb25e28152f9768",
+      "sha256": "39b82a99273834ef699cd650203abfae8f7e3bf835b2e43b2775a37fa9b90b64",
       "size_bytes": 315392
     },
     {
       "path": "vectors/realm-identities.jsonl",
-      "sha256": "90e0c9cd4fcee3ef0a96966bfd44cda8eab7aecb3513de116d10cc1c498f934a",
+      "sha256": "31fa01998c6b44f1f77668059df8145b7507d4d16c9f2d230f9b2f2f9516f4c0",
       "size_bytes": 193426
     },
     {
       "path": "vectors/recovery.jsonl",
-      "sha256": "e087e9d23ff9619f1387f5384d9b880e6a2877c1fa9f36d7e65fd65114e6dbed",
+      "sha256": "86d1b68c7d7ec35fac3c322869d90c9f38a33e534990e6cb162abc0687048f40",
       "size_bytes": 910
     },
     {
       "path": "vectors/safe-halt.jsonl",
-      "sha256": "c39b4a223bdf5fd5a62a8a3802198d88890e2c2714a3c91cf75a276efea2aa71",
+      "sha256": "fc120f9381e34d1818393f5beda43f1375f670e0a25a5a746b7ba39673bbada5",
       "size_bytes": 864
     },
     {
       "path": "vectors/state-assessments.jsonl",
-      "sha256": "4a6b27d5ff38495c2cadedd26be8cfc7f1b5a92c5b18fac74be958a2ef490d6a",
+      "sha256": "aa6461037ebd33ae0bd9936e21424bb97d995708ccc6640b0c6f4dc5569c168b",
       "size_bytes": 2032
     },
     {
       "path": "vectors/states.jsonl",
-      "sha256": "71f1a26d842605f46f779c452a9f7d941e5682bfd38d065c9bdd9f233516e4d4",
+      "sha256": "37c9b985928d3c853571a0a7db38dd784e1e16bfa97bac8a15d9a16df1103f3d",
       "size_bytes": 205202
     },
     {
       "path": "vectors/topology.jsonl",
-      "sha256": "2dd80e1ef4f1c84526f66db68770ea046c6e9520f3ce5390184597fd99570c34",
+      "sha256": "36b590e34d6d1c50c0cd49f04edfe77377fd0b3b3dacb9b4c3466901f01f3d7c",
       "size_bytes": 422400
     },
     {
       "path": "vectors/transformations.jsonl",
-      "sha256": "7b9fed730525e0304af7054c7e192b49c796f682ea451a3e2d2145e82df01ea9",
+      "sha256": "20067082c3034a87ed072df17be28756848ed9813833bae9a532ead70a1ecab6",
       "size_bytes": 3596288
     }
   ],

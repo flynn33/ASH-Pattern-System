@@ -216,6 +216,6 @@
     "trigger": "CONTAINMENT_BREACH"
   },
   "id": "APS-DIAG-579D4805AB46410A4777E5EA",
-  "product_version": "1.0.0-rc.2",
+  "product_version": "1.0.0-rc.3",
   "schema_version": "1.0"
 }

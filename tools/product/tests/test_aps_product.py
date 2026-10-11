@@ -59,7 +59,7 @@ class ProductOutputTests(unittest.TestCase):
             aps_product.build_product_tree(root, source_commit="0" * 40)
             report = aps_product.verify_product_tree(root)
             self.assertEqual([], report["errors"])
-            self.assertEqual("1.0.0-rc.2", json.loads((root / "product-manifest.json").read_text())["version"])
+            self.assertEqual("1.0.0-rc.3", json.loads((root / "product-manifest.json").read_text())["version"])
             self.assertTrue((root / "canonical-data/1.0/codewords.json").is_file())
             self.assertTrue((root / "conformance/1.0/manifest.json").is_file())
             self.assertTrue((root / "schemas/1.0/ash-state.schema.json").is_file())
@@ -128,7 +128,7 @@ class ProductOutputTests(unittest.TestCase):
             archive_result = aps_product.build_release_archive(staging, output / "aps.zip")
             manifest = aps_product.release_manifest(staging, archive_result, source_commit="0" * 40)
             self.assertEqual("ASH Pattern System", manifest["product_name"])
-            self.assertEqual("1.0.0-rc.2", manifest["version"])
+            self.assertEqual("1.0.0-rc.3", manifest["version"])
             self.assertEqual(archive_result["sha256"], manifest["archive_sha256"])
             self.assertIn("VERSION", {entry["path"] for entry in manifest["files"]})
             self.assertGreater(manifest["included_file_count"], 10)
@@ -207,10 +207,10 @@ class ProductOutputTests(unittest.TestCase):
 
             self.assertEqual(0, result.returncode, result.stdout)
             self.assertFalse((output / "staging").exists())
-            self.assertFalse((output / "ash-pattern-system-1.0.0-rc.2.second.zip").exists())
+            self.assertFalse((output / "ash-pattern-system-1.0.0-rc.3.second.zip").exists())
             manifest = json.loads((output / "release-manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(source_commit, manifest["source_commit"])
-            with zipfile.ZipFile(output / "ash-pattern-system-1.0.0-rc.2.zip") as archive:
+            with zipfile.ZipFile(output / "ash-pattern-system-1.0.0-rc.3.zip") as archive:
                 archived_manifest = json.loads(archive.read("product-manifest.json"))
             self.assertEqual(source_commit, archived_manifest["source_commit"])
 
@@ -242,7 +242,7 @@ class ProductOutputTests(unittest.TestCase):
 
             self.assertEqual(0, result.returncode, result.stdout)
             self.assertEqual(stale_commit, json.loads((root / "product-manifest.json").read_text())["source_commit"])
-            with zipfile.ZipFile(output / "ash-pattern-system-1.0.0-rc.2.zip") as archive:
+            with zipfile.ZipFile(output / "ash-pattern-system-1.0.0-rc.3.zip") as archive:
                 archived_manifest = json.loads(archive.read("product-manifest.json"))
             self.assertEqual(release_commit, archived_manifest["source_commit"])
 

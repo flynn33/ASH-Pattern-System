@@ -2,6 +2,8 @@
 
 Downstream implementations are conformant only when module contracts and verification thresholds are both satisfied.
 
+The current canonical candidate is **1.0.0-rc.3**. Apply the repository's [explicit normative reconciliation](https://github.com/flynn33/ASH-Pattern-System/blob/main/PUBLIC-SPECIFICATION-API.md#100-rc3-normative-reconciliation) for older conflicting clauses. Structural normalization preserves every well-formed realm; operational health needs validated context; topology is structural; fallback ordering follows the declared policy definitions. Unaffected module and invariant requirements remain mandatory.
+
 ## Required Semantic Modules
 
 | Module | Contract file |

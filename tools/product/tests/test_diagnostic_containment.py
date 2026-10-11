@@ -85,6 +85,33 @@ class DiagnosticRequirementsTests(unittest.TestCase):
             record["diagnostic_id"] = contract.identity(record)
             self.assertTrue(contract.record_errors(record), key)
 
+    def test_machine_schema_itself_rejects_blank_explanations(self):
+        schema = aps_product.schema_for("diagnostic-envelope")
+        for field, value in (("subject_reference", " \t"), ("summary", " \n"),
+                             ("summary", "two\nlines"), ("notes", []),
+                             ("notes", [""]), ("notes", [" \t\r\n"]),
+                             ("notes", ["\u00a0\u2003"])):
+            record = independent_record()
+            record[field] = value
+            projection = contract.wrapper(record, aps_product.PRODUCT_VERSION)
+            self.assertTrue(aps_product.validate_instance(projection, schema, "projection"), field)
+        projection = contract.wrapper(independent_record(), aps_product.PRODUCT_VERSION)
+        self.assertEqual([], aps_product.validate_instance(projection, schema, "projection"))
+
+    def test_rc3_preserves_complete_rc2_semantic_expected_records(self):
+        corrected_baseline = "ea2c6494b0d40bd6975bd210efe33a0cf540812f"
+        for name in ("diagnostics", "diagnostic-chains", "containment", "safe-halt"):
+            relative = f"conformance/1.0/vectors/{name}.jsonl"
+            original = subprocess.check_output(["git", "show", f"{corrected_baseline}:{relative}"], cwd=ROOT, text=True)
+            actual = (ROOT / relative).read_text()
+            baseline_rows = [json.loads(line) for line in original.splitlines()]
+            actual_rows = [json.loads(line) for line in actual.splitlines()]
+            self.assertEqual(len(baseline_rows), len(actual_rows), name)
+            for expected, observed in zip(baseline_rows, actual_rows):
+                self.assertEqual(expected["vector_id"], observed["vector_id"])
+                self.assertEqual(expected["input"], observed["input"])
+                self.assertEqual(expected["expected_output"], observed["expected_output"])
+
     def test_root_and_child_projection_preserve_required_fields(self):
         root = independent_record()
         child = independent_record("RECOVER", "RECOVERY", root)
@@ -224,7 +251,7 @@ class SafetyOutcomeRequirementsTests(unittest.TestCase):
 
 class ImmutableBaselineRequirementsTests(unittest.TestCase):
     def test_product_regeneration_preserves_corrected_authoritative_release_docs(self):
-        documents = ("COMPATIBILITY.md", "MIGRATION-GUIDE.md", "CHANGELOG.md", "RELEASE-NOTES.md", "RELEASE-PROCESS.md")
+        documents = ("PUBLIC-SPECIFICATION-API.md", "COMPATIBILITY.md", "MIGRATION-GUIDE.md", "CHANGELOG.md", "RELEASE-NOTES.md", "RELEASE-PROCESS.md")
         expected = {name: (ROOT / name).read_bytes() for name in documents}
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

@@ -21,7 +21,7 @@ RULE_PATTERN = "^ASH-(?:INPUT|STATE|CODEWORD|ORBIT|REALM|TRANSITION|TOPOLOGY|AXI
 
 
 def record_schema() -> dict[str, Any]:
-    text = {"type": "string", "minLength": 1}
+    text = {"type": "string", "minLength": 1, "pattern": r"^[\s\S]*\S[\s\S]*$"}
     diagnostic_id = {"type": "string", "pattern": ID_PATTERN}
     properties = {
         "schema_version": {"type": "string", "const": "1.0"},
@@ -35,7 +35,7 @@ def record_schema() -> dict[str, Any]:
         "chain_root_diagnostic_id": diagnostic_id,
         "sequence_number": {"type": "integer", "minimum": 1},
         "rule_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": RULE_PATTERN}},
-        "summary": text,
+        "summary": {**text, "pattern": r"^[^\r\n]*\S[^\r\n]*$"},
         "notes": {"type": "array", "minItems": 1, "items": text},
         "details": {"type": "object"},
         "occurrence_metadata": {"type": ["object", "null"]},

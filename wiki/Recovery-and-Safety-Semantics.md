@@ -48,6 +48,8 @@ Every stage must emit diagnostics conforming to:
 - Shared envelope (`specs/interfaces/diagnostic-schema.md`)
 - Canonical rule-ID taxonomy (`specs/interfaces/rule-id-taxonomy.md`)
 
+Confirmed containment breach finishes at frozen terminal `SAFE_HALT`. A prevented unauthorized attempt remains `CONTAINED` with a blocked management record. Subsequent calls after halt return the frozen snapshot without adding diagnostics. Machine schemas reject blank explanation fields; identity, causal continuity, and safety ordering require semantic validation in addition to schema checks.
+
 ## References
 
 - `specs/core/state-validity-diagnostics.pseudo.md`

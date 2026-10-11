@@ -1,4 +1,4 @@
-# Diagnostic Schema — canonical specification (1.0.0-rc.2)
+# Diagnostic Schema — canonical specification (1.0.0-rc.3)
 
 ## Shared record and transport envelope
 
@@ -56,6 +56,8 @@ Stages express either a safety phase or an operation label. The explicit safety 
 ## Explanation, details, and occurrence metadata
 
 Summary identifies the condition in one line. Each note explains a condition, action, or disposition; a filler string added solely to satisfy cardinality is nonconformant. `details` holds structured semantic facts such as candidate state, policy, restricted operations, or breach evidence. It is required even when `{}` suffices. Rule IDs follow `rule-id-taxonomy.md`, in evaluation order.
+
+The machine schema requires nonblank subject, summary, and note strings, and a summary without line breaks. It rejects missing, empty, and whitespace-only explanations. Shape validation cannot establish whether an explanation is meaningful; that remains a semantic requirement. Identity and cross-record safety checks also remain separate from schema validation.
 
 `occurrence_metadata` is required and may be null. When present it holds non-semantic timestamp, host, process, or transport facts. Times use strings. Diagnostic JSON values are null, Boolean, Unicode scalar strings, signed 64-bit integers, arrays, or objects with Unicode scalar string keys. Floating-point values and invalid Unicode surrogate strings are prohibited in these records; exact ratios may be represented by integer numerator/denominator objects. This bounds portable canonical serialization without changing mathematical averaging semantics.
 

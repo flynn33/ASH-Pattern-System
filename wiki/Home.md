@@ -2,6 +2,8 @@
 
 The ASH Pattern System repository is the canonical, platform-neutral specification baseline for resilient software semantics.
 
+**Current candidate: 1.0.0-rc.3.** The [public specification API](https://github.com/flynn33/ASH-Pattern-System/blob/main/PUBLIC-SPECIFICATION-API.md) records exact precedence for older conflicting references. Diagnostic schemas reject blank explanations; semantic validation still checks meaningful content, identity, and causal safety chains. Prior release evidence remains historical.
+
 ## Canonical Status Snapshot
 
 | Area | Status |
