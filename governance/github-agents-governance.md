@@ -148,6 +148,8 @@ Checks:
 - prohibited attribution tokens in branch and tag names
 - prohibited attribution tokens in non-grandfathered changed paths
 
+Tag pushes are distinct from newly created branch pushes. They may introduce no commits and supply an empty commit inventory. The checker peels the declared full object SHA to a commit, requires it to agree with the fetched full tag reference and any supplied head commit, and checks that commit's metadata and changed content. Annotated tag messages and tagger identities are also checked. Tag deletion, unavailable objects, malformed references, and target mismatches fail closed. New branch pushes still require an explicit commit inventory; ordinary branch and pull-request ranges retain their existing checks. `.github/scripts/test_gate_workflow_activation.py` exercises these paths with real Git repositories, including prohibited metadata and content.
+
 ### 6. Gate Integrity Agent
 
 **Workflow:** `.github/workflows/gate-integrity.yml`

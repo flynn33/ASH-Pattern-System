@@ -1,4 +1,4 @@
-"""Adversarial activation/hardening tests; existing policy cases remain intact."""
+"""Adversarial activation, hardening, and event tests; policy cases remain intact."""
 import copy
 import json
 import shutil
@@ -99,6 +99,152 @@ class WorkflowActivationTests(unittest.TestCase):
         records.append({"filename": "tools/product/aps_product.py", "status": "modified"})
         reviews = [{"user": {"login": "flynn33"}, "state": "APPROVED", "commit_id": "1" * 40}]
         self.assertFalse(evaluate(records, {"governance-change"}, "governance/activation", "1" * 40, reviews).ok)
+
+
+import contextlib
+import io
+import os
+import subprocess
+from unittest.mock import patch
+
+import no_attribution_check as sentinel
+
+
+class AttributionEventTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="aps-attribution-")
+        self.previous = Path.cwd()
+        os.chdir(self.temporary.name)
+        self.git("init", "-b", "main")
+        self.git("config", "user.name", "Jim Daley")
+        self.git("config", "user.email", "94642455+flynn33@users.noreply.github.com")
+        self.git("config", "commit.gpgsign", "false")
+        self.git("config", "tag.gpgsign", "false")
+        Path("fixture.txt").write_text("Canonical source\n", encoding="utf-8")
+        self.git("add", "fixture.txt")
+        self.git("commit", "-m", "Initial canonical fixture")
+        self.base = self.git("rev-parse", "HEAD")
+        Path("fixture.txt").write_text("Canonical source candidate\n", encoding="utf-8")
+        self.git("commit", "-am", "Update canonical fixture")
+        self.head = self.git("rev-parse", "HEAD")
+        self.git("tag", "-a", "v1.0.0-rc.2", "-m", "Canonical candidate")
+        self.tag_object = self.git("rev-parse", "v1.0.0-rc.2")
+        self.environment = patch.dict(os.environ, {
+            "GITHUB_EVENT_NAME": "push", "GITHUB_REF_NAME": "v1.0.0-rc.2",
+            "GITHUB_SHA": self.head, "GITHUB_EVENT_PATH": "",
+        })
+        self.environment.start()
+
+    def tearDown(self):
+        self.environment.stop()
+        os.chdir(self.previous)
+        self.temporary.cleanup()
+
+    @staticmethod
+    def git(*args):
+        return subprocess.check_output(["git", *args], stderr=subprocess.STDOUT, text=True).strip()
+
+    def event(self, **changes):
+        return {"before": sentinel.ZERO_SHA, "after": self.head,
+                "ref": "refs/tags/v1.0.0-rc.2", "created": True, "deleted": False,
+                "commits": [], "head_commit": {"id": self.head}, **changes}
+
+    def run_event(self, event):
+        path = Path("event.json")
+        path.write_text(json.dumps(event), encoding="utf-8")
+        with patch.dict(os.environ, {"GITHUB_EVENT_PATH": str(path)}), contextlib.redirect_stdout(io.StringIO()) as output:
+            result = sentinel.main()
+        return result, output.getvalue()
+
+    def test_normal_branch_range_is_unchanged(self):
+        selector = sentinel.commit_selector("push", {"before": self.base, "after": self.head, "ref": "refs/heads/main"})
+        self.assertEqual(f"{self.base}..{self.head}", selector)
+        self.assertEqual([self.head], sentinel.commits(selector))
+
+    def test_new_branch_requires_explicit_inventory(self):
+        event = self.event(ref="refs/heads/release/candidate", commits=[{"id": self.head}])
+        self.assertEqual([self.head], sentinel.commit_selector("push", event))
+
+    def test_empty_new_branch_still_fails_closed(self):
+        with self.assertRaises(sentinel.AttributionError):
+            sentinel.commit_selector("push", self.event(ref="refs/heads/release/candidate"))
+
+    def test_pull_request_range_is_unchanged(self):
+        event = {"pull_request": {"base": {"sha": self.base}, "head": {"sha": self.head}}}
+        self.assertEqual(f"{self.base}..{self.head}", sentinel.commit_selector("pull_request", event))
+
+    def test_annotated_tag_with_commit_after_and_empty_inventory(self):
+        event = self.event()
+        self.assertEqual([self.head], sentinel.commit_selector("push", event))
+        self.assertEqual({"fixture.txt"}, sentinel.changed_files([self.head]))
+        self.assertEqual(0, self.run_event(event)[0])
+
+    def test_annotated_tag_object_is_peeled_before_selection(self):
+        event = self.event(after=self.tag_object)
+        self.assertNotEqual(self.head, self.tag_object)
+        self.assertEqual([self.head], sentinel.commit_selector("push", event))
+        self.assertEqual(0, self.run_event(event)[0])
+
+    def test_lightweight_tag_uses_same_target_checks(self):
+        self.git("tag", "v1.0.0-lightweight")
+        event = self.event(ref="refs/tags/v1.0.0-lightweight", head_commit=None)
+        self.assertEqual([self.head], sentinel.commit_selector("push", event))
+        self.assertEqual(0, self.run_event(event)[0])
+
+    def test_wrong_tag_target_fails_closed(self):
+        with self.assertRaises(sentinel.AttributionError):
+            sentinel.commit_selector("push", self.event(after=self.base))
+
+    def test_wrong_head_commit_fails_closed(self):
+        with self.assertRaises(sentinel.AttributionError):
+            sentinel.commit_selector("push", self.event(head_commit={"id": self.base}))
+
+    def test_unavailable_tag_fails_closed(self):
+        with self.assertRaises(sentinel.AttributionError):
+            sentinel.commit_selector("push", self.event(ref="refs/tags/unavailable"))
+
+    def test_deleted_tag_never_qualifies_publication(self):
+        for changes in ({"deleted": True}, {"after": sentinel.ZERO_SHA}):
+            with self.subTest(changes=changes), self.assertRaises(sentinel.AttributionError):
+                sentinel.commit_selector("push", self.event(**changes))
+
+    def test_non_sha_target_and_invalid_tag_ref_fail_closed(self):
+        for changes in ({"after": "HEAD"}, {"after": "-1"}, {"ref": "refs/tags/invalid name"}):
+            with self.subTest(changes=changes), self.assertRaises(sentinel.AttributionError):
+                sentinel.commit_selector("push", self.event(**changes))
+
+    def test_annotated_tag_metadata_is_checked(self):
+        self.git("tag", "-a", "v1.0.0-prohibited", "-m", "Created using " + "Open" + "AI")
+        event = self.event(ref="refs/tags/v1.0.0-prohibited")
+        result, output = self.run_event(event)
+        self.assertEqual(1, result)
+        self.assertIn("annotated tag metadata", output)
+
+    def test_target_commit_metadata_is_checked(self):
+        Path("fixture.txt").write_text("Another fixture\n", encoding="utf-8")
+        self.git("commit", "-am", "Created using " + "Open" + "AI")
+        target = self.git("rev-parse", "HEAD")
+        self.git("tag", "v1.0.0-target-check")
+        result, output = self.run_event(self.event(after=target, ref="refs/tags/v1.0.0-target-check", head_commit={"id": target}))
+        self.assertEqual(1, result)
+        self.assertIn("commit metadata", output)
+
+    def test_tag_name_is_checked(self):
+        name = "v1.0.0-" + "ai"
+        self.git("tag", name)
+        with patch.dict(os.environ, {"GITHUB_REF_NAME": name}):
+            result, output = self.run_event(self.event(ref="refs/tags/" + name))
+        self.assertEqual(1, result)
+        self.assertIn("ref name", output)
+
+    def test_target_content_is_checked(self):
+        Path("fixture.txt").write_text("Created using " + "Open" + "AI\n", encoding="utf-8")
+        self.git("commit", "-am", "Change fixture contents")
+        target = self.git("rev-parse", "HEAD")
+        self.git("tag", "v1.0.0-content-check")
+        result, output = self.run_event(self.event(after=target, ref="refs/tags/v1.0.0-content-check", head_commit={"id": target}))
+        self.assertEqual(1, result)
+        self.assertIn("file content", output)
 
 
 if __name__ == "__main__":
