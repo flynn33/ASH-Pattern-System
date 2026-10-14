@@ -1,5 +1,7 @@
 # Notice
 
-ASH Pattern System. Copyright (c) 2026 James Daley. All rights reserved.
+ASH Pattern System.
 
-Dual-licensed. Non-commercial, academic, and personal use is free. Commercial use requires a separate written license. See LICENSE for the applicable terms.
+Copyright (c) 2026 James Daley, Raven Forge Software.
+
+Licensed under the MIT License. See LICENSE.

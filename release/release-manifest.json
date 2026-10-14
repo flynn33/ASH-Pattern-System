@@ -947,7 +947,7 @@
     }
   ],
   "included_file_count": 188,
-  "license": "LicenseRef-ASH-Pattern-System-Personal-Academic",
+  "license": "MIT",
   "product_identifier": "aps",
   "product_name": "ASH Pattern System",
   "release_gate_results": {

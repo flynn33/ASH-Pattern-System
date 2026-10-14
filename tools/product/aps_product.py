@@ -24,7 +24,7 @@ from tools.product import diagnostic_contract
 
 PRODUCT_NAME = "ASH Pattern System"
 PRODUCT_IDENTIFIER = "aps"
-PRODUCT_LICENSE = "LicenseRef-RavenForge-Dual"
+PRODUCT_LICENSE = "MIT"
 PRODUCT_VERSION = "1.0.0-rc.3"
 SCHEMA_VERSION = "1.0"
 CANONICAL_DATA_VERSION = "1.0"
@@ -1042,10 +1042,10 @@ def build_root_documents(root: Path, source_commit: str) -> None:
         "NORMATIVE-ARTIFACT-INDEX.md": "# Normative Artifact Index\n\nThe machine-readable index lives at `canonical-data/1.0/normative-artifact-index.json`.\n",
         "NOTICE.md": (Path(__file__).resolve().parents[2] / "NOTICE.md").read_text(encoding="utf-8"),
         "SECURITY.md": "# Security Policy\n\nReport vulnerabilities through the repository private security advisory mechanism or an owner-confirmed private contact before public disclosure.\n",
-        "SUPPORT.md": "# Support Policy\n\nSupported requests include specification defects, conformance questions, security reports, and commercial licensing inquiries. Downstream implementation defects belong to their implementation repository.\n",
+        "SUPPORT.md": "# Support Policy\n\nSupported requests include specification defects, conformance questions, security reports, and questions about the MIT License. Downstream implementation defects belong to their implementation repository.\n",
         "CONTRIBUTING.md": "# Contributing\n\nContributions must preserve canonical APS semantics, include verification evidence, respect compatibility policy, and avoid platform implementation code in this canonical repository.\n",
         "CODE_OF_CONDUCT.md": "# Code of Conduct\n\nParticipation requires professional, respectful collaboration. Report conduct issues through an owner-confirmed repository contact.\n",
-        "CITATION.cff": f"cff-version: 1.2.0\nmessage: \"If you use this specification, cite it as below.\"\ntitle: \"ASH Pattern System\"\nauthors:\n  - family-names: \"Daley\"\n    given-names: \"James\"\nversion: \"{PRODUCT_VERSION}\"\nrepository-code: \"https://github.com/flynn33/ASH-Pattern-System\"\n# Dual license is not an SPDX identifier. See LICENSE.\n",
+        "CITATION.cff": f"cff-version: 1.2.0\nmessage: \"If you use this specification, cite it as below.\"\ntitle: \"ASH Pattern System\"\nauthors:\n  - family-names: \"Daley\"\n    given-names: \"James\"\nversion: \"{PRODUCT_VERSION}\"\nrepository-code: \"https://github.com/flynn33/ASH-Pattern-System\"\nlicense: MIT\n",
     }
     for relative, text in documents.items():
         path = root / relative

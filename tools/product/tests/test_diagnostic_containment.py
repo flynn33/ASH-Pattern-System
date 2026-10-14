@@ -264,10 +264,11 @@ class ImmutableBaselineRequirementsTests(unittest.TestCase):
 
     def test_license_metadata_matches_existing_terms_without_reintroducing_removed_file(self):
         current_license = (ROOT / "LICENSE").read_bytes()
-        self.assertIn(b"Dual License", current_license)
-        self.assertEqual("LicenseRef-RavenForge-Dual", json.loads((ROOT / "product-manifest.json").read_text())["license"])
+        self.assertIn(b"MIT License", current_license)
+        self.assertIn(b"James Daley, Raven Forge Software", current_license)
+        self.assertEqual("MIT", json.loads((ROOT / "product-manifest.json").read_text())["license"])
         citation = (ROOT / "CITATION.cff").read_text()
-        self.assertIn("Dual license is not an SPDX identifier", citation)
+        self.assertIn("license: MIT", citation)
         self.assertNotIn("Apache-2.0", citation)
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
@@ -276,14 +277,14 @@ class ImmutableBaselineRequirementsTests(unittest.TestCase):
             self.assertEqual((ROOT / "NOTICE.md").read_bytes(), (root / "NOTICE.md").read_bytes())
             self.assertNotIn("Commercial licensing requires separate written permission", (root / "NOTICE.md").read_text())
             self.assertFalse((root / "LICENSE.md").exists())
-            self.assertEqual("LicenseRef-RavenForge-Dual", json.loads((root / "product-manifest.json").read_text())["license"])
+            self.assertEqual("MIT", json.loads((root / "product-manifest.json").read_text())["license"])
             generated_citation = (root / "CITATION.cff").read_text()
-            self.assertIn("Dual license is not an SPDX identifier", generated_citation)
+            self.assertIn("license: MIT", generated_citation)
             self.assertNotIn("Apache-2.0", generated_citation)
             archive = aps_product.build_release_archive(root, root / "license-fixture.zip")
             try:
                 release = aps_product.release_manifest(root, archive, source_commit="1" * 40)
-                self.assertEqual("LicenseRef-RavenForge-Dual", release["license"])
+                self.assertEqual("MIT", release["license"])
                 with zipfile.ZipFile(archive["archive"]) as package:
                     self.assertEqual((ROOT / "NOTICE.md").read_bytes(), package.read("NOTICE.md"))
                     self.assertEqual(current_license, package.read("LICENSE"))
