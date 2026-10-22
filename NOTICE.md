@@ -3,13 +3,15 @@
 ASH Pattern System
 Copyright (c) 2026 James Daley, Raven Forge Software
 
-This product includes ASH Pattern System, developed by James Daley, Raven Forge Software.
+You must give credit to James Daley, Raven Forge Software, for the ASH Pattern System.
+
+This project is licensed under the Apache License, Version 2.0.
+You may use, modify, and distribute it, including for commercial purposes.
+The copyright stays with James Daley, Raven Forge Software.
+
+Any copy, modification, or product that uses this work must:
+- give credit to James Daley, Raven Forge Software, for the ASH Pattern System
+- keep this notice, the LICENSE, and the copyright lines in the source
+- state the changes you make
+
 Source: https://github.com/flynn33/ASH-Pattern-System
-
-You may use, modify, and distribute this project, including for
-commercial purposes, under the Apache License, Version 2.0. The
-copyright stays with James Daley, Raven Forge Software.
-
-Redistributions must retain this notice and the copyright and
-attribution notices in the source, and must state changes, so
-provenance remains credited to James Daley, Raven Forge Software for this project.

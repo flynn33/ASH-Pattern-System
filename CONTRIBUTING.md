@@ -1,6 +1,8 @@
 # Contributing
 
-This repository is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE).
+This repository is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+
+You must give credit to James Daley, Raven Forge Software, for the ASH Pattern System.
 
 You are welcome to use, study, modify, and distribute the code under the terms of that license.
 
