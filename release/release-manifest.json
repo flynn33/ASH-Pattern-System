@@ -157,8 +157,8 @@
     },
     {
       "path": "NOTICE.md",
-      "sha256": "1b98e81a8a13890698b8201bf9c66aeab35f4c67afb641888c8cd45f836c1f0c",
-      "size_bytes": 143
+      "sha256": "8ab96005f35ed89ab5c4be60f0d1f5dc16e07443599abe1ae91da48e4937a61a",
+      "size_bytes": 620
     },
     {
       "path": "PRODUCT-STATUS.md",
@@ -947,7 +947,7 @@
     }
   ],
   "included_file_count": 188,
-  "license": "MIT",
+  "license": "Apache-2.0",
   "product_identifier": "aps",
   "product_name": "ASH Pattern System",
   "release_gate_results": {

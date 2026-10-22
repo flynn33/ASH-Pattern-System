@@ -4,7 +4,7 @@
   "conformance_corpus_version": "1.0",
   "copyright_holder": "James Daley",
   "hashes": {},
-  "license": "MIT",
+  "license": "Apache-2.0",
   "product_identifier": "aps",
   "product_name": "ASH Pattern System",
   "release_tag": "v1.0.0-rc.3",
